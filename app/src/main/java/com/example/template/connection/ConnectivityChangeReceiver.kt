@@ -3,14 +3,22 @@ package com.example.template.connection
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.widget.Toast
 
 class ConnectivityChangeReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        println("*** Action: " + intent.action)
-//        if (intent.action.equals("android.net.conn.CONNECTIVITY_CHANGE", ignoreCase = true)) {
-//            Toast.makeText(context, "Connection changed", Toast.LENGTH_SHORT).show()
-//        }
+        if (ConnectivityManager.EXTRA_NETWORK == intent.action) {
+            val noConnectivity = intent.getBooleanExtra(
+                ConnectivityManager.EXTRA_NO_CONNECTIVITY, false
+            )
+            if (noConnectivity) {
+                Toast.makeText(context, "disconnected", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(context, "connected", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
 }
