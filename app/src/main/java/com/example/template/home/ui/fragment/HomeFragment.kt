@@ -4,6 +4,7 @@ import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import com.example.template.R
 import com.example.template.core.util.Resource
 import com.example.template.home.ui.viewmodel.HomeViewModel
