@@ -7,11 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.example.template.core.util.Resource
 import com.example.template.home.data.repository.HomeRepository
 import com.example.template.home.data.servicemodels.UserRes
+import com.example.template.home.domain.GetUserUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class HomeViewModel @ViewModelInject constructor(private val homeRepository: HomeRepository) :
+class HomeViewModel @ViewModelInject constructor(private val userUseCase: GetUserUseCase) :
     ViewModel() {
     init {
         getUsers(1)
@@ -19,9 +20,9 @@ class HomeViewModel @ViewModelInject constructor(private val homeRepository: Hom
 
      val userResResponse = MutableLiveData<Resource<UserRes>>()
 
-    fun getUsers(page: Int) = viewModelScope.launch(Dispatchers.IO) {
+    private fun getUsers(page: Int) = viewModelScope.launch(Dispatchers.IO) {
         userResResponse.postValue(Resource.Loading())
-        val result = homeRepository.getUsers(page)
+        val result = userUseCase.getUsers(page)
         userResResponse.postValue(result)
     }
 
