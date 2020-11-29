@@ -7,7 +7,8 @@ import javax.inject.Inject
 
 
 class HomeRemote @Inject constructor(private val userDataSource: UserDataSource) {
-    suspend fun getUsers(page: Int) : Resource<UserRes> {
+    suspend fun getUsers(page: Int): Resource<UserRes> {
         return safeApiCall { userDataSource.getUsers() }
+
     }
 }
