@@ -1,9 +1,10 @@
 package com.example.template
 
 import android.util.Log
-import com.example.template.feature1.data.servicemodels.Ad
-import com.example.template.feature1.data.servicemodels.Data
-import com.example.template.feature1.data.servicemodels.UserRes
+import com.example.template.home.data.remote.UserDataSource
+import com.example.template.home.data.servicemodels.Ad
+import com.example.template.home.data.servicemodels.Data
+import com.example.template.home.data.servicemodels.UserRes
 import retrofit2.Response
 import retrofit2.Retrofit
 
