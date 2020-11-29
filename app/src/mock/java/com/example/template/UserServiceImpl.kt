@@ -7,7 +7,7 @@ import com.example.template.feature1.data.servicemodels.UserRes
 import retrofit2.Response
 import retrofit2.Retrofit
 
-class UserServiceImpl(private val retrofit: Retrofit) : UserService {
+class UserServiceImpl(private val retrofit: Retrofit) : UserDataSource {
 
     private var stuff : Response<UserRes>
     init {

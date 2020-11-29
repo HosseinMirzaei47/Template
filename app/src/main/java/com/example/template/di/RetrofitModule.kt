@@ -1,7 +1,7 @@
 package com.example.template.di
 
-import com.example.template.home.data.remote.UserService
-import com.example.template.UserServiceImpl
+import com.example.template.home.data.remote.UserDataSource
+import com.example.template.UserDataSourceImpl
 import com.example.template.core.util.Constants.BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -47,5 +47,5 @@ object RetrofitModule {
 
     @Singleton
     @Provides
-    fun provideDemoServiceApi(retrofit: Retrofit) : UserService = UserServiceImpl(retrofit)
+    fun provideDemoServiceApi(retrofit: Retrofit) : UserDataSource = UserDataSourceImpl(retrofit)
 }

@@ -6,8 +6,8 @@ import com.example.template.home.data.servicemodels.UserRes
 import javax.inject.Inject
 
 
-class HomeRemote @Inject constructor(private val userService: UserService) {
+class HomeRemote @Inject constructor(private val userDataSource: UserDataSource) {
     suspend fun getUsers(page: Int) : Resource<UserRes> {
-        return safeApiCall { userService.getUsers() }
+        return safeApiCall { userDataSource.getUsers() }
     }
 }
