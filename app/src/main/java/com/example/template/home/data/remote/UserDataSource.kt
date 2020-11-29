@@ -4,5 +4,5 @@ import com.example.template.home.data.servicemodels.UserRes
 import retrofit2.Response
 
 interface UserDataSource {
-   suspend fun getUsers() : Response<UserRes>
+   suspend fun getUsers(page: Int): Response<UserRes>
 }
