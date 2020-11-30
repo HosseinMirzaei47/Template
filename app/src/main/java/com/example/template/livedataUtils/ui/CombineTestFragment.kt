@@ -1,7 +1,6 @@
 package com.example.template.livedataUtils.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,5 +15,13 @@ class CombineTestFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         return inflater.inflate(R.layout.fragment_comibine_test, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val combineTestViewModel = ViewModelProvider(this).get(CombineTestViewModel::class.java)
+
+
     }
 }

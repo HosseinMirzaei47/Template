@@ -8,9 +8,15 @@ import com.example.template.livedataUtils.data.Resource
 class CombineTestViewModel :
     ViewModel() {
 
-    val list = mutableListOf<MutableLiveData<Resource<Any>>>()
+    private var list = mutableListOf<MutableLiveData<Resource<Any>>>()
+    var live1 = MutableLiveData<Resource<String>>()
+    var live2 = MutableLiveData<Resource<String>>()
+    var mediator: Combiner
 
-    fun test() {
-        val a = Combiner(list)
+    init {
+        list.add(live1)
+        mediator = Combiner(list)
     }
+
+
 }
