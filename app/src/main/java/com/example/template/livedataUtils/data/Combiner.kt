@@ -16,7 +16,7 @@ class Combiner(private val lives: MutableList<MutableLiveData<Resource<Any>>>) {
     }
 
     private fun checkAll() {
-        isLoading.value = !lives.any {
+        isLoading.value = lives.any {
             it.value?.status == Status.LOADING
         }
     }
