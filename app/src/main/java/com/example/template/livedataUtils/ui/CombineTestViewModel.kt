@@ -30,23 +30,23 @@ class CombineTestViewModel :
         list2.add(live4 as MutableLiveData<Resource<Any>>)
         combiner = Combiner(list1)
         combiner2 = Combiner(list2)
-        list3.add(combiner.isLoading)
-        list3.add(combiner2.isLoading)
+        list3.add(combiner.result)
+        list3.add(combiner2.result)
         combiner3 = Combiner(list3)
     }
 
     fun liveChange1(text: String) {
         viewModelScope.launch {
             live1.postValue(Resource(Status.LOADING, "", "before delay"))
-            delay(7000)
-            live1.postValue(Resource(Status.SUCCESS, text, "after delay"))
+            delay(10000)
+            live1.postValue(Resource(Status.ERROR, text, "after delay"))
         }
     }
 
     fun liveChange2(text: String) {
         viewModelScope.launch {
             live2.value = Resource(Status.LOADING, "", "before delay")
-            delay(7000)
+            delay(10000)
             live2.value = Resource(Status.SUCCESS, text, "after delay")
         }
     }
@@ -54,7 +54,7 @@ class CombineTestViewModel :
     fun liveChange3(text: String) {
         viewModelScope.launch {
             live3.postValue(Resource(Status.LOADING, "", "before delay"))
-            delay(7000)
+            delay(10000)
             live3.postValue(Resource(Status.SUCCESS, text, "after delay"))
         }
     }
@@ -62,8 +62,8 @@ class CombineTestViewModel :
     fun liveChange4(text: String) {
         viewModelScope.launch {
             live4.value = Resource(Status.LOADING, "", "before delay")
-            delay(7000)
-            live4.value = Resource(Status.SUCCESS, text, "after delay")
+            delay(10000)
+            live4.value = Resource(Status.ERROR, text, "after delay")
         }
     }
 

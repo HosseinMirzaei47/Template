@@ -15,6 +15,8 @@ import kotlinx.android.synthetic.main.fragment_comibine_test.*
 
 class CombineTestFragment : Fragment() {
 
+    var isError = false
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -35,11 +37,12 @@ class CombineTestFragment : Fragment() {
 
         test_btn_2.setOnClickListener {
             combineTestViewModel.liveChange2(et_test_2.text.toString())
-
         }
 
         combineTestViewModel.live1.observe(viewLifecycleOwner, {
             if (it.status == Status.SUCCESS) {
+                Toast.makeText(requireContext(), it.data, Toast.LENGTH_SHORT).show()
+            } else if (it.status == Status.ERROR) {
                 Toast.makeText(requireContext(), it.data, Toast.LENGTH_SHORT).show()
             }
         })
@@ -47,10 +50,12 @@ class CombineTestFragment : Fragment() {
         combineTestViewModel.live2.observe(viewLifecycleOwner, {
             if (it.status == Status.SUCCESS) {
                 Toast.makeText(requireContext(), it.data, Toast.LENGTH_SHORT).show()
+            } else if (it.status == Status.ERROR) {
+                Toast.makeText(requireContext(), it.data, Toast.LENGTH_SHORT).show()
             }
         })
 
-        val loading: MediatorLiveData<Resource<Any>> = combineTestViewModel.combiner.isLoading
+        val loading: MediatorLiveData<Resource<Any>> = combineTestViewModel.combiner.result
         loading.observe(viewLifecycleOwner, {
             if (it.status == Status.LOADING) {
                 test_progress.visibility = View.VISIBLE
@@ -72,16 +77,20 @@ class CombineTestFragment : Fragment() {
         combineTestViewModel.live3.observe(viewLifecycleOwner, {
             if (it.status == Status.SUCCESS) {
                 Toast.makeText(requireContext(), it.data, Toast.LENGTH_SHORT).show()
+            } else if (it.status == Status.ERROR) {
+                Toast.makeText(requireContext(), it.data, Toast.LENGTH_SHORT).show()
             }
         })
 
         combineTestViewModel.live4.observe(viewLifecycleOwner, {
             if (it.status == Status.SUCCESS) {
                 Toast.makeText(requireContext(), it.data, Toast.LENGTH_SHORT).show()
+            } else if (it.status == Status.ERROR) {
+                Toast.makeText(requireContext(), it.data, Toast.LENGTH_SHORT).show()
             }
         })
 
-        val loading2: MediatorLiveData<Resource<Any>> = combineTestViewModel.combiner2.isLoading
+        val loading2: MediatorLiveData<Resource<Any>> = combineTestViewModel.combiner2.result
         loading2.observe(viewLifecycleOwner, {
             if (it.status == Status.LOADING) {
                 test_progress_2.visibility = View.VISIBLE
@@ -92,14 +101,28 @@ class CombineTestFragment : Fragment() {
 
         // ************************************ Total ***********************************************
 
-        val loading3: MediatorLiveData<Resource<Any>> = combineTestViewModel.combiner3.isLoading
+        val loading3: MediatorLiveData<Resource<Any>> = combineTestViewModel.combiner3.result
         loading3.observe(viewLifecycleOwner, {
-            if (it.status == Status.LOADING) {
-                test_progress_3.visibility = View.VISIBLE
-                layout_fade.visibility = View.VISIBLE
-            } else {
-                test_progress_3.visibility = View.INVISIBLE
-                layout_fade.visibility = View.INVISIBLE
+            when (it.status) {
+                Status.LOADING -> {
+                    if (!isError) {
+                        test_progress_3.visibility = View.VISIBLE
+                        layout_fade.visibility = View.VISIBLE
+                    }
+                }
+                Status.ERROR -> {
+                    isError = true
+                    test_progress_3.visibility = View.INVISIBLE
+                    tv_error.visibility = View.VISIBLE
+                    layout_fade.visibility = View.INVISIBLE
+                    Toast.makeText(requireContext(), it.data.toString(), Toast.LENGTH_SHORT).show()
+                }
+                else -> {
+                    isError = false
+                    test_progress_3.visibility = View.INVISIBLE
+                    tv_error.visibility = View.INVISIBLE
+                    layout_fade.visibility = View.INVISIBLE
+                }
             }
         })
 
