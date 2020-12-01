@@ -5,7 +5,7 @@ import androidx.lifecycle.MutableLiveData
 
 class Combiner(private val lives: MutableList<MutableLiveData<Resource<Any>>>) {
 
-    var isLoading = MediatorLiveData<Boolean>()
+    var isLoading = MediatorLiveData<Resource<Any>>()
 
     init {
         lives.forEach { myLive ->
@@ -16,8 +16,14 @@ class Combiner(private val lives: MutableList<MutableLiveData<Resource<Any>>>) {
     }
 
     private fun checkAll() {
-        isLoading.value = lives.any {
+        val loading = lives.any {
             it.value?.status == Status.LOADING
         }
+        if (loading) {
+            isLoading.postValue(Resource(Status.LOADING, null, null))
+        } else {
+            isLoading.postValue(Resource(Status.SUCCESS, null, null))
+        }
+
     }
 }
