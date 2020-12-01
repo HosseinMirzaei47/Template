@@ -54,7 +54,7 @@ class HomeFragment : Fragment() {
             .setNegativeButton("Cancel") { _, _ ->
             }
             .setPositiveButton("Retry") { _, _ ->
-
+                viewModel.users.retry()
             }
             .show()
     }
