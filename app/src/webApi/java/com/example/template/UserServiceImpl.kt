@@ -7,9 +7,9 @@ import retrofit2.Response
 import retrofit2.Retrofit
 
 class UserServiceImpl(private val retrofit: Retrofit) : UserDataSource {
-    private val api=retrofit.create(HomeApi::class.java)
+    private val api = retrofit.create(HomeApi::class.java)
 
-    override suspend fun getUsers(): Response<UserRes>{
-        return api.getUsers(1)
+    override suspend fun getUsers(page: Int): Response<UserRes> {
+        return api.getUsers(page)
     }
 }

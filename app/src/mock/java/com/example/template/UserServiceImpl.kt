@@ -1,26 +1,55 @@
 package com.example.template
 
-import android.util.Log
 import com.example.template.home.data.remote.UserDataSource
 import com.example.template.home.data.servicemodels.Ad
 import com.example.template.home.data.servicemodels.Data
 import com.example.template.home.data.servicemodels.UserRes
+import kotlinx.coroutines.delay
 import retrofit2.Response
 import retrofit2.Retrofit
 
 class UserServiceImpl(private val retrofit: Retrofit) : UserDataSource {
 
-    private var stuff : Response<UserRes>
+    private var stuff: Response<UserRes>
+
     init {
-        val dataList = mutableListOf<Data>(
-            Data(id = 0, avatar = "", email = "", first_name= "Amir", last_name = "R"),
-            Data(id = 1, avatar = "", email = "", first_name= "Amir", last_name = "RR"),
-            Data(id = 2, avatar = "", email = "", first_name= "Amir", last_name = "RRR"),
+        val dataList = mutableListOf(
+            Data(
+                id = 0,
+                avatar = "https://api.time.com/wp-content/uploads/2019/07/jennifer-lopez-birthday-party.jpg",
+                email = "jenniferlopez@gmail.com",
+                first_name = "Jennifer",
+                last_name = "Lopez"
+            ),
+            Data(
+                id = 1,
+                avatar = "https://i.pinimg.com/originals/ae/38/4a/ae384a97f1fc3bbd1767e0e2561a7740.jpg",
+                email = "shakira@gmail.com",
+                first_name = "Shakira",
+                last_name = "Khanoom"
+            ),
+            Data(
+                id = 2,
+                avatar = "https://mcmscache.epapr.in/post_images/website_13/post_16913054/thumb.jpg",
+                email = "scarlettjohansson@gmail.com",
+                first_name = "Scarlett",
+                last_name = "Johansson"
+            ),
         )
-        stuff = Response.success(UserRes(ad = Ad("", "part", ""), dataList, 0, 0, 0, 0))
+        stuff = Response.success(
+            UserRes(
+                ad = Ad("partsoftware", "part", "partsoftware.com"),
+                dataList,
+                0,
+                0,
+                0,
+                0
+            )
+        )
     }
 
-    override suspend fun getUsers(): Response<UserRes> {
+    override suspend fun getUsers(page: Int): Response<UserRes> {
+        delay(3000)
         return stuff
     }
 }
