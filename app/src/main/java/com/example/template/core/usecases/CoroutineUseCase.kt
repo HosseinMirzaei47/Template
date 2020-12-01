@@ -1,11 +1,13 @@
 package com.example.template.core.usecases
 
 import com.example.template.core.Result
+import com.example.template.core.util.NetworkStatusCode.STATUS_CONNECTION_LOST
 import com.example.template.core.util.readServerError
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
+import java.io.IOException
 
 abstract class CoroutineUseCase<in P, R>(private val coroutineDispatcher: CoroutineDispatcher) {
 
@@ -23,6 +25,8 @@ abstract class CoroutineUseCase<in P, R>(private val coroutineDispatcher: Corout
                 e
             }
             Result.Error(parsedError.message!!)
+        } catch (e: IOException) {
+            Result.Error(e.message!!, STATUS_CONNECTION_LOST)
         } catch (e: Exception) {
             Result.Error(e.message!!)
         }

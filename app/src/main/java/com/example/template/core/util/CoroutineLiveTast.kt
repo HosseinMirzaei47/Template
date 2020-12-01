@@ -1,7 +1,12 @@
 package com.example.template.core.util
 
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.MediatorLiveData
+import com.example.template.core.EventTask
+import com.example.template.core.MyApp.Companion.connectionLiveData
+import com.example.template.core.MyApp.Companion.loggerTasks
 import com.example.template.core.Result
+import com.example.template.core.util.NetworkStatusCode.STATUS_CONNECTION_LOST
+import com.example.template.core.withError
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -19,12 +24,25 @@ class CoroutineLiveTask<T>(
     private val context: CoroutineContext = EmptyCoroutineContext,
     private val timeoutInMs: Long = DEFAULT_TIMEOUT,
     val block: suspend LiveTaskScope<T>.() -> Unit,
-) : MutableLiveData<Result<T>>() {
+) : MediatorLiveData<Result<T>>() {
 
     private var blockRunner: TaskRunner<T>? = null
 
     init {
         initBlockRunner()
+
+        this.addSource(this) {
+            if (it is Result.Error) {
+                it.withError(
+                    onError = { message: String, code: Int ->
+                        if (code == STATUS_CONNECTION_LOST) {
+                            loggerTasks.postValue(EventTask(message))
+                            retryOnNetworkBack()
+                        }
+                    }
+                )
+            }
+        }
     }
 
     private fun initBlockRunner() {
@@ -40,6 +58,15 @@ class CoroutineLiveTask<T>(
         }
     }
 
+    private fun retryOnNetworkBack() {
+        this.addSource(connectionLiveData) {
+            if (it) {
+                retry()
+            }
+        }
+    }
+
+
     override fun onActive() {
         super.onActive()
         blockRunner?.maybeRun()
@@ -51,6 +78,7 @@ class CoroutineLiveTask<T>(
     }
 
     fun retry() {
+        this.removeSource(connectionLiveData)
         initBlockRunner()
         blockRunner?.maybeRun()
     }
@@ -83,7 +111,6 @@ internal class TaskRunner<T>(
             onDone()
         }
     }
-
 
     fun cancel() {
         if (cancellationJob != null) {

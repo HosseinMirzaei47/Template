@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import com.example.template.core.Result
+import com.example.template.core.util.NetworkStatusCode
 import com.example.template.core.withResult
 import com.example.template.databinding.FragmentHomeBinding
 import com.example.template.home.data.servicemodels.UserRes
@@ -38,13 +40,19 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.users.observe(viewLifecycleOwner, usersObserver)
+
     }
 
     private val usersObserver = Observer<Result<UserRes>> {
         it.withResult(
-            onSuccess = { showDialog() },
+            onSuccess = { userRes ->
+                Toast.makeText(requireContext(), "$userRes", Toast.LENGTH_SHORT).show()
+            },
             onLoading = {},
-            onError = { showDialog() }
+            onError = { _, code ->
+                if (code != NetworkStatusCode.STATUS_CONNECTION_LOST)
+                    showDialog()
+            }
         )
     }
 
