@@ -21,6 +21,7 @@ class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     private val viewModel: HomeViewModel by viewModels()
 
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -35,6 +36,7 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.users.observe(viewLifecycleOwner, usersObserver)
@@ -42,7 +44,7 @@ class HomeFragment : Fragment() {
 
     private val usersObserver = Observer<Result<UserRes>> {
         it.withResult(
-            onSuccess = { showDialog() },
+            onSuccess = {},
             onLoading = {},
             onError = { showDialog() }
         )

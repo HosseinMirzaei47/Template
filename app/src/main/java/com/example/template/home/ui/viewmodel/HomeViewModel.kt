@@ -13,4 +13,5 @@ class HomeViewModel @ViewModelInject constructor(
         emit(Result.Loading)
         emit(userUseCase(1))
     }
+
 }
