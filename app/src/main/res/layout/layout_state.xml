@@ -8,48 +8,51 @@
 
     </data>
 
-    <com.google.android.material.card.MaterialCardView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/cv_result_state"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-
-        android:layoutDirection="rtl"
-        app:cardCornerRadius="8dp"
-        app:cardElevation="4dp">
+        android:background="@android:color/white"
+        android:layoutDirection="rtl">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-
-            <ProgressBar
-                android:id="@+id/pb_load"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-
             <com.google.android.material.textview.MaterialTextView
                 android:id="@+id/tv_status"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="32dp"
                 android:textColor="@color/black"
-                android:textSize="18sp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/pb_load"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Loading" />
+
+            <app.frantic.loadingdots.LoadingDots
+                android:id="@+id/pb_load"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:LoadingDots_auto_play="true"
+                app:LoadingDots_dots_color="@android:color/black"
+                app:LoadingDots_dots_count="3"
+                app:LoadingDots_dots_size="4dp"
+                app:LoadingDots_dots_space="4dp"
+                app:LoadingDots_jump_duration="200"
+                app:LoadingDots_jump_height="4dp"
+                app:LoadingDots_loop_duration="800"
+                app:LoadingDots_loop_start_delay="100"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintBottom_toBottomOf="@+id/tv_status"
+                app:layout_constraintEnd_toStartOf="@+id/tv_status"
+                app:layout_constraintTop_toTopOf="@+id/tv_status" />
 
             <ImageView
                 android:id="@+id/ivBtn_close"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
                 android:scaleType="fitXY"
                 android:src="@drawable/ic_baseline_close_24"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -68,11 +71,10 @@
                 app:layout_constraintStart_toEndOf="@id/ivBtn_close"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_goneMarginStart="16dp"
-
                 />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </com.google.android.material.card.MaterialCardView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
