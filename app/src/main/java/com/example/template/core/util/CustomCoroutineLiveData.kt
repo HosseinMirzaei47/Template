@@ -1,11 +1,12 @@
 package com.example.template.core.util
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.example.template.core.Result
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.experimental.ExperimentalTypeInference
+
 
 internal const val DEFAULT_TIMEOUT = 5000L
 
@@ -19,7 +20,7 @@ class CoroutineLiveTask<T>(
     private val context: CoroutineContext = EmptyCoroutineContext,
     private val timeoutInMs: Long = DEFAULT_TIMEOUT,
     val block: suspend LiveTaskScope<T>.() -> Unit,
-) : MutableLiveData<Result<T>>() {
+) : MutableLiveData<com.example.template.core.Result<T>>() {
 
     private var blockRunner: TaskRunner<T>? = null
 
@@ -53,6 +54,7 @@ class CoroutineLiveTask<T>(
     fun retry() {
         initBlockRunner()
         blockRunner?.maybeRun()
+        Log.d("retry", "retry: done ")
     }
 
     fun cancel() {
@@ -104,14 +106,15 @@ internal class LiveTaskScopeImpl<T>(
     context: CoroutineContext
 ) : LiveTaskScope<T> {
 
-    override val latestValue: Result<T>?
+    override val latestValue: com.example.template.core.Result<T>?
         get() = target.value
 
     private val coroutineContext = context + Dispatchers.Main.immediate
 
-    override suspend fun emit(userUseCase: Result<T>) = withContext(coroutineContext) {
-        target.value = userUseCase
-    }
+    override suspend fun emit(userUseCase: com.example.template.core.Result<T>) =
+        withContext(coroutineContext) {
+            target.value = userUseCase
+        }
 
     override fun retrySexy() {}
 }
@@ -119,7 +122,7 @@ internal class LiveTaskScopeImpl<T>(
 internal typealias Block<T> = suspend LiveTaskScope<T>.() -> Unit
 
 interface LiveTaskScope<T> {
-    val latestValue: Result<T>?
-    suspend fun emit(userUseCase: Result<T>)
+    val latestValue: com.example.template.core.Result<T>?
+    suspend fun emit(userUseCase: com.example.template.core.Result<T>)
     fun retrySexy()
 }

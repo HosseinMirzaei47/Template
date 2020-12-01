@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.databinding.BindingAdapter
 import com.example.template.R
+import com.example.template.core.util.CoroutineLiveTask
 import kotlinx.android.synthetic.main.layout_state.view.*
 
 private const val LOAD_STATE = "loading"
@@ -15,18 +16,20 @@ private const val SUCCESS_STATE = "success"
 var hashMap: HashMap<Int, View> = HashMap()
 
 @BindingAdapter("reactToResult")
-fun <T> View.reactToResult(result: Result<T>?) {
+fun <T> View.reactToResult(result: CoroutineLiveTask<T>) {
+
     this as ConstraintLayout
     val stateLayout = getStateLayout(this.context, this)
-    when (result) {
+
+    when (result.value) {
         is Result.Success -> {
-            showLoadingState(SUCCESS_STATE, stateLayout)
+            showLoadingState(SUCCESS_STATE, stateLayout, result)
         }
         is Result.Loading -> {
-            showLoadingState(LOAD_STATE, stateLayout)
+            showLoadingState(LOAD_STATE, stateLayout, result)
         }
         is Result.Error -> {
-            showLoadingState(ERROR_STATE, stateLayout)
+            showLoadingState(ERROR_STATE, stateLayout, result)
         }
     }
 }
@@ -41,7 +44,7 @@ fun getStateLayout(context: Context, viewGroup: ViewGroup): View? {
     return hashMap[viewGroup.id]
 }
 
-fun View.showLoadingState(state: String, stateLayout: View?) {
+fun View.showLoadingState(state: String, stateLayout: View?, x: CoroutineLiveTask<*>) {
     this as ConstraintLayout
     when (state) {
         LOAD_STATE -> {
@@ -63,7 +66,7 @@ fun View.showLoadingState(state: String, stateLayout: View?) {
                     this.removeView(it)
                 }
                 it.ivBtn_refresh.setOnClickListener {
-
+                    x.retry()
                 }
             }
         }

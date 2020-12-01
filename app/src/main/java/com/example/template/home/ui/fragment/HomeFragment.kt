@@ -43,7 +43,8 @@ class HomeFragment : Fragment() {
     }
 
     private val usersObserver = Observer<Result<UserRes>> {
-        it.withResult(
+
+    it.withResult(
             onSuccess = {},
             onLoading = {},
             onError = { showDialog() }
