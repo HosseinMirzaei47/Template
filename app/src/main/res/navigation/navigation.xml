@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/navigation"
-    app:startDestination="@id/homeFragment">
+    app:startDestination="@id/combineTestFragment">
 
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.template.home.ui.fragment.HomeFragment"
         android:label="HomeFragment" />
+    <fragment
+        android:id="@+id/combineTestFragment"
+        android:name="com.example.template.livedataUtils.ui.CombineTestFragment"
+        android:label="fragment_comibine_test"
+        tools:layout="@layout/fragment_comibine_test" />
 </navigation>
