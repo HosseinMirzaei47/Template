@@ -131,6 +131,9 @@ dependencies {
     /*moshi*/
     implementation "com.squareup.retrofit2:converter-moshi:2.9.0"
 
-    // multi dex
+    /*multi dex*/
     implementation "androidx.multidex:multidex:2.0.1"
+
+    /*Chat-Loading-Dots*/
+    implementation 'com.github.kapilmhr:Chat-Loading-Dots:1.0'
 }

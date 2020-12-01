@@ -1,6 +1,7 @@
 package com.example.template.home.ui.fragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,6 +15,7 @@ import com.example.template.home.data.servicemodels.UserRes
 import com.example.template.home.ui.viewmodel.HomeViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.layout_state.*
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -51,13 +53,13 @@ class HomeFragment : Fragment() {
     }
 
     private fun showDialog() {
-        val dialog = MaterialAlertDialogBuilder(requireContext())
-        dialog.setTitle("Request Failed")
-            .setNegativeButton("Cancel") { _, _ ->
-            }
-            .setPositiveButton("Retry") { _, _ ->
-                viewModel.users.retry()
-            }
-            .show()
+//        val dialog = MaterialAlertDialogBuilder(requireContext())
+//        dialog.setTitle("Request Failed")
+//            .setNegativeButton("Cancel") { _, _ ->
+//            }
+//            .setPositiveButton("Retry") { _, _ ->
+//                viewModel.users.retry()
+//            }
+//            .show()
     }
 }
