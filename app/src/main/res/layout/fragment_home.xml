@@ -16,7 +16,6 @@
         android:orientation="vertical"
         android:id="@+id/container">
 
-
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintRoot"
             reactToResult="@{vm.users}"

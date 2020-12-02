@@ -8,10 +8,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.databinding.BindingAdapter
 import com.example.template.R
 import com.example.template.core.util.CoroutineLiveTask
-import kotlinx.android.synthetic.main.layout_state.view.ivBtn_close
-import kotlinx.android.synthetic.main.layout_state.view.ivBtn_refresh
-import kotlinx.android.synthetic.main.layout_state.view.pb_load
-import kotlinx.android.synthetic.main.layout_state.view.tv_status
+import kotlinx.android.synthetic.main.layout_state.view.*
 
 private const val LOAD_STATE = "loading"
 private const val ERROR_STATE = "error"
@@ -33,6 +30,7 @@ fun <T> View.reactToResult(result: CoroutineLiveTask<T>) {
         }
     }
 }
+
 
 fun situationOfStateLayout(view: View): Pair<View, Any> {
     when (view) {
