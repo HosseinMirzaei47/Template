@@ -2,4 +2,6 @@
     <string name="app_name">Template</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="close_state_layout">close state layout</string>
+    <string name="refresh">refresh</string>
 </resources>

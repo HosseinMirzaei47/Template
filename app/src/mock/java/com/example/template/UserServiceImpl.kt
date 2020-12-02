@@ -5,14 +5,28 @@ import com.example.template.home.data.servicemodels.Ad
 import com.example.template.home.data.servicemodels.Data
 import com.example.template.home.data.servicemodels.UserRes
 import kotlinx.coroutines.delay
+import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
 import retrofit2.Retrofit
 
+
 class UserServiceImpl(private val retrofit: Retrofit) : UserDataSource {
 
-    private var stuff: Response<UserRes>
+    private lateinit var stuff: Response<UserRes>
 
     init {
+        returnResponse(false)
+    }
+
+    private fun returnResponse(responseIsSuccess: Boolean) {
+        if (responseIsSuccess) {
+            returnSuccessResponse()
+        } else {
+            returnErrorResponse()
+        }
+    }
+
+    private fun returnSuccessResponse() {
         val dataList = mutableListOf(
             Data(
                 id = 0,
@@ -48,8 +62,13 @@ class UserServiceImpl(private val retrofit: Retrofit) : UserDataSource {
         )
     }
 
+    private fun returnErrorResponse() {
+        stuff = Response.error(404, "error happened".toResponseBody())
+    }
+
     override suspend fun getUsers(page: Int): Response<UserRes> {
         delay(3000)
         return stuff
     }
+
 }

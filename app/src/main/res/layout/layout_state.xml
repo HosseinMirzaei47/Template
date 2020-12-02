@@ -58,8 +58,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-
-                />
+                android:contentDescription="@string/close_state_layout" />
 
             <ImageView
                 android:id="@+id/ivBtn_refresh"
@@ -72,7 +71,7 @@
                 app:layout_constraintStart_toEndOf="@id/ivBtn_close"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_goneMarginStart="16dp"
-                />
+                android:contentDescription="@string/refresh" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

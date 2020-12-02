@@ -31,7 +31,6 @@ fun <T> View.reactToResult(result: CoroutineLiveTask<T>) {
     }
 }
 
-
 fun situationOfStateLayout(view: View): Pair<View, Any> {
     when (view) {
         is ConstraintLayout -> {
