@@ -1,5 +1,6 @@
 package com.example.template.core
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -35,49 +36,22 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
     when (view) {
         is ConstraintLayout -> {
             if (view.tag == null) {
-                val stateLayout = LayoutInflater.from(view.context)
-                    .inflate(R.layout.layout_state, view, false)
-                stateLayout.id = View.generateViewId()
+                val stateLayout = inflateStateLayoutAndSetID(view)
+                Log.d("view : ", view.id.toString())
+                Log.d("stateLayout : ", stateLayout.id.toString())
+                //    all childes of parent must have id to clone in constraint set
+                //    setConstraintForStateLayout(view, stateLayout, view)
                 view.addView(stateLayout)
                 view.tag = stateLayout.id
             }
-            return Pair(view.getViewById(view.tag as Int),view)
+            return Pair(view.getViewById(view.tag as Int), view)
         }
         else -> {
             if (view.parent is ConstraintLayout) {
                 val parent = view.parent as ConstraintLayout
                 if (view.tag == null) {
-                    val stateLayout = LayoutInflater.from(parent.context)
-                        .inflate(R.layout.layout_state, parent, false)
-                    stateLayout.id = View.generateViewId()
-                    val constraintSet = ConstraintSet()
-                    constraintSet.clone(parent)
-                    constraintSet.connect(
-                        stateLayout.id,
-                        ConstraintSet.TOP,
-                        view.id,
-                        ConstraintSet.TOP
-                    )
-                    constraintSet.connect(
-                        stateLayout.id,
-                        ConstraintSet.BOTTOM,
-                        view.id,
-                        ConstraintSet.BOTTOM
-                    )
-                    constraintSet.connect(
-                        stateLayout.id,
-                        ConstraintSet.END,
-                        view.id,
-                        ConstraintSet.END
-                    )
-                    constraintSet.connect(
-                        stateLayout.id,
-                        ConstraintSet.START,
-                        view.id,
-                        ConstraintSet.START
-                    )
-                    parent.addView(stateLayout)
-                    constraintSet.applyTo(parent)
+                    val stateLayout = inflateStateLayoutAndSetID(parent)
+                    setConstraintForStateLayout(parent, stateLayout, view)
                     view.tag = stateLayout.id
                 }
                 return Pair(parent.getViewById(view.tag as Int), parent)
@@ -85,9 +59,7 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
                 val parent = view.parent as ViewGroup
 
                 if (view.tag == null) {
-                    val stateLayout = LayoutInflater.from(view.context)
-                        .inflate(R.layout.layout_state, view.parent as ViewGroup, false)
-                    stateLayout.id = View.generateViewId()
+                    val stateLayout = inflateStateLayoutAndSetID(parent)
                     parent.addView(stateLayout)
                     view.tag = stateLayout.id
                 }
@@ -95,6 +67,49 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
             }
         }
     }
+}
+
+private fun inflateStateLayoutAndSetID(view: ViewGroup): View {
+    val stateLayout = LayoutInflater.from(view.context)
+        .inflate(R.layout.layout_state, view, false)
+    stateLayout.id = View.generateViewId()
+    return stateLayout
+}
+
+private fun setConstraintForStateLayout(
+    parent: ConstraintLayout,
+    stateLayout: View,
+    view: View
+) {
+    val constraintSet = ConstraintSet()
+    Log.d("mamad", "setConstraintForStateLayout: ")
+    constraintSet.clone(parent)
+    constraintSet.connect(
+        stateLayout.id,
+        ConstraintSet.TOP,
+        ConstraintSet.PARENT_ID,
+        ConstraintSet.TOP
+    )
+    constraintSet.connect(
+        stateLayout.id,
+        ConstraintSet.BOTTOM,
+        ConstraintSet.PARENT_ID,
+        ConstraintSet.BOTTOM
+    )
+    constraintSet.connect(
+        stateLayout.id,
+        ConstraintSet.END,
+        ConstraintSet.PARENT_ID,
+        ConstraintSet.END
+    )
+    constraintSet.connect(
+        stateLayout.id,
+        ConstraintSet.START,
+        ConstraintSet.PARENT_ID,
+        ConstraintSet.START
+    )
+    parent.addView(stateLayout)
+    constraintSet.applyTo(parent)
 }
 
 fun showLoadingState(
