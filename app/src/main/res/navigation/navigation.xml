@@ -8,10 +8,19 @@
     <fragment
         android:id="@+id/homeFragment"
         android:name="com.example.template.home.ui.fragment.HomeFragment"
-        android:label="HomeFragment" />
+        android:label="HomeFragment"
+        tools:layout="@layout/fragment_home">
+
+        <action
+            android:id="@+id/action_homeFragment_to_combineTestFragment"
+            app:destination="@id/combineTestFragment" />
+
+    </fragment>
+
     <fragment
         android:id="@+id/combineTestFragment"
         android:name="com.example.template.livedataUtils.ui.CombineTestFragment"
         android:label="fragment_comibine_test"
         tools:layout="@layout/fragment_comibine_test" />
+
 </navigation>

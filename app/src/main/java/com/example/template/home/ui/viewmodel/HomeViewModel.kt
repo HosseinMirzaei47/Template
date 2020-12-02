@@ -13,4 +13,16 @@ class HomeViewModel @ViewModelInject constructor(
         emit(Result.Loading)
         emit(userUseCase(1))
     }
+
+    /*fun rte() {
+        viewModelScope.launch() {
+
+        }
+
+        withmain
+
+        withContext(Main){
+
+        }
+    }*/
 }

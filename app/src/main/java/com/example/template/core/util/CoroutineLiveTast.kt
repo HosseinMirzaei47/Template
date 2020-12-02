@@ -1,13 +1,14 @@
 package com.example.template.core.util
 
 import androidx.lifecycle.MediatorLiveData
-import com.example.template.core.EventTask
+import com.example.template.core.Event
+import com.example.template.core.MyApp
 import com.example.template.core.MyApp.Companion.connectionLiveData
-import com.example.template.core.MyApp.Companion.loggerTasks
 import com.example.template.core.Result
 import com.example.template.core.util.NetworkStatusCode.STATUS_CONNECTION_LOST
 import com.example.template.core.withError
 import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.Main
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.experimental.ExperimentalTypeInference
@@ -26,6 +27,8 @@ class CoroutineLiveTask<T>(
     val block: suspend LiveTaskScope<T>.() -> Unit,
 ) : MediatorLiveData<Result<T>>() {
 
+    var attempts = 0
+
     private var blockRunner: TaskRunner<T>? = null
 
     init {
@@ -34,10 +37,16 @@ class CoroutineLiveTask<T>(
         this.addSource(this) {
             if (it is Result.Error) {
                 it.withError(
-                    onError = { message: String, code: Int ->
+                    onError = { _: String, code: Int ->
                         if (code == STATUS_CONNECTION_LOST) {
-                            loggerTasks.postValue(EventTask(message))
-                            retryOnNetworkBack()
+                            if (attempts >= 1) {
+                                this.postValue(Result.Error("Your internet has run out of data."))
+                                attempts = 0
+                            } else {
+                                retryOnNetworkBack()
+                            }
+                        } else {
+                            MyApp.logger.postValue(Event { retry() })
                         }
                     }
                 )
@@ -58,14 +67,22 @@ class CoroutineLiveTask<T>(
         }
     }
 
+    private var suspensionTime = 0L
+
     private fun retryOnNetworkBack() {
-        this.addSource(connectionLiveData) {
-            if (it) {
-                retry()
+        this.addSource(connectionLiveData) { hasConnection ->
+            if (System.currentTimeMillis() - suspensionTime > 1000) {
+                suspensionTime = System.currentTimeMillis()
+                if (hasConnection && attempts < 1) {
+                    attempts++
+                    GlobalScope.launch(Main) {
+                        delay(500)
+                        retry()
+                    }
+                }
             }
         }
     }
-
 
     override fun onActive() {
         super.onActive()
@@ -116,7 +133,7 @@ internal class TaskRunner<T>(
         if (cancellationJob != null) {
             error("Cancel call cannot happen without a maybeRun")
         }
-        cancellationJob = scope.launch(Dispatchers.Main.immediate) {
+        cancellationJob = scope.launch(Main.immediate) {
             delay(timeoutInMs)
             if (!liveData.hasActiveObservers()) {
                 runningJob?.cancel()
@@ -134,7 +151,7 @@ internal class LiveTaskScopeImpl<T>(
     override val latestValue: Result<T>?
         get() = target.value
 
-    private val coroutineContext = context + Dispatchers.Main.immediate
+    private val coroutineContext = context + Main.immediate
 
     override suspend fun emit(userUseCase: Result<T>) = withContext(coroutineContext) {
         target.value = userUseCase
