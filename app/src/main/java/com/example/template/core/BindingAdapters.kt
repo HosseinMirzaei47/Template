@@ -2,7 +2,9 @@ package com.example.template.core
 
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.databinding.BindingAdapter
 import com.example.template.R
 import com.example.template.core.util.CoroutineLiveTask
@@ -14,33 +16,97 @@ import kotlinx.android.synthetic.main.layout_state.view.tv_status
 private const val LOAD_STATE = "loading"
 private const val ERROR_STATE = "error"
 private const val SUCCESS_STATE = "success"
-var hashMap: HashMap<Int, View> = HashMap()
 
 @BindingAdapter("reactToResult")
 fun <T> View.reactToResult(result: CoroutineLiveTask<T>) {
-    this as ConstraintLayout
-    if(this.tag == null){
-        val stateLayout = LayoutInflater.from(context).inflate(R.layout.layout_state, this, false)
-        stateLayout.id = View.generateViewId()
-        this.addView(stateLayout)
-        this.tag = stateLayout.id
-    }
-    val stateLayout = this.getViewById(this.tag as Int)
+    val stateLayout = situationOfStateLayout(this).first
+    val parent = situationOfStateLayout(this).second
     when (result.value) {
         is Result.Success -> {
-            showLoadingState(SUCCESS_STATE, stateLayout, result)
+            showLoadingState(SUCCESS_STATE, stateLayout, parent, result)
         }
         is Result.Loading -> {
-            showLoadingState(LOAD_STATE, stateLayout, result)
+            showLoadingState(LOAD_STATE, stateLayout, parent, result)
         }
         is Result.Error -> {
-            showLoadingState(ERROR_STATE, stateLayout, result)
+            showLoadingState(ERROR_STATE, stateLayout, parent, result)
         }
     }
 }
 
-fun View.showLoadingState(state: String, stateLayout: View?, result: CoroutineLiveTask<*>) {
-    this as ConstraintLayout
+fun situationOfStateLayout(view: View): Pair<View, Any> {
+    when (view) {
+        is ConstraintLayout -> {
+            if (view.tag == null) {
+                val stateLayout = LayoutInflater.from(view.context)
+                    .inflate(R.layout.layout_state, view, false)
+                stateLayout.id = View.generateViewId()
+                view.addView(stateLayout)
+                view.tag = stateLayout.id
+            }
+            return Pair(view.getViewById(view.tag as Int),view)
+        }
+        else -> {
+            if (view.parent is ConstraintLayout) {
+                val parent = view.parent as ConstraintLayout
+                if (view.tag == null) {
+                    val stateLayout = LayoutInflater.from(parent.context)
+                        .inflate(R.layout.layout_state, parent, false)
+                    stateLayout.id = View.generateViewId()
+                    val constraintSet = ConstraintSet()
+                    constraintSet.clone(parent)
+                    constraintSet.connect(
+                        stateLayout.id,
+                        ConstraintSet.TOP,
+                        view.id,
+                        ConstraintSet.TOP
+                    )
+                    constraintSet.connect(
+                        stateLayout.id,
+                        ConstraintSet.BOTTOM,
+                        view.id,
+                        ConstraintSet.BOTTOM
+                    )
+                    constraintSet.connect(
+                        stateLayout.id,
+                        ConstraintSet.END,
+                        view.id,
+                        ConstraintSet.END
+                    )
+                    constraintSet.connect(
+                        stateLayout.id,
+                        ConstraintSet.START,
+                        view.id,
+                        ConstraintSet.START
+                    )
+                    parent.addView(stateLayout)
+                    constraintSet.applyTo(parent)
+                    view.tag = stateLayout.id
+                }
+                return Pair(parent.getViewById(view.tag as Int), parent)
+            } else {
+                val parent = view.parent as ViewGroup
+
+                if (view.tag == null) {
+                    val stateLayout = LayoutInflater.from(view.context)
+                        .inflate(R.layout.layout_state, view.parent as ViewGroup, false)
+                    stateLayout.id = View.generateViewId()
+                    parent.addView(stateLayout)
+                    view.tag = stateLayout.id
+                }
+                return Pair(parent.findViewById(view.tag as Int), parent)
+            }
+        }
+    }
+}
+
+fun showLoadingState(
+    state: String,
+    stateLayout: View?,
+    parent: Any,
+    result: CoroutineLiveTask<*>
+) {
+    parent as ViewGroup
     when (state) {
         LOAD_STATE -> {
             stateLayout?.let {
@@ -49,7 +115,7 @@ fun View.showLoadingState(state: String, stateLayout: View?, result: CoroutineLi
                 it.pb_load.visibility = View.VISIBLE
                 it.tv_status.text = LOAD_STATE
                 it.ivBtn_close.setOnClickListener { _ ->
-                    this.removeView(it)
+                    parent.removeView(it)
                 }
             }
         }
@@ -59,7 +125,7 @@ fun View.showLoadingState(state: String, stateLayout: View?, result: CoroutineLi
                 it.tv_status.text = ERROR_STATE
                 it.pb_load.visibility = View.GONE
                 it.ivBtn_close.setOnClickListener { _ ->
-                    this.removeView(it)
+                    parent.removeView(it)
                 }
                 it.ivBtn_refresh.setOnClickListener {
                     result.retry()
@@ -68,7 +134,7 @@ fun View.showLoadingState(state: String, stateLayout: View?, result: CoroutineLi
         }
         SUCCESS_STATE -> {
             stateLayout?.let {
-                this.removeView(it)
+                parent.removeView(it)
             }
         }
 
