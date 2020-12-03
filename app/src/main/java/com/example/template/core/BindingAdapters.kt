@@ -44,5 +44,8 @@ private fun View.loadingView() {
 
 fun View.hideProgressBar() {
     this as ConstraintLayout
-    this.removeView(progressBar)
+    try {
+        this.removeView(progressBar)
+    } catch (e: Exception) {
+    }
 }

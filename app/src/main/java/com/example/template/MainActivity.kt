@@ -6,9 +6,11 @@ import androidx.databinding.DataBindingUtil
 import com.example.template.core.Result
 import com.example.template.core.util.NoConnectionException
 import com.example.template.core.util.RequestsObserver
+import com.example.template.core.util.ServerException
 import com.example.template.databinding.ActivityMainBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
+import retrofit2.HttpException
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -24,6 +26,8 @@ class MainActivity : AppCompatActivity() {
                 is Result.Error -> {
                     if (event.exception is NoConnectionException) {
                         showDialog()
+                    } else if (event.exception is ServerException || (event.exception is HttpException && event.exception.code() == 401)) {
+                        showUnauthorizedDialog()
                     } else {
                         showDialog("ارتباط به درستی بر قرار نشد")
                     }
@@ -32,6 +36,19 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun showUnauthorizedDialog() {
+        val dialog = MaterialAlertDialogBuilder(this)
+        dialog.setTitle("دسترسی شما غیر مجاز است مجددا لاگین کنید")
+            .setCancelable(false)
+            .setNegativeButton("لاگین نا موفق") { _, _ ->
+                finish()
+            }
+            .setPositiveButton("لاگین موفق") { _, _ ->
+                RequestsObserver.retry()
+            }
+            .show()
     }
 
     private fun showDialog(s: String) {
