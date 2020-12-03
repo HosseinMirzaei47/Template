@@ -3,7 +3,7 @@ package com.example.template.core.usecases
 import com.example.template.core.Result
 import com.example.template.core.Result.Error
 import com.example.template.core.Result.Success
-import com.example.template.core.util.NetworkStatusCode
+import com.example.template.core.util.detectException
 import com.example.template.core.util.readServerError
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
@@ -19,18 +19,18 @@ abstract class CoroutineUseCaseNoParameter<R>(private val coroutineDispatcher: C
                 Success(execute())
             }
         } catch (e: CancellationException) {
-            Error(e.message!!)
+            Error(e)
         } catch (e: HttpException) {
             val parsedError = try {
                 readServerError(e)
             } catch (f: Exception) {
                 e
             }
-            Error(parsedError.message!!)
+            Error(parsedError)
         } catch (e: IOException) {
-            Error(e.message!!, NetworkStatusCode.STATUS_CONNECTION_LOST)
+            Error(e.detectException())
         } catch (e: Exception) {
-            Error(e.message!!)
+            Error(e)
         }
     }
 

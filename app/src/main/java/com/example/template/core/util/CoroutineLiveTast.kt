@@ -1,11 +1,8 @@
 package com.example.template.core.util
 
 import androidx.lifecycle.MediatorLiveData
-import com.example.template.core.Event
-import com.example.template.core.MyApp
 import com.example.template.core.MyApp.Companion.connectionLiveData
 import com.example.template.core.Result
-import com.example.template.core.util.NetworkStatusCode.STATUS_CONNECTION_LOST
 import com.example.template.core.withError
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
@@ -27,8 +24,6 @@ class CoroutineLiveTask<T>(
     val block: suspend LiveTaskScope<T>.() -> Unit,
 ) : MediatorLiveData<Result<T>>() {
 
-    var attempts = 0
-
     private var blockRunner: TaskRunner<T>? = null
 
     init {
@@ -36,22 +31,17 @@ class CoroutineLiveTask<T>(
 
         this.addSource(this) {
             if (it is Result.Error) {
-                it.withError(
-                    onError = { _: String, code: Int ->
-                        if (code == STATUS_CONNECTION_LOST) {
-                            if (attempts >= 1) {
-                                this.postValue(Result.Error("Your internet has run out of data."))
-                                attempts = 0
-                            } else {
-                                retryOnNetworkBack()
-                            }
-                        } else {
-                            MyApp.logger.postValue(Event { retry() })
+                it.withError { exception ->
+                    when (exception) {
+                        is NoConnectionException -> {
+                            retryOnNetworkBack()
                         }
                     }
-                )
+                }
             }
         }
+
+        RequestsObserver.addLiveData(this as CoroutineLiveTask<Result<*>>)
     }
 
     private fun initBlockRunner() {
@@ -67,19 +57,11 @@ class CoroutineLiveTask<T>(
         }
     }
 
-    private var suspensionTime = 0L
 
     private fun retryOnNetworkBack() {
         this.addSource(connectionLiveData) { hasConnection ->
-            if (System.currentTimeMillis() - suspensionTime > 1000) {
-                suspensionTime = System.currentTimeMillis()
-                if (hasConnection && attempts < 1) {
-                    attempts++
-                    GlobalScope.launch(Main) {
-                        delay(500)
-                        retry()
-                    }
-                }
+            if (hasConnection) {
+                retry()
             }
         }
     }
