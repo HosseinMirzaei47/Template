@@ -42,12 +42,6 @@ class HomeFragment : Fragment() {
         }
 
         viewModel.users.observe(viewLifecycleOwner, usersObserver)
-        viewModel.users1.observe(viewLifecycleOwner, usersObserver)
-        viewModel.users2.observe(viewLifecycleOwner, usersObserver)
-        viewModel.users3.observe(viewLifecycleOwner, usersObserver)
-        viewModel.users4.observe(viewLifecycleOwner, usersObserver)
-        viewModel.users5.observe(viewLifecycleOwner, usersObserver)
-        viewModel.users6.observe(viewLifecycleOwner, usersObserver)
     }
 
     private val usersObserver = Observer<Result<UserRes>> {
