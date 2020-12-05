@@ -18,18 +18,28 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
+        observeRequestsStatus()
+    }
 
+    private fun observeRequestsStatus() {
         RequestsObserver.observe(this) { event ->
             when (event) {
                 is Result.Success -> {
                 }
                 is Result.Error -> {
-                    if (event.exception is NoConnectionException) {
-                        showDialog()
-                    } else if (event.exception is ServerException || (event.exception is HttpException && event.exception.code() == 401)) {
-                        showUnauthorizedDialog()
-                    } else {
-                        showDialog("ارتباط به درستی بر قرار نشد")
+                    when {
+                        event.exception is NoConnectionException -> {
+                            noConnectionDialog()
+                        }
+                        (event.exception is ServerException &&
+                                event.exception.meta.statusCode == 401) ||
+                                (event.exception is HttpException &&
+                                        event.exception.code() == 401) -> {
+                            unauthorizedDialog()
+                        }
+                        else -> {
+                            errorDialog()
+                        }
                     }
                 }
                 is Result.Loading -> {
@@ -38,7 +48,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showUnauthorizedDialog() {
+    private fun unauthorizedDialog() {
         val dialog = MaterialAlertDialogBuilder(this)
         dialog.setTitle("دسترسی شما غیر مجاز است مجددا لاگین کنید")
             .setCancelable(false)
@@ -51,21 +61,22 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun showDialog(s: String) {
+    private fun noConnectionDialog() {
         val dialog = MaterialAlertDialogBuilder(this)
-        dialog.setTitle(s)
-            .setNegativeButton("Cancel") { _, _ ->
-            }
-            .setPositiveButton("Retry") { _, _ ->
-                RequestsObserver.retry()
+        dialog.setTitle("هیچ اتصالی برای اینترنت موجود نمی باشد")
+            .setCancelable(false)
+            .setNeutralButton("ورود به تنظیمات") { _, _ ->
             }
             .show()
     }
 
-    private fun showDialog() {
+    private fun errorDialog() {
         val dialog = MaterialAlertDialogBuilder(this)
-        dialog.setTitle("کلا اتصال بر قرار نیست")
-            .setNeutralButton("خایلوخو") { _, _ ->
+        dialog.setTitle("امکان برقراری ارتباط با سرور مقدور نمی باشد")
+            .setNegativeButton("انصراف") { _, _ ->
+            }
+            .setPositiveButton("تلاش مجدد") { _, _ ->
+                RequestsObserver.retry()
             }
             .show()
     }

@@ -11,7 +11,7 @@ object RequestsObserver : MediatorLiveData<Result<*>>() {
         taskList.add(task)
 
         this.addSource(task) { result ->
-            printStats()
+            //printStats()
             when (result) {
                 is Result.Success -> {
                     this.removeSource(task)
@@ -19,14 +19,14 @@ object RequestsObserver : MediatorLiveData<Result<*>>() {
                     checkIsThereAnyUnSuccess()
                 }
                 is Result.Error -> {
-                    if (this.value !is Result.Error) {
+                    if (this.value !is Result.Error && (task.retryCounts > task.retryAttempts)) {
                         this.postValue(task.value)
                     }
                 }
                 is Result.Loading -> {
                     when (this.value) {
                         is Result.Error -> {
-                            this.postValue(Result.Loading)
+                            setLoadingIfNoErrorLeft()
                         }
                         is Result.Success -> {
                             this.postValue(Result.Loading)
@@ -42,11 +42,20 @@ object RequestsObserver : MediatorLiveData<Result<*>>() {
         }
     }
 
+    private fun setLoadingIfNoErrorLeft() {
+        val hasError = taskList.any { it ->
+            it.value is Result.Error
+        }
+        if (!hasError) {
+            this.postValue(Result.Loading)
+        }
+    }
+
     private fun printStats() {
         var sucessess = 0
         var failed = 0
         var loading = 0
-        taskList.forEachIndexed { index, coroutineLiveTask ->
+        taskList.forEachIndexed { _, coroutineLiveTask ->
             when (coroutineLiveTask.value) {
                 is Result.Success -> {
                     sucessess++
@@ -59,14 +68,16 @@ object RequestsObserver : MediatorLiveData<Result<*>>() {
                 }
             }
         }
-        // println("mmb successha=$sucessess failedha=$failed loadingha=$loading allcount=${list.size}")
+        println("mmb successha=$sucessess failedha=$failed loadingha=$loading allcount=${taskList.size}")
     }
 
     fun retry() {
         this.postValue(Result.Loading)
-        taskList.forEachIndexed { index, coroutineLiveTask ->
-            if (coroutineLiveTask.value is Result.Error)
-                coroutineLiveTask.retry()
+        val listOfUnSuccesses = taskList.filter { coroutineLiveTask ->
+            coroutineLiveTask.value is Result.Error
+        }
+        listOfUnSuccesses.forEachIndexed { _, coroutineLiveTask ->
+            coroutineLiveTask.retry()
         }
     }
 
@@ -77,12 +88,13 @@ object RequestsObserver : MediatorLiveData<Result<*>>() {
         if (!anyRequestLeft) {
             this.postValue(Result.Success(null))
         } else {
-            taskList.forEachIndexed { _, coroutineLiveTask ->
-                if (coroutineLiveTask.value is Result.Error)
-                    if (this.value is Result.Loading) {
-                        this.postValue(coroutineLiveTask.value)
-                        return@forEachIndexed
-                    }
+            if (this.value is Result.Loading) {
+                val oneOfErrors = taskList.find { coroutineLiveTask ->
+                    coroutineLiveTask.value is Result.Error
+                }
+                oneOfErrors?.let {
+                    this.postValue(it.value)
+                }
             }
         }
     }

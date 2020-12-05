@@ -11,20 +11,24 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.experimental.ExperimentalTypeInference
 
 internal const val DEFAULT_TIMEOUT = 5000L
+internal const val DEFAULT_RETRY_ATTEMPTS = 1
 
 @OptIn(ExperimentalTypeInference::class)
 fun <T> liveTask(
+    retryAttempts: Int = DEFAULT_RETRY_ATTEMPTS,
     context: CoroutineContext = EmptyCoroutineContext,
     @BuilderInference block: suspend LiveTaskScope<T>.() -> Unit
-): CoroutineLiveTask<T> = CoroutineLiveTask(context, block = block)
+): CoroutineLiveTask<T> = CoroutineLiveTask(retryAttempts, context, block = block)
 
 class CoroutineLiveTask<T>(
+    var retryAttempts: Int = DEFAULT_RETRY_ATTEMPTS,
     private val context: CoroutineContext = EmptyCoroutineContext,
     private val timeoutInMs: Long = DEFAULT_TIMEOUT,
     val block: suspend LiveTaskScope<T>.() -> Unit,
 ) : MediatorLiveData<Result<T>>() {
 
     private var blockRunner: TaskRunner<T>? = null
+    var retryCounts = 1
 
     init {
         initBlockRunner()
@@ -35,6 +39,12 @@ class CoroutineLiveTask<T>(
                     when (exception) {
                         is NoConnectionException -> {
                             retryOnNetworkBack()
+                        }
+                        else -> {
+                            if (retryCounts <= retryAttempts) {
+                                this.retry()
+                                retryCounts++
+                            }
                         }
                     }
                 }
