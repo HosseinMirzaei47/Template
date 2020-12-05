@@ -1,13 +1,12 @@
 package com.example.template.core.util
 
-import androidx.lifecycle.MediatorLiveData
 import com.example.template.core.Result
 
-object RequestsObserver : MediatorLiveData<Result<*>>() {
+class RequestsObserver private constructor() : CoroutineLiveTask<Any>(block = {}) {
 
-    var taskList = mutableListOf<CoroutineLiveTask<Result<*>>>()
+    var taskList = mutableListOf<CoroutineLiveTask<Result<Any>>>()
 
-    fun addLiveData(task: CoroutineLiveTask<Result<*>>) {
+    fun addLiveData(task: CoroutineLiveTask<Result<Any>>) {
         taskList.add(task)
 
         this.addSource(task) { result ->
@@ -51,12 +50,40 @@ object RequestsObserver : MediatorLiveData<Result<*>>() {
         }
     }
 
+    fun retryAll() {
+        this.postValue(Result.Loading)
+        val listOfUnSuccesses = taskList.filter { coroutineLiveTask ->
+            coroutineLiveTask.value is Result.Error
+        }
+        listOfUnSuccesses.forEachIndexed { _, coroutineLiveTask ->
+            coroutineLiveTask.retry()
+        }
+    }
+
     private fun setLoadingIfNoErrorLeft() {
         val hasError = taskList.any { it ->
             it.value is Result.Error
         }
         if (!hasError) {
             this.postValue(Result.Loading)
+        }
+    }
+
+    private fun checkIsThereAnyUnSuccess() {
+        val anyRequestLeft = taskList.any { it ->
+            it.value is Result.Loading || it.value is Result.Error
+        }
+        if (!anyRequestLeft) {
+            this.postValue(Result.Success(Any()))
+        } else {
+            if (this.value is Result.Loading) {
+                val oneOfErrors = taskList.find { coroutineLiveTask ->
+                    coroutineLiveTask.value is Result.Error
+                }
+                oneOfErrors?.let {
+                    this.postValue(it.value)
+                }
+            }
         }
     }
 
@@ -80,31 +107,8 @@ object RequestsObserver : MediatorLiveData<Result<*>>() {
         println("mmb successha=$sucessess failedha=$failed loadingha=$loading allcount=${taskList.size}")
     }
 
-    fun retry() {
-        this.postValue(Result.Loading)
-        val listOfUnSuccesses = taskList.filter { coroutineLiveTask ->
-            coroutineLiveTask.value is Result.Error
-        }
-        listOfUnSuccesses.forEachIndexed { _, coroutineLiveTask ->
-            coroutineLiveTask.retry()
-        }
-    }
-
-    private fun checkIsThereAnyUnSuccess() {
-        val anyRequestLeft = taskList.any { it ->
-            it.value is Result.Loading || it.value is Result.Error
-        }
-        if (!anyRequestLeft) {
-            this.postValue(Result.Success(null))
-        } else {
-            if (this.value is Result.Loading) {
-                val oneOfErrors = taskList.find { coroutineLiveTask ->
-                    coroutineLiveTask.value is Result.Error
-                }
-                oneOfErrors?.let {
-                    this.postValue(it.value)
-                }
-            }
-        }
+    companion object {
+        private var singleInstance: RequestsObserver = RequestsObserver()
+        fun getInstance() = singleInstance
     }
 }

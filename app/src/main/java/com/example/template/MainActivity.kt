@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun observeRequestsStatus() {
-        RequestsObserver.observe(this) { event ->
+        RequestsObserver.getInstance().observe(this) { event ->
             when (event) {
                 is Result.Success -> {
                 }
@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
                 finish()
             }
             .setPositiveButton("لاگین موفق") { _, _ ->
-                RequestsObserver.retry()
+                RequestsObserver.getInstance().retryAll()
             }
             .show()
     }
@@ -76,7 +76,7 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton("انصراف") { _, _ ->
             }
             .setPositiveButton("تلاش مجدد") { _, _ ->
-                RequestsObserver.retry()
+                RequestsObserver.getInstance().retryAll()
             }
             .show()
     }

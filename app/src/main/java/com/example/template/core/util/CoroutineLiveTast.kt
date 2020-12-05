@@ -17,10 +17,10 @@ internal const val DEFAULT_RETRY_ATTEMPTS = 1
 fun <T> liveTask(
     retryAttempts: Int = DEFAULT_RETRY_ATTEMPTS,
     context: CoroutineContext = EmptyCoroutineContext,
-    @BuilderInference block: suspend LiveTaskScope<T>.() -> Unit
+    @BuilderInference block: suspend LiveTaskScope<T>.() -> Unit = {}
 ): CoroutineLiveTask<T> = CoroutineLiveTask(retryAttempts, context, block = block)
 
-class CoroutineLiveTask<T>(
+open class CoroutineLiveTask<T>(
     var retryAttempts: Int = DEFAULT_RETRY_ATTEMPTS,
     private val context: CoroutineContext = EmptyCoroutineContext,
     private val timeoutInMs: Long = DEFAULT_TIMEOUT,
@@ -51,7 +51,9 @@ class CoroutineLiveTask<T>(
             }
         }
 
-        RequestsObserver.addLiveData(this as CoroutineLiveTask<Result<*>>)
+        RequestsObserver.getInstance().let {
+            it.addLiveData(this as CoroutineLiveTask<Result<Any>>)
+        }
     }
 
     private fun initBlockRunner() {
@@ -123,13 +125,13 @@ internal class TaskRunner<T>(
 
     fun cancel() {
         if (cancellationJob != null) {
-            //  error("Cancel call cannot happen without a maybeRun")
+            error("Cancel call cannot happen without a maybeRun")
         }
         cancellationJob = scope.launch(Main.immediate) {
             delay(timeoutInMs)
             //  if (!liveData.hasActiveObservers()) {
-                runningJob?.cancel()
-                runningJob = null
+            runningJob?.cancel()
+            runningJob = null
             //  }
         }
     }

@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.Button
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.databinding.BindingAdapter
@@ -17,16 +18,32 @@ private const val SUCCESS_STATE = "success"
 
 @BindingAdapter("reactToResult")
 fun <T> View.reactToResult(result: CoroutineLiveTask<T>) {
-    val stateLayout = situationOfStateLayout(this).first
-    val parent = situationOfStateLayout(this).second
     when (result.value) {
         is Result.Success -> {
+            var stateLayout = situationOfStateLayout(this).first
+            if (stateLayout == null) {
+                this.tag = null
+                stateLayout = situationOfStateLayout(this).first
+            }
+            val parent = situationOfStateLayout(this).second
             showLoadingState(SUCCESS_STATE, stateLayout, parent, result)
         }
         is Result.Loading -> {
+            var stateLayout = situationOfStateLayout(this).first
+            if (stateLayout == null) {
+                this.tag = null
+                stateLayout = situationOfStateLayout(this).first
+            }
+            val parent = situationOfStateLayout(this).second
             showLoadingState(LOAD_STATE, stateLayout, parent, result)
         }
         is Result.Error -> {
+            var stateLayout = situationOfStateLayout(this).first
+            if (stateLayout == null) {
+                this.tag = null
+                stateLayout = situationOfStateLayout(this).first
+            }
+            val parent = situationOfStateLayout(this).second
             showLoadingState(ERROR_STATE, stateLayout, parent, result)
         }
     }
@@ -163,5 +180,22 @@ fun showLoadingState(
             }
         }
 
+    }
+}
+
+@BindingAdapter("enablebutton")
+fun <T> Button.enablebutton(result: CoroutineLiveTask<T>) {
+    when (result.value) {
+        is Result.Loading -> {
+            this.isEnabled = false
+        }
+        is Result.Success -> {
+            this.isEnabled = true
+
+        }
+        is Result.Error -> {
+            this.text = "errore"
+            this.isEnabled = false
+        }
     }
 }
