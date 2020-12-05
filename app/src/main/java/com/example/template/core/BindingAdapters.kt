@@ -1,9 +1,9 @@
 package com.example.template.core
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.databinding.BindingAdapter
@@ -37,8 +37,6 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
         is ConstraintLayout -> {
             if (view.tag == null) {
                 val stateLayout = inflateStateLayoutAndSetID(view)
-                Log.d("view : ", view.id.toString())
-                Log.d("stateLayout : ", stateLayout.id.toString())
                 //    all childes of parent must have id to clone in constraint set
                 //    setConstraintForStateLayout(view, stateLayout, view)
                 view.addView(stateLayout)
@@ -72,6 +70,7 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
 private fun inflateStateLayoutAndSetID(view: ViewGroup): View {
     val stateLayout = LayoutInflater.from(view.context)
         .inflate(R.layout.layout_state, view, false)
+
     stateLayout.id = View.generateViewId()
     return stateLayout
 }
@@ -82,7 +81,6 @@ private fun setConstraintForStateLayout(
     view: View
 ) {
     val constraintSet = ConstraintSet()
-    Log.d("mamad", "setConstraintForStateLayout: ")
     constraintSet.clone(parent)
     constraintSet.connect(
         stateLayout.id,
@@ -120,23 +118,33 @@ fun showLoadingState(
 ) {
     parent as ViewGroup
     when (state) {
+
         LOAD_STATE -> {
             stateLayout?.let {
+                it.tv_status.startAnimation(
+                    AnimationUtils.loadAnimation(
+                        it.context,
+                        R.anim.fade_out_repeatition
+                    )
+                )
                 it.layoutParams.height = 60
                 it.ivBtn_refresh.visibility = View.INVISIBLE
                 it.pb_load.visibility = View.VISIBLE
                 it.tv_status.text = LOAD_STATE
                 it.ivBtn_close.setOnClickListener { _ ->
+                    it.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.fade_out))
                     parent.removeView(it)
                 }
             }
         }
         ERROR_STATE -> {
             stateLayout?.let {
+                it.tv_status.clearAnimation()
                 it.ivBtn_refresh.visibility = View.VISIBLE
                 it.tv_status.text = ERROR_STATE
                 it.pb_load.visibility = View.GONE
                 it.ivBtn_close.setOnClickListener { _ ->
+                    it.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.fade_out))
                     parent.removeView(it)
                 }
                 it.ivBtn_refresh.setOnClickListener {
