@@ -139,7 +139,6 @@ fun showLoadingState(
 
         LOAD_STATE -> {
             stateLayout?.let {
-                println("mamad0 load")
                 it.tv_status.startAnimation(
                     AnimationUtils.loadAnimation(
                         it.context,
@@ -158,7 +157,6 @@ fun showLoadingState(
             }
         }
         ERROR_STATE -> {
-            println("mamad1 error")
             stateLayout?.let {
                 it.tv_status.clearAnimation()
                 it.ivBtn_refresh.visibility = View.VISIBLE
@@ -174,27 +172,27 @@ fun showLoadingState(
             }
         }
         SUCCESS_STATE -> {
-            println("mamad2 success")
             stateLayout?.let {
                 parent.removeView(it)
             }
         }
-
     }
 }
 
-@BindingAdapter("enablebutton")
-fun <T> Button.enablebutton(result: CoroutineLiveTask<T>) {
+@BindingAdapter("enableButton")
+fun <T> Button.enableButton(result: CoroutineLiveTask<T>) {
     when (result.value) {
         is Result.Loading -> {
+            this.text = "loading..."
             this.isEnabled = false
         }
         is Result.Success -> {
+            this.text = "success"
             this.isEnabled = true
 
         }
         is Result.Error -> {
-            this.text = "errore"
+            this.text = "error"
             this.isEnabled = false
         }
     }

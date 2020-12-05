@@ -51,7 +51,7 @@ open class CoroutineLiveTask<T>(
             }
         }
 
-        RequestsObserver.getInstance().let {
+        RequestsObserver.getInstance()?.let {
             it.addLiveData(this as CoroutineLiveTask<Result<Any>>)
         }
     }

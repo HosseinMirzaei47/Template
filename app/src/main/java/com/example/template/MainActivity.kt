@@ -1,6 +1,8 @@
 package com.example.template
 
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.example.template.core.Result
@@ -66,6 +68,7 @@ class MainActivity : AppCompatActivity() {
         dialog.setTitle("هیچ اتصالی برای اینترنت موجود نمی باشد")
             .setCancelable(false)
             .setNeutralButton("ورود به تنظیمات") { _, _ ->
+                startActivity(Intent(Settings.ACTION_WIFI_SETTINGS));
             }
             .show()
     }
