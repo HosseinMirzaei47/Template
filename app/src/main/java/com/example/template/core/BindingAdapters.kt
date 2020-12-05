@@ -118,8 +118,6 @@ fun showLoadingState(
 ) {
     parent as ViewGroup
 
-    println("mamad0$state")
-
     when (state) {
 
         LOAD_STATE -> {
@@ -136,6 +134,7 @@ fun showLoadingState(
                 it.pb_load.visibility = View.VISIBLE
                 it.tv_status.text = LOAD_STATE
                 it.ivBtn_close.setOnClickListener { _ ->
+                    result.cancel()
                     it.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.fade_out))
                     parent.removeView(it)
                 }

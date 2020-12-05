@@ -10,7 +10,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.experimental.ExperimentalTypeInference
 
-internal const val DEFAULT_TIMEOUT = 5000L
+internal const val DEFAULT_TIMEOUT = 100L
 internal const val DEFAULT_RETRY_ATTEMPTS = 1
 
 @OptIn(ExperimentalTypeInference::class)
@@ -123,14 +123,14 @@ internal class TaskRunner<T>(
 
     fun cancel() {
         if (cancellationJob != null) {
-            error("Cancel call cannot happen without a maybeRun")
+            //  error("Cancel call cannot happen without a maybeRun")
         }
         cancellationJob = scope.launch(Main.immediate) {
             delay(timeoutInMs)
-            if (!liveData.hasActiveObservers()) {
+            //  if (!liveData.hasActiveObservers()) {
                 runningJob?.cancel()
                 runningJob = null
-            }
+            //  }
         }
     }
 }

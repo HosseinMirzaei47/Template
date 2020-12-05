@@ -13,7 +13,7 @@ class ArticleServiceImpl(val retrofit: Retrofit) : ArticleDataSource {
     private lateinit var stuff: Response<List<Article>>
 
     init {
-        returnResponse(true)
+        returnResponse(false)
     }
 
     private fun returnResponse(responseIsSuccess: Boolean) {

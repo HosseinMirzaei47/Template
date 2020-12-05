@@ -72,7 +72,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun errorDialog() {
         val dialog = MaterialAlertDialogBuilder(this)
-        dialog.setTitle("امکان برقراری ارتباط با سرور مقدور نمی باشد")
+        dialog.setTitle(" برقراری ارتباط با سرور مقدور نمی باشد")
             .setNegativeButton("انصراف") { _, _ ->
             }
             .setPositiveButton("تلاش مجدد") { _, _ ->
