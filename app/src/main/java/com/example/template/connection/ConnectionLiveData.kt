@@ -89,4 +89,5 @@ class ConnectionLiveData(private val context: Context) : LiveData<Boolean>() {
         val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
         postValue(activeNetwork?.isConnected == true)
     }
+
 }

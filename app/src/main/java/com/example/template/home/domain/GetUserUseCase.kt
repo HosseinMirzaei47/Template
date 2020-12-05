@@ -13,5 +13,4 @@ class GetUserUseCase @Inject constructor(
 ) : CoroutineUseCase<Int, UserRes>(dispatchers.io) {
     override suspend fun execute(parameters: Int): UserRes =
         homeRepository.getUsers(parameters).bodyOrThrow()
-
 }
