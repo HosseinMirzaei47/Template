@@ -13,9 +13,7 @@ import com.example.template.core.withResult
 import com.example.template.databinding.FragmentHomeBinding
 import com.example.template.home.data.servicemodels.UserRes
 import com.example.template.home.ui.viewmodel.HomeViewModel
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.layout_state.*
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -41,16 +39,30 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         viewModel.users.observe(viewLifecycleOwner, usersObserver)
+
+
+        viewModel.article.observe(viewLifecycleOwner, Observer {
+            it.withResult(
+                onSuccess = {
+
+                    Log.d("mamad", "my lisr=t: ${it} ")
+                },
+                onLoading = {},
+                onError = { showDialog() }
+            )
+
+        })
     }
 
     private val usersObserver = Observer<Result<UserRes>> {
 
     it.withResult(
-            onSuccess = {},
-            onLoading = {},
-            onError = { showDialog() }
-        )
+        onSuccess = { Log.d("mamad4", "sss") },
+        onLoading = { Log.d("mamad4", "lll") },
+        onError = { showDialog() }
+    )
     }
 
     private fun showDialog() {
@@ -60,7 +72,7 @@ class HomeFragment : Fragment() {
 //            }
 //            .setPositiveButton("Retry") { _, _ ->
 //                viewModel.users.retry()
-//            }
+//            }f
 //            .show()
     }
 }

@@ -1,8 +1,12 @@
 package com.example.template.di
 
+import com.example.template.ArticleServiceImpl
+import com.example.template.CommentServiceImpl
 import com.example.template.UserServiceImpl
-import com.example.template.home.data.remote.UserDataSource
 import com.example.template.core.util.Constants.BASE_URL
+import com.example.template.home.data.remote.ArticleDataSource
+import com.example.template.home.data.remote.CommentDataSource
+import com.example.template.home.data.remote.UserDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -47,5 +51,15 @@ object RetrofitModule {
 
     @Singleton
     @Provides
-    fun provideDemoServiceApi(retrofit: Retrofit) : UserDataSource = UserServiceImpl(retrofit)
+    fun provideDemoUserServiceApi(retrofit: Retrofit): UserDataSource = UserServiceImpl(retrofit)
+
+    @Singleton
+    @Provides
+    fun provideDemoArticleServiceApi(retrofit: Retrofit): ArticleDataSource =
+        ArticleServiceImpl(retrofit)
+
+    @Singleton
+    @Provides
+    fun provideDemoCommentServiceApi(retrofit: Retrofit): CommentDataSource =
+        CommentServiceImpl(retrofit)
 }

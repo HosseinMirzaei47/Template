@@ -39,7 +39,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintRoot2"
-            reactToResult="@{vm.users2}"
+            reactToResult="@{vm.article}"
             android:layout_width="280dp"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"

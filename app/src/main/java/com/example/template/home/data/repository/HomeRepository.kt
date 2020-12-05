@@ -7,4 +7,8 @@ class HomeRepository @Inject constructor(
     private val homeRemoteDataSource: HomeRemoteDataSource
 ) {
     suspend fun getUsers(page: Int) = homeRemoteDataSource.getUsers(page)
+
+    suspend fun getArticles(userId: Int) = homeRemoteDataSource.getArticle(userId)
+
+    suspend fun getComments(articleId: String) = homeRemoteDataSource.getComments(articleId)
 }

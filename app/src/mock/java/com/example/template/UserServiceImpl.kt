@@ -15,7 +15,7 @@ class UserServiceImpl(private val retrofit: Retrofit) : UserDataSource {
     private lateinit var stuff: Response<UserRes>
 
     init {
-        returnResponse(false)
+        returnResponse(true)
     }
 
     private fun returnResponse(responseIsSuccess: Boolean) {

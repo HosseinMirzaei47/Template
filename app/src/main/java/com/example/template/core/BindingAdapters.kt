@@ -117,10 +117,14 @@ fun showLoadingState(
     result: CoroutineLiveTask<*>
 ) {
     parent as ViewGroup
+
+    println("mamad0$state")
+
     when (state) {
 
         LOAD_STATE -> {
             stateLayout?.let {
+                println("mamad0 load")
                 it.tv_status.startAnimation(
                     AnimationUtils.loadAnimation(
                         it.context,
@@ -138,6 +142,7 @@ fun showLoadingState(
             }
         }
         ERROR_STATE -> {
+            println("mamad1 error")
             stateLayout?.let {
                 it.tv_status.clearAnimation()
                 it.ivBtn_refresh.visibility = View.VISIBLE
@@ -153,6 +158,7 @@ fun showLoadingState(
             }
         }
         SUCCESS_STATE -> {
+            println("mamad2 success")
             stateLayout?.let {
                 parent.removeView(it)
             }
