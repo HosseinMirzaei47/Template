@@ -42,8 +42,8 @@ class CoroutineLiveTask<T>(
                         }
                         else -> {
                             if (retryCounts <= retryAttempts) {
-                                this.retry()
                                 retryCounts++
+                                this.retry()
                             }
                         }
                     }

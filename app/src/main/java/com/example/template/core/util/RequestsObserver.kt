@@ -11,7 +11,7 @@ object RequestsObserver : MediatorLiveData<Result<*>>() {
         taskList.add(task)
 
         this.addSource(task) { result ->
-            //printStats()
+            printStats()
             when (result) {
                 is Result.Success -> {
                     this.removeSource(task)
@@ -19,8 +19,17 @@ object RequestsObserver : MediatorLiveData<Result<*>>() {
                     checkIsThereAnyUnSuccess()
                 }
                 is Result.Error -> {
-                    if (this.value !is Result.Error && (task.retryCounts > task.retryAttempts)) {
-                        this.postValue(task.value)
+                    if (this.value !is Result.Error) {
+                        when (result.exception) {
+                            is NoConnectionException -> {
+                                this.postValue(task.value)
+                            }
+                            else -> {
+                                if (task.retryCounts > task.retryAttempts) {
+                                    this.postValue(task.value)
+                                }
+                            }
+                        }
                     }
                 }
                 is Result.Loading -> {
