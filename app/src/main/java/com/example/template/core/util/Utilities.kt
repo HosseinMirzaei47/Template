@@ -32,3 +32,8 @@ fun <T> Response<T>.bodyOrThrow(): T {
     if (!isSuccessful) throw HttpException(this)
     return body()!!
 }
+
+object NetworkStatusCode {
+    const val STATUS_DEFAULT = -1
+    const val STATUS_CONNECTION_LOST = 0
+}
