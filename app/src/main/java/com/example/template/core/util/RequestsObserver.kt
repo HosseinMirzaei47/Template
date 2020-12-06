@@ -1,10 +1,11 @@
 package com.example.template.core.util
 
 import com.example.template.core.Result
+import retrofit2.HttpException
 
-class RequestsObserver private constructor() : CoroutineLiveTask<Any>(block = {}) {
+class RequestsObserver private constructor() : CoroutineLiveTask<Any>() {
 
-    var taskList = mutableListOf<CoroutineLiveTask<Result<Any>>>()
+    private var taskList = mutableListOf<CoroutineLiveTask<Result<Any>>>()
 
     fun addLiveData(task: CoroutineLiveTask<Result<Any>>) {
         taskList.add(task)
@@ -19,9 +20,17 @@ class RequestsObserver private constructor() : CoroutineLiveTask<Any>(block = {}
                 }
                 is Result.Error -> {
                     if (this.value !is Result.Error) {
-                        when (result.exception) {
-                            is NoConnectionException -> {
+                        val b = (result.exception is ServerException &&
+                                result.exception.meta.statusCode == 401) ||
+                                (result.exception is HttpException &&
+                                        result.exception.code() == 401)
+                        when {
+                            result.exception is NoConnectionException -> {
                                 this.postValue(task.value)
+                            }
+                            b -> {
+                                this.postValue(task.value)
+                                cancelAll(task.value)
                             }
                             else -> {
                                 if (task.retryCounts > task.retryAttempts) {
@@ -60,8 +69,19 @@ class RequestsObserver private constructor() : CoroutineLiveTask<Any>(block = {}
         }
     }
 
+    private fun cancelAll(value: Result<Result<Any>>?) {
+        val listOfUnLoading = taskList.filter { coroutineLiveTask ->
+            coroutineLiveTask.value is Result.Loading
+        }
+
+        listOfUnLoading.forEachIndexed { _, coroutineLiveTask ->
+            coroutineLiveTask.cancel()
+            coroutineLiveTask.postValue(value)
+        }
+    }
+
     private fun setLoadingIfNoErrorLeft() {
-        val hasError = taskList.any { it ->
+        val hasError = taskList.any {
             it.value is Result.Error
         }
         if (!hasError) {
@@ -70,7 +90,7 @@ class RequestsObserver private constructor() : CoroutineLiveTask<Any>(block = {}
     }
 
     private fun checkIsThereAnyUnSuccess() {
-        val anyRequestLeft = taskList.any { it ->
+        val anyRequestLeft = taskList.any {
             it.value is Result.Loading || it.value is Result.Error
         }
         if (!anyRequestLeft) {
@@ -88,13 +108,13 @@ class RequestsObserver private constructor() : CoroutineLiveTask<Any>(block = {}
     }
 
     private fun printStats() {
-        var sucessess = 0
+        var successes = 0
         var failed = 0
         var loading = 0
         taskList.forEachIndexed { _, coroutineLiveTask ->
             when (coroutineLiveTask.value) {
                 is Result.Success -> {
-                    sucessess++
+                    successes++
                 }
                 is Result.Error -> {
                     failed++
@@ -104,7 +124,7 @@ class RequestsObserver private constructor() : CoroutineLiveTask<Any>(block = {}
                 }
             }
         }
-        println("mmb successha=$sucessess failedha=$failed loadingha=$loading allcount=${taskList.size}")
+        println("jalil successful: $successes failed :$failed loading :$loading all requests: ${taskList.size}")
     }
 
     companion object {

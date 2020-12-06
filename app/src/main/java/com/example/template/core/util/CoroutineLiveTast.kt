@@ -6,6 +6,7 @@ import com.example.template.core.Result
 import com.example.template.core.withError
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
+import retrofit2.HttpException
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.experimental.ExperimentalTypeInference
@@ -24,7 +25,7 @@ open class CoroutineLiveTask<T>(
     var retryAttempts: Int = DEFAULT_RETRY_ATTEMPTS,
     private val context: CoroutineContext = EmptyCoroutineContext,
     private val timeoutInMs: Long = DEFAULT_TIMEOUT,
-    val block: suspend LiveTaskScope<T>.() -> Unit,
+    val block: suspend LiveTaskScope<T>.() -> Unit = {},
 ) : MediatorLiveData<Result<T>>() {
 
     private var blockRunner: TaskRunner<T>? = null
@@ -36,12 +37,17 @@ open class CoroutineLiveTask<T>(
         this.addSource(this) {
             if (it is Result.Error) {
                 it.withError { exception ->
+
+                    val isNotAuthorized =
+                        (exception is ServerException && exception.meta.statusCode == 401) ||
+                                (exception is HttpException && exception.code() == 401)
+
                     when (exception) {
                         is NoConnectionException -> {
                             retryOnNetworkBack()
                         }
                         else -> {
-                            if (retryCounts <= retryAttempts) {
+                            if (retryCounts <= retryAttempts && !isNotAuthorized) {
                                 retryCounts++
                                 this.retry()
                             }
@@ -124,15 +130,10 @@ internal class TaskRunner<T>(
     }
 
     fun cancel() {
-        if (cancellationJob != null) {
-            error("Cancel call cannot happen without a maybeRun")
-        }
         cancellationJob = scope.launch(Main.immediate) {
             delay(timeoutInMs)
-            //  if (!liveData.hasActiveObservers()) {
             runningJob?.cancel()
             runningJob = null
-            //  }
         }
     }
 }
@@ -151,7 +152,7 @@ internal class LiveTaskScopeImpl<T>(
         target.value = userUseCase
     }
 
-    override fun retrySexy() {}
+    override fun retry() {}
 }
 
 internal typealias Block<T> = suspend LiveTaskScope<T>.() -> Unit
@@ -159,5 +160,5 @@ internal typealias Block<T> = suspend LiveTaskScope<T>.() -> Unit
 interface LiveTaskScope<T> {
     val latestValue: Result<T>?
     suspend fun emit(userUseCase: Result<T>)
-    fun retrySexy()
+    fun retry()
 }

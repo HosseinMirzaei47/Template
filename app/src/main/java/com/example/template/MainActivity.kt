@@ -29,14 +29,14 @@ class MainActivity : AppCompatActivity() {
                 is Result.Success -> {
                 }
                 is Result.Error -> {
+                    val isNotAuthorized =
+                        (event.exception is ServerException && event.exception.meta.statusCode == 401) ||
+                                (event.exception is HttpException && event.exception.code() == 401)
                     when {
                         event.exception is NoConnectionException -> {
                             noConnectionDialog()
                         }
-                        (event.exception is ServerException &&
-                                event.exception.meta.statusCode == 401) ||
-                                (event.exception is HttpException &&
-                                        event.exception.code() == 401) -> {
+                        isNotAuthorized -> {
                             unauthorizedDialog()
                         }
                         else -> {
@@ -52,12 +52,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun unauthorizedDialog() {
         val dialog = MaterialAlertDialogBuilder(this)
-        dialog.setTitle("دسترسی شما غیر مجاز است مجددا لاگین کنید")
+        dialog.setTitle("دسترسی غیر مجاز")
             .setCancelable(false)
-            .setNegativeButton("لاگین نا موفق") { _, _ ->
+            .setNegativeButton("خروج") { _, _ ->
                 finish()
             }
-            .setPositiveButton("لاگین موفق") { _, _ ->
+            .setPositiveButton("اوکی") { _, _ ->
                 RequestsObserver.getInstance().retryAll()
             }
             .show()
@@ -65,17 +65,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun noConnectionDialog() {
         val dialog = MaterialAlertDialogBuilder(this)
-        dialog.setTitle("هیچ اتصالی برای اینترنت موجود نمی باشد")
+        dialog.setTitle("خطا در اتصال به اینترنت")
             .setCancelable(false)
             .setNeutralButton("ورود به تنظیمات") { _, _ ->
-                startActivity(Intent(Settings.ACTION_WIFI_SETTINGS));
+                startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
             }
             .show()
     }
 
     private fun errorDialog() {
         val dialog = MaterialAlertDialogBuilder(this)
-        dialog.setTitle(" برقراری ارتباط با سرور مقدور نمی باشد")
+        dialog.setTitle("خطا در برقراری ارتباط با سرور")
             .setNegativeButton("انصراف") { _, _ ->
             }
             .setPositiveButton("تلاش مجدد") { _, _ ->
