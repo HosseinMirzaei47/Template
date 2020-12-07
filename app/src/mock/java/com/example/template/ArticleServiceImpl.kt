@@ -1,13 +1,11 @@
 package com.example.template
 
 import com.example.template.home.data.remote.ArticleDataSource
+import com.example.template.home.data.remote.HomeApi
 import com.example.template.home.data.servicemodels.Article
 import kotlinx.coroutines.delay
-import okhttp3.ResponseBody.Companion.toResponseBody
-import retrofit2.Response
-import retrofit2.Retrofit
 
-class ArticleServiceImpl(val retrofit: Retrofit) : ArticleDataSource {
+class ArticleServiceImpl(val api: HomeApi) : ArticleDataSource {
 
     private fun returnResponse(responseIsSuccess: Boolean): List<Article> {
         return if (responseIsSuccess) {

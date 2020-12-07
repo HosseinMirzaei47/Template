@@ -1,17 +1,11 @@
 package com.example.template
 
-import android.util.Log
-import com.example.template.core.util.NoConnectionException
 import com.example.template.home.data.remote.HomeApi
 import com.example.template.home.data.remote.UserDataSource
 import com.example.template.home.data.servicemodels.Ad
 import com.example.template.home.data.servicemodels.Data
 import com.example.template.home.data.servicemodels.UserRes
 import kotlinx.coroutines.delay
-import okhttp3.ResponseBody.Companion.toResponseBody
-import retrofit2.HttpException
-import retrofit2.Response
-import retrofit2.Retrofit
 
 
 class UserServiceImpl(private val api: HomeApi) : UserDataSource {
@@ -62,7 +56,7 @@ class UserServiceImpl(private val api: HomeApi) : UserDataSource {
     }
 
     private fun returnErrorResponse(): UserRes {
-        throw NoConnectionException("error")
+        throw Exception("error")
     }
 
     override suspend fun getUsers(page: Int): UserRes {
