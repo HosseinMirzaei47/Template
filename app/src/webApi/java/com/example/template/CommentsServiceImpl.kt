@@ -1,31 +1,26 @@
 package com.example.template
 
-import com.example.template.home.data.remote.ArticleDataSource
+import com.example.template.core.util.bodyOrThrow
 import com.example.template.home.data.remote.CommentDataSource
-import com.example.template.home.data.servicemodels.*
+import com.example.template.home.data.remote.HomeApi
+import com.example.template.home.data.servicemodels.Comment
 import kotlinx.coroutines.delay
-import okhttp3.ResponseBody.Companion.toResponseBody
 import retrofit2.Response
-import retrofit2.Retrofit
 
-class CommentServiceImpl(val retrofit: Retrofit) : CommentDataSource {
+class CommentServiceImpl(private val api: HomeApi) : CommentDataSource {
 
 
     private lateinit var stuff: Response<List<Comment>>
 
-    init {
-        returnResponse(false)
-    }
-
-    private fun returnResponse(responseIsSuccess: Boolean) {
-        if (responseIsSuccess) {
+    private fun returnResponse(responseIsSuccess: Boolean): List<Comment> {
+        return if (responseIsSuccess) {
             returnSuccessResponse()
         } else {
             returnErrorResponse()
         }
     }
 
-    private fun returnSuccessResponse() {
+    private fun returnSuccessResponse(): List<Comment> {
         val commentList = mutableListOf(
             Comment("1", "comment 1 ", "mamd", 13, true),
             Comment("2", "comment 2", "reaq", 14, false),
@@ -50,15 +45,16 @@ class CommentServiceImpl(val retrofit: Retrofit) : CommentDataSource {
         stuff = Response.success(
             commentList
         )
+        return stuff.bodyOrThrow()
     }
 
-    private fun returnErrorResponse() {
-        stuff = Response.error(404, "error happened".toResponseBody())
+    private fun returnErrorResponse(): List<Comment> {
+        throw Exception("error")
     }
 
-    override suspend fun getComments(articleId: String): Response<List<Comment>> {
+    override suspend fun getComments(articleId: String): List<Comment> {
         delay(3000L)
-        return stuff
+        return returnResponse(false)
     }
 
 
