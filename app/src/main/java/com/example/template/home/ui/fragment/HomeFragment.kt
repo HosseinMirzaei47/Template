@@ -1,24 +1,23 @@
 package com.example.template.home.ui.fragment
 
+import android.content.Intent
 import android.os.Bundle
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
-import com.example.template.R
+import androidx.navigation.fragment.findNavController
 import com.example.template.core.Result
-import com.example.template.core.util.liveTask
+import com.example.template.core.util.NoConnectionException
+import com.example.template.core.util.ServerException
 import com.example.template.databinding.FragmentHomeBinding
 import com.example.template.home.domain.GetUserUseCase
 import com.example.template.home.ui.viewmodel.HomeViewModel
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_home.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -26,11 +25,8 @@ class HomeFragment : Fragment() {
 
     @Inject
     lateinit var useCase: GetUserUseCase
-
     private lateinit var binding: FragmentHomeBinding
     private val viewModel: HomeViewModel by viewModels()
-
-    lateinit var selected: String
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,146 +44,78 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        onSubmitClick()
-        spinnerSetup()
+        setOnClicks()
+
+        observeRequestsStatus()
     }
 
-    private fun onSubmitClick() {
+    private fun setOnClicks() {
+        binding.gotonext.setOnClickListener {
+            findNavController().navigate(HomeFragmentDirections.actionHomeFragmentSelf())
+        }
+
         binding.submit.setOnClickListener {
-            lifecycleScope.launch(Dispatchers.Main) {
-                when (selected) {
-                    "1" -> testForOne()
-                    "2" -> testForTwo()
-                    "3" -> testForThree()
-                    "4" -> testForFour()
-                    "5" -> testForFive()
-                    "6" -> testForSix()
+            viewModel.combinedTasks.executeAll()
+        }
+    }
+
+    private fun observeRequestsStatus() {
+        viewModel.combinedTasks.observe(viewLifecycleOwner) { event ->
+            when (event) {
+                is Result.Success<*> -> {
+                }
+                is Result.Error -> {
+                    val isNotAuthorized =
+                        (event.exception is ServerException && event.exception.meta.statusCode == 401) ||
+                                (event.exception is HttpException && event.exception.code() == 401)
+                    when {
+                        event.exception is NoConnectionException -> {
+                            noConnectionDialog()
+                        }
+                        isNotAuthorized -> {
+                            unauthorizedDialog()
+                        }
+                        else -> {
+                            errorDialog()
+                        }
+                    }
+                }
+                is Result.Loading -> {
                 }
             }
         }
     }
 
-    private fun spinnerSetup() {
-        ArrayAdapter.createFromResource(
-            requireContext(),
-            R.array.sp_item,
-            android.R.layout.simple_spinner_item
-        ).also { adapter ->
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            binding.spinner.adapter = adapter
-        }
-
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onNothingSelected(p0: AdapterView<*>?) {
+    private fun unauthorizedDialog() {
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+        dialog.setTitle("دسترسی غیر مجاز")
+            .setCancelable(false)
+            .setNegativeButton("خروج") { _, _ ->
+                requireActivity().finish()
             }
-
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, pos: Int, id: Long) {
-                selected = spinner.selectedItem.toString()
+            .setPositiveButton("تلاش برای لاگین موفق") { _, _ ->
+                viewModel.combinedTasks.retryAll()
             }
-
-        }
+            .show()
     }
 
-    private suspend fun testForOne() {
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
+    private fun noConnectionDialog() {
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+        dialog.setTitle("خطا در اتصال به اینترنت")
+            .setCancelable(false)
+            .setNeutralButton("ورود به تنظیمات") { _, _ ->
+                startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+            }
+            .show()
     }
 
-    private suspend fun testForTwo() {
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
+    private fun errorDialog() {
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+        dialog.setTitle("خطا در برقراری ارتباط با سرور")
+            .setNegativeButton("انصراف") { _, _ ->
+            }
+            .setPositiveButton("تلاش مجدد") { _, _ ->
+            }
+            .show()
     }
-
-    private suspend fun testForThree() {
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
-    }
-
-    private suspend fun testForFour() {
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
-    }
-
-    private suspend fun testForFive() {
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
-    }
-
-    private suspend fun testForSix() {
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
-        liveTask {
-            emit(Result.Loading)
-            emit(useCase(1))
-        }
-    }
-
 }

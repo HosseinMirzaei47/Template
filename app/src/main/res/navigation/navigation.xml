@@ -14,6 +14,9 @@
         <action
             android:id="@+id/action_homeFragment_to_combineTestFragment"
             app:destination="@id/combineTestFragment" />
+        <action
+            android:id="@+id/action_homeFragment_self"
+            app:destination="@id/homeFragment" />
 
     </fragment>
 

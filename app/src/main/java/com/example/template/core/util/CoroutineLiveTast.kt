@@ -32,7 +32,6 @@ open class CoroutineLiveTask<T>(
     var retryCounts = 1
 
     init {
-        initBlockRunner()
 
         this.addSource(this) {
             if (it is Result.Error) {
@@ -57,12 +56,11 @@ open class CoroutineLiveTask<T>(
             }
         }
 
-        RequestsObserver.getInstance()?.let {
-            it.addLiveData(this as CoroutineLiveTask<Result<Any>>)
-        }
+
     }
 
-    private fun initBlockRunner() {
+    fun execute() {
+        this.postValue(Result.Loading)
         val supervisorJob = SupervisorJob(context[Job])
         val scope = CoroutineScope(Dispatchers.IO + context + supervisorJob)
         blockRunner = TaskRunner(
@@ -73,6 +71,8 @@ open class CoroutineLiveTask<T>(
         ) {
             blockRunner = null
         }
+
+        blockRunner?.maybeRun()
     }
 
 
@@ -96,8 +96,7 @@ open class CoroutineLiveTask<T>(
 
     fun retry() {
         this.removeSource(connectionLiveData)
-        initBlockRunner()
-        blockRunner?.maybeRun()
+        execute()
     }
 
     fun cancel() {
