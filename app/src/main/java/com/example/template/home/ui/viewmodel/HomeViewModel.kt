@@ -13,4 +13,6 @@ class HomeViewModel @ViewModelInject constructor(
     private val commentUseCase: GetCommentUseCase
 ) : ViewModel() {
     val status = RequestsObserver.getInstance()
+
+
 }

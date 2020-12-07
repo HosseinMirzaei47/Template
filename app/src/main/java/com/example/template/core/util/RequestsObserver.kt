@@ -111,6 +111,7 @@ class RequestsObserver private constructor() : CoroutineLiveTask<Any>() {
         var successes = 0
         var failed = 0
         var loading = 0
+
         taskList.forEachIndexed { _, coroutineLiveTask ->
             when (coroutineLiveTask.value) {
                 is Result.Success -> {
