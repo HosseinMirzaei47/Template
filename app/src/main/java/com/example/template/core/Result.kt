@@ -42,3 +42,21 @@ inline fun <T> Result<T>.onError(action: (Exception) -> Unit): Result<T> {
     }
     return this
 }
+
+fun <T> Result<T>.state(): String {
+    return when (this) {
+        is Result.Loading -> {
+            "Loading..."
+        }
+        is Result.Error -> {
+            "Error..."
+
+        }
+        is Result.Success -> {
+            "Success..."
+        }
+    }
+}
+
+
+

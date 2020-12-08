@@ -3,38 +3,38 @@ package com.example.template.core.util
 import com.example.template.core.Result
 import retrofit2.HttpException
 
-class RequestsObserver private constructor() : CoroutineLiveTask<Any>() {
+class TaskCombiner(vararg requests: CoroutineLiveTask<*>) : CoroutineLiveTask<Any>() {
 
-    private var taskList = mutableListOf<CoroutineLiveTask<Result<Any>>>()
+    private var taskList = mutableListOf<CoroutineLiveTask<*>>()
 
-    fun addLiveData(task: CoroutineLiveTask<Result<Any>>) {
+    init {
+        requests.forEach { addTaskAsSource(it) }
+    }
+
+    fun addTaskAsSource(task: CoroutineLiveTask<*>) {
         taskList.add(task)
-
         this.addSource(task) { result ->
             printStats()
             when (result) {
                 is Result.Success -> {
-                    this.removeSource(task)
-                    taskList.remove(task)
                     checkIsThereAnyUnSuccess()
                 }
                 is Result.Error -> {
                     if (this.value !is Result.Error) {
-                        val b = (result.exception is ServerException &&
+                        val isNotAuthorized = (result.exception is ServerException &&
                                 result.exception.meta.statusCode == 401) ||
                                 (result.exception is HttpException &&
                                         result.exception.code() == 401)
                         when {
                             result.exception is NoConnectionException -> {
-                                this.postValue(task.value)
+                                this.postValue(task.value as Result<Any>?)
                             }
-                            b -> {
-                                this.postValue(task.value)
-                                cancelAll(task.value)
+                            isNotAuthorized -> {
+                                this.postValue(task.value as Result<Any>?)
                             }
                             else -> {
                                 if (task.retryCounts > task.retryAttempts) {
-                                    this.postValue(task.value)
+                                    this.postValue(task.value as Result<Any>?)
                                 }
                             }
                         }
@@ -45,7 +45,7 @@ class RequestsObserver private constructor() : CoroutineLiveTask<Any>() {
                         is Result.Error -> {
                             setLoadingIfNoErrorLeft()
                         }
-                        is Result.Success -> {
+                        is Result.Success<*> -> {
                             this.postValue(Result.Loading)
                         }
                         is Result.Loading -> {
@@ -59,24 +59,26 @@ class RequestsObserver private constructor() : CoroutineLiveTask<Any>() {
         }
     }
 
+    fun executeAll() = taskList.forEach { it.execute() }
+
     fun retryAll() {
         this.postValue(Result.Loading)
         val listOfUnSuccesses = taskList.filter { coroutineLiveTask ->
             coroutineLiveTask.value is Result.Error
         }
-        listOfUnSuccesses.forEachIndexed { _, coroutineLiveTask ->
+        listOfUnSuccesses.forEach { coroutineLiveTask ->
             coroutineLiveTask.retry()
         }
     }
 
-    private fun cancelAll(value: Result<Result<Any>>?) {
+    fun cancelAll(value: Result<Any>?) {
         val listOfUnLoading = taskList.filter { coroutineLiveTask ->
             coroutineLiveTask.value is Result.Loading
         }
 
-        listOfUnLoading.forEachIndexed { _, coroutineLiveTask ->
+        listOfUnLoading.forEach { coroutineLiveTask ->
             coroutineLiveTask.cancel()
-            coroutineLiveTask.postValue(value)
+            coroutineLiveTask.postValue(value as Result<Nothing>?)
         }
     }
 
@@ -101,7 +103,7 @@ class RequestsObserver private constructor() : CoroutineLiveTask<Any>() {
                     coroutineLiveTask.value is Result.Error
                 }
                 oneOfErrors?.let {
-                    this.postValue(it.value)
+                    this.postValue(it.value as Result<Any>?)
                 }
             }
         }
@@ -111,8 +113,7 @@ class RequestsObserver private constructor() : CoroutineLiveTask<Any>() {
         var successes = 0
         var failed = 0
         var loading = 0
-
-        taskList.forEachIndexed { _, coroutineLiveTask ->
+        taskList.forEach { coroutineLiveTask ->
             when (coroutineLiveTask.value) {
                 is Result.Success -> {
                     successes++
@@ -125,11 +126,6 @@ class RequestsObserver private constructor() : CoroutineLiveTask<Any>() {
                 }
             }
         }
-        println("jalil successful: $successes failed :$failed loading :$loading all requests: ${taskList.size}")
-    }
-
-    companion object {
-        private var singleInstance: RequestsObserver = RequestsObserver()
-        fun getInstance() = singleInstance
+        println("mmb successful: $successes failed :$failed loading :$loading all requests: ${taskList.size}")
     }
 }
