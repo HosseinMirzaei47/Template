@@ -14,5 +14,4 @@ class HomeViewModel @ViewModelInject constructor(
 ) : ViewModel() {
     val status = RequestsObserver.getInstance()
 
-
 }
