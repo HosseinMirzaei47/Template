@@ -11,7 +11,7 @@ class TaskCombiner(vararg requests: CoroutineLiveTask<*>) : CoroutineLiveTask<An
         requests.forEach { addTaskAsSource(it) }
     }
 
-    fun addTaskAsSource(task: CoroutineLiveTask<*>) {
+    private fun addTaskAsSource(task: CoroutineLiveTask<*>) {
         taskList.add(task)
         this.addSource(task) { result ->
             printStats()

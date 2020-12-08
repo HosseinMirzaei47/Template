@@ -1,6 +1,8 @@
 package com.example.template.core.util
 
 import androidx.lifecycle.MediatorLiveData
+import com.example.template.core.ErrorEvent
+import com.example.template.core.Logger
 import com.example.template.core.MyApp.Companion.connectionLiveData
 import com.example.template.core.Result
 import com.example.template.core.withError
@@ -36,6 +38,7 @@ open class CoroutineLiveTask<T>(
         this.addSource(this) {
             if (it is Result.Error) {
                 it.withError { exception ->
+                    Logger.errorEvent.postValue(ErrorEvent((exception)))
 
                     val isNotAuthorized =
                         (exception is ServerException && exception.meta.statusCode == 401) ||
@@ -55,8 +58,6 @@ open class CoroutineLiveTask<T>(
                 }
             }
         }
-
-
     }
 
     fun execute() {
