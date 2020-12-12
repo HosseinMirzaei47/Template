@@ -20,6 +20,8 @@ class HomeViewModel @ViewModelInject constructor(
     }
 
     val users2 = liveTask {
+        retryAttempts(10)
+        autoRetry(true)
         emit(useCase(1))
     }
 

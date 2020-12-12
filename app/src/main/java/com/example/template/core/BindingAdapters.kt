@@ -7,17 +7,18 @@ import android.view.animation.AnimationUtils
 import android.widget.Button
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
+import com.example.template.BaseLiveTask
 import com.example.template.R
-import com.example.template.core.util.CoroutineLiveTask
 import kotlinx.android.synthetic.main.layout_state.view.*
 
 private const val LOAD_STATE = "loading"
 private const val ERROR_STATE = "error"
 private const val SUCCESS_STATE = "success"
 
-@BindingAdapter("reactToResult")
-fun <T> View.reactToResult(result: CoroutineLiveTask<T>) {
+@BindingAdapter("reactToTask")
+fun <T> ViewGroup.reactToTask(result: BaseLiveTask<Any>) {
     when (result.value) {
         is Result.Success -> {
             var stateLayout = situationOfStateLayout(this).first
@@ -66,7 +67,7 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
                 val parent = view.parent as ConstraintLayout
                 if (view.tag == null) {
                     val stateLayout = inflateStateLayoutAndSetID(parent)
-                    setConstraintForStateLayout(parent, stateLayout, view)
+                    setConstraintForStateLayout(parent, stateLayout)
                     view.tag = stateLayout.id
                 }
                 return Pair(parent.getViewById(view.tag as Int), parent)
@@ -94,8 +95,7 @@ private fun inflateStateLayoutAndSetID(view: ViewGroup): View {
 
 private fun setConstraintForStateLayout(
     parent: ConstraintLayout,
-    stateLayout: View,
-    view: View
+    stateLayout: View
 ) {
     val constraintSet = ConstraintSet()
     constraintSet.clone(parent)
@@ -131,7 +131,7 @@ fun showLoadingState(
     state: String,
     stateLayout: View?,
     parent: Any,
-    result: CoroutineLiveTask<*>
+    result: BaseLiveTask<Any>
 ) {
     parent as ViewGroup
 
@@ -179,21 +179,12 @@ fun showLoadingState(
     }
 }
 
-@BindingAdapter("enableButton")
-fun <T> Button.enableButton(result: CoroutineLiveTask<T>) {
-    when (result.value) {
-        is Result.Loading -> {
-            this.text = "loading..."
-            this.isEnabled = false
-        }
-        is Result.Success -> {
-            this.text = "success"
-            this.isEnabled = true
+@BindingAdapter("visibleOnLoading")
+fun View.visibleOnLoading(result: BaseLiveTask<Any>?) {
+    this.isVisible = Result.Loading == result?.value
+}
 
-        }
-        is Result.Error -> {
-            this.text = "error"
-            this.isEnabled = false
-        }
-    }
+@BindingAdapter("disableOnLoading")
+fun Button.disableOnLoading(result: BaseLiveTask<Any>?) {
+    this.isEnabled = Result.Loading != result?.value
 }

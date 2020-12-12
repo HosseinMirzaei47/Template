@@ -1,6 +1,6 @@
 package com.example.template.core.util
 
-import androidx.lifecycle.MediatorLiveData
+import com.example.template.BaseLiveTask
 import com.example.template.core.ErrorEvent
 import com.example.template.core.Logger
 import com.example.template.core.MyApp.Companion.connectionLiveData
@@ -14,27 +14,23 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.experimental.ExperimentalTypeInference
 
 internal const val DEFAULT_TIMEOUT = 100L
-internal const val DEFAULT_RETRY_ATTEMPTS = 1
 
 @OptIn(ExperimentalTypeInference::class)
 fun <T> liveTask(
-    retryAttempts: Int = DEFAULT_RETRY_ATTEMPTS,
     context: CoroutineContext = EmptyCoroutineContext,
     @BuilderInference block: suspend LiveTaskScope<T>.() -> Unit = {}
-): CoroutineLiveTask<T> = CoroutineLiveTask(retryAttempts, context, block = block)
+): BaseLiveTask<T> = CoroutineLiveTask(context, block = block)
 
-open class CoroutineLiveTask<T>(
-    var retryAttempts: Int = DEFAULT_RETRY_ATTEMPTS,
+class CoroutineLiveTask<T>(
     private val context: CoroutineContext = EmptyCoroutineContext,
     private val timeoutInMs: Long = DEFAULT_TIMEOUT,
     val block: suspend LiveTaskScope<T>.() -> Unit = {},
-) : MediatorLiveData<Result<T>>() {
+) : BaseLiveTask<T>() {
 
     private var blockRunner: TaskRunner<T>? = null
-    var retryCounts = 1
+    var autoRetry = false
 
     init {
-
         this.addSource(this) {
             if (it is Result.Error) {
                 it.withError { exception ->
@@ -46,7 +42,7 @@ open class CoroutineLiveTask<T>(
 
                     when (exception) {
                         is NoConnectionException -> {
-                            retryOnNetworkBack()
+                            if (autoRetry) retryOnNetworkBack()
                         }
                         else -> {
                             if (retryCounts <= retryAttempts && !isNotAuthorized) {
@@ -60,7 +56,7 @@ open class CoroutineLiveTask<T>(
         }
     }
 
-    fun execute() {
+    override fun execute() {
         this.postValue(Result.Loading)
         val supervisorJob = SupervisorJob(context[Job])
         val scope = CoroutineScope(Dispatchers.IO + context + supervisorJob)
@@ -95,12 +91,12 @@ open class CoroutineLiveTask<T>(
         blockRunner?.cancel()
     }
 
-    fun retry() {
+    override fun retry() {
         this.removeSource(connectionLiveData)
         execute()
     }
 
-    fun cancel() {
+    override fun cancel() {
         blockRunner?.cancel()
     }
 }
@@ -153,6 +149,14 @@ internal class LiveTaskScopeImpl<T>(
     }
 
     override fun retry() {}
+
+    override fun retryAttempts(attempts: Int) {
+        target.retryAttempts = attempts
+    }
+
+    override fun autoRetry(bool: Boolean) {
+        target.autoRetry = bool
+    }
 }
 
 internal typealias Block<T> = suspend LiveTaskScope<T>.() -> Unit
@@ -160,5 +164,7 @@ internal typealias Block<T> = suspend LiveTaskScope<T>.() -> Unit
 interface LiveTaskScope<T> {
     val latestValue: Result<T>?
     suspend fun emit(userUseCase: Result<T>)
+    fun retryAttempts(attempts: Int)
+    fun autoRetry(bool: Boolean)
     fun retry()
 }
