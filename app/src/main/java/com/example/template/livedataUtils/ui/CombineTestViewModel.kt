@@ -3,9 +3,8 @@ package com.example.template.livedataUtils.ui
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.template.core.util.Resource
 import com.example.template.livedataUtils.data.Combiner
-import com.example.template.livedataUtils.data.Resource
-import com.example.template.livedataUtils.data.Status
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -37,33 +36,33 @@ class CombineTestViewModel :
 
     fun liveChange1(text: String) {
         viewModelScope.launch {
-            live1.postValue(Resource(Status.LOADING, "", "before delay"))
+            live1.postValue(Resource.Loading())
             delay(10000)
-            live1.postValue(Resource(Status.ERROR, text, "after delay"))
+            live1.postValue(Resource.Error(text, "After Delay"))
         }
     }
 
     fun liveChange2(text: String) {
         viewModelScope.launch {
-            live2.value = Resource(Status.LOADING, "", "before delay")
+            live2.postValue(Resource.Loading())
             delay(10000)
-            live2.value = Resource(Status.SUCCESS, text, "after delay")
+            live2.postValue(Resource.Success(text))
         }
     }
 
     fun liveChange3(text: String) {
         viewModelScope.launch {
-            live3.postValue(Resource(Status.LOADING, "", "before delay"))
+            live3.postValue(Resource.Loading())
             delay(10000)
-            live3.postValue(Resource(Status.SUCCESS, text, "after delay"))
+            live3.postValue(Resource.Success(text))
         }
     }
 
     fun liveChange4(text: String) {
         viewModelScope.launch {
-            live4.value = Resource(Status.LOADING, "", "before delay")
+            live4.postValue(Resource.Loading())
             delay(10000)
-            live4.value = Resource(Status.ERROR, text, "after delay")
+            live4.postValue(Resource.Error(text, "After Delay"))
         }
     }
 

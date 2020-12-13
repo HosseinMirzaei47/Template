@@ -2,6 +2,7 @@ package com.example.template.livedataUtils.data
 
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.template.core.util.Resource
 
 class Combiner(private val lives: MutableList<MutableLiveData<Resource<Any>>>) {
 
@@ -17,27 +18,27 @@ class Combiner(private val lives: MutableList<MutableLiveData<Resource<Any>>>) {
 
     private fun checkAllForLoading() {
         val loading = lives.any {
-            it.value?.status == Status.LOADING
+            it.value is Resource.Loading
         }
         if (loading) {
-            result.postValue(Resource(Status.LOADING, null, null))
+            result.postValue(Resource.Loading())
         } else {
-            result.postValue(Resource(Status.SUCCESS, null, null))
+            result.postValue(Resource.Success("null"))
         }
     }
 
     private fun checkAllForError() {
         val error = lives.any {
-            it.value?.status == Status.ERROR
+            it.value is Resource.Error
         }
         if (error) {
             var totalError = ""
             lives.forEach {
-                if (it.value?.status == Status.ERROR) {
+                if (it.value is Resource.Error) {
                     totalError += "\n" + it.value!!.data.toString()
                 }
             }
-            result.postValue(Resource(Status.ERROR, totalError, null))
+            result.postValue(Resource.Error(totalError))
         } else {
             checkAllForLoading()
         }

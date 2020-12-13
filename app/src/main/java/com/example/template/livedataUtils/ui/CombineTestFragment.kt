@@ -9,8 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.ViewModelProvider
 import com.example.template.R
-import com.example.template.livedataUtils.data.Resource
-import com.example.template.livedataUtils.data.Status
+import com.example.template.core.util.Resource
 import kotlinx.android.synthetic.main.fragment_comibine_test.*
 
 class CombineTestFragment : Fragment() {
@@ -40,24 +39,24 @@ class CombineTestFragment : Fragment() {
         }
 
         combineTestViewModel.live1.observe(viewLifecycleOwner, {
-            if (it.status == Status.SUCCESS) {
+            if (it is Resource.Success) {
                 Toast.makeText(requireContext(), it.data, Toast.LENGTH_SHORT).show()
-            } else if (it.status == Status.ERROR) {
+            } else if (it is Resource.Error) {
                 Toast.makeText(requireContext(), it.data, Toast.LENGTH_SHORT).show()
             }
         })
 
         combineTestViewModel.live2.observe(viewLifecycleOwner, {
-            if (it.status == Status.SUCCESS) {
+            if (it is Resource.Success) {
                 Toast.makeText(requireContext(), it.data, Toast.LENGTH_SHORT).show()
-            } else if (it.status == Status.ERROR) {
+            } else if (it is Resource.Error) {
                 Toast.makeText(requireContext(), it.data, Toast.LENGTH_SHORT).show()
             }
         })
 
         val loading: MediatorLiveData<Resource<Any>> = combineTestViewModel.combiner.result
         loading.observe(viewLifecycleOwner, {
-            if (it.status == Status.LOADING) {
+            if (it is Resource.Loading) {
                 test_progress.visibility = View.VISIBLE
             } else {
                 test_progress.visibility = View.INVISIBLE
@@ -75,24 +74,24 @@ class CombineTestFragment : Fragment() {
         }
 
         combineTestViewModel.live3.observe(viewLifecycleOwner, {
-            if (it.status == Status.SUCCESS) {
+            if (it is Resource.Success) {
                 Toast.makeText(requireContext(), it.data, Toast.LENGTH_SHORT).show()
-            } else if (it.status == Status.ERROR) {
+            } else if (it is Resource.Error) {
                 Toast.makeText(requireContext(), it.data, Toast.LENGTH_SHORT).show()
             }
         })
 
         combineTestViewModel.live4.observe(viewLifecycleOwner, {
-            if (it.status == Status.SUCCESS) {
+            if (it is Resource.Success) {
                 Toast.makeText(requireContext(), it.data, Toast.LENGTH_SHORT).show()
-            } else if (it.status == Status.ERROR) {
+            } else if (it is Resource.Error) {
                 Toast.makeText(requireContext(), it.data, Toast.LENGTH_SHORT).show()
             }
         })
 
         val loading2: MediatorLiveData<Resource<Any>> = combineTestViewModel.combiner2.result
         loading2.observe(viewLifecycleOwner, {
-            if (it.status == Status.LOADING) {
+            if (it is Resource.Loading) {
                 test_progress_2.visibility = View.VISIBLE
             } else {
                 test_progress_2.visibility = View.INVISIBLE
@@ -103,14 +102,14 @@ class CombineTestFragment : Fragment() {
 
         val loading3: MediatorLiveData<Resource<Any>> = combineTestViewModel.combiner3.result
         loading3.observe(viewLifecycleOwner, {
-            when (it.status) {
-                Status.LOADING -> {
+            when (it) {
+                is Resource.Loading -> {
                     if (!isError) {
                         test_progress_3.visibility = View.VISIBLE
                         layout_fade.visibility = View.VISIBLE
                     }
                 }
-                Status.ERROR -> {
+                is Resource.Error -> {
                     isError = true
                     test_progress_3.visibility = View.INVISIBLE
                     tv_error.visibility = View.VISIBLE
