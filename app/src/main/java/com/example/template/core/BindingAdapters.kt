@@ -1,5 +1,6 @@
 package com.example.template.core
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,6 +53,7 @@ fun <T> View.reactToResult(result: CoroutineLiveTask<T>) {
 fun situationOfStateLayout(view: View): Pair<View, Any> {
     when (view) {
         is ConstraintLayout -> {
+            Log.d("parent", "ConstraintLayout")
             if (view.tag == null) {
                 val stateLayout = inflateStateLayoutAndSetID(view)
                 //    all childes of parent must have id to clone in constraint set
@@ -63,6 +65,7 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
         }
         else -> {
             if (view.parent is ConstraintLayout) {
+                Log.d("parent", "parent ConstraintLayout")
                 val parent = view.parent as ConstraintLayout
                 if (view.tag == null) {
                     val stateLayout = inflateStateLayoutAndSetID(parent)
@@ -71,6 +74,7 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
                 }
                 return Pair(parent.getViewById(view.tag as Int), parent)
             } else {
+                Log.d("parent", "Otheeeeeeeeeer")
                 val parent = view.parent as ViewGroup
 
                 if (view.tag == null) {
@@ -102,25 +106,25 @@ private fun setConstraintForStateLayout(
     constraintSet.connect(
         stateLayout.id,
         ConstraintSet.TOP,
-        ConstraintSet.PARENT_ID,
+        view.id,
         ConstraintSet.TOP
     )
     constraintSet.connect(
         stateLayout.id,
         ConstraintSet.BOTTOM,
-        ConstraintSet.PARENT_ID,
+        view.id,
         ConstraintSet.BOTTOM
     )
     constraintSet.connect(
         stateLayout.id,
         ConstraintSet.END,
-        ConstraintSet.PARENT_ID,
+        view.id,
         ConstraintSet.END
     )
     constraintSet.connect(
         stateLayout.id,
         ConstraintSet.START,
-        ConstraintSet.PARENT_ID,
+        view.id,
         ConstraintSet.START
     )
     parent.addView(stateLayout)

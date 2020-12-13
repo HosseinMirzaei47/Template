@@ -1,32 +1,26 @@
 package com.example.template
 
+import com.example.template.home.data.remote.HomeApi
 import com.example.template.home.data.remote.UserDataSource
 import com.example.template.home.data.servicemodels.Ad
 import com.example.template.home.data.servicemodels.Data
 import com.example.template.home.data.servicemodels.UserRes
 import kotlinx.coroutines.delay
-import okhttp3.ResponseBody.Companion.toResponseBody
-import retrofit2.Response
-import retrofit2.Retrofit
 
 
-class UserServiceImpl(private val retrofit: Retrofit) : UserDataSource {
+class UserServiceImpl(private val api: HomeApi) : UserDataSource {
 
-    private lateinit var stuff: Response<UserRes>
+    private lateinit var stuff: UserRes
 
-    init {
-        returnResponse(true)
-    }
-
-    private fun returnResponse(responseIsSuccess: Boolean) {
-        if (responseIsSuccess) {
+    private fun returnResponse(responseIsSuccess: Boolean): UserRes {
+        return if (responseIsSuccess) {
             returnSuccessResponse()
         } else {
             returnErrorResponse()
         }
     }
 
-    private fun returnSuccessResponse() {
+    private fun returnSuccessResponse(): UserRes {
         val dataList = mutableListOf(
             Data(
                 id = 0,
@@ -50,25 +44,25 @@ class UserServiceImpl(private val retrofit: Retrofit) : UserDataSource {
                 last_name = "Johansson"
             ),
         )
-        stuff = Response.success(
-            UserRes(
-                ad = Ad("partsoftware", "part", "partsoftware.com"),
-                dataList,
-                0,
-                0,
-                0,
-                0
-            )
+        stuff = UserRes(
+            ad = Ad("partsoftware", "part", "partsoftware.com"),
+            dataList,
+            0,
+            0,
+            0,
+            0
         )
-    }
-
-    private fun returnErrorResponse() {
-        stuff = Response.error(404, "error happened".toResponseBody())
-    }
-
-    override suspend fun getUsers(page: Int): Response<UserRes> {
-        delay(3000)
         return stuff
     }
+
+    private fun returnErrorResponse(): UserRes {
+        throw Exception("error")
+    }
+
+    override suspend fun getUsers(page: Int): UserRes {
+        delay(3000)
+        return returnResponse(false)
+    }
+
 
 }

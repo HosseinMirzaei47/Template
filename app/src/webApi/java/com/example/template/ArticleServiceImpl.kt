@@ -1,12 +1,13 @@
 package com.example.template
 
+import com.example.template.core.util.bodyOrThrow
 import com.example.template.home.data.remote.ArticleDataSource
+import com.example.template.home.data.remote.HomeApi
 import com.example.template.home.data.servicemodels.Article
 import kotlinx.coroutines.delay
 import retrofit2.Response
-import retrofit2.Retrofit
 
-class ArticleServiceImpl(val retrofit: Retrofit) : ArticleDataSource {
+class ArticleServiceImpl(private val api: HomeApi) : ArticleDataSource {
 
     private var articleList: List<Article>
 
@@ -15,12 +16,12 @@ class ArticleServiceImpl(val retrofit: Retrofit) : ArticleDataSource {
     }
 
     private lateinit var stuff: Response<List<Article>>
-    override suspend fun getArticle(userId: Int): Response<List<Article>> {
+    override suspend fun getArticle(userId: Int): List<Article> {
         stuff = Response.success(
             articleList
         )
         delay(1000L)
-        return stuff
+        return stuff.bodyOrThrow()
     }
 
     private fun setupList(): MutableList<Article> {

@@ -1,31 +1,22 @@
 package com.example.template
 
 import com.example.template.home.data.remote.ArticleDataSource
+import com.example.template.home.data.remote.HomeApi
 import com.example.template.home.data.servicemodels.Article
 import kotlinx.coroutines.delay
-import okhttp3.ResponseBody.Companion.toResponseBody
-import retrofit2.Response
-import retrofit2.Retrofit
 
-class ArticleServiceImpl(val retrofit: Retrofit) : ArticleDataSource {
+class ArticleServiceImpl(val api: HomeApi) : ArticleDataSource {
 
-
-    private lateinit var stuff: Response<List<Article>>
-
-    init {
-        returnResponse(false)
-    }
-
-    private fun returnResponse(responseIsSuccess: Boolean) {
-        if (responseIsSuccess) {
+    private fun returnResponse(responseIsSuccess: Boolean): List<Article> {
+        return if (responseIsSuccess) {
             returnSuccessResponse()
         } else {
             returnErrorResponse()
         }
     }
 
-    private fun returnSuccessResponse() {
-        val articlesList = mutableListOf(
+    private fun returnSuccessResponse(): List<Article> {
+        return mutableListOf(
             Article(
                 "1",
                 "dini",
@@ -179,18 +170,15 @@ class ArticleServiceImpl(val retrofit: Retrofit) : ArticleDataSource {
 
 
             )
-        stuff = Response.success(
-            articlesList
-        )
     }
 
-    private fun returnErrorResponse() {
-        stuff = Response.error(404, "error happened".toResponseBody())
+    private fun returnErrorResponse(): List<Article> {
+        throw Exception("error")
     }
 
 
-    override suspend fun getArticle(userId: Int): Response<List<Article>> {
+    override suspend fun getArticle(userId: Int): List<Article> {
         delay(3000L)
-        return stuff
+        return returnResponse(false)
     }
 }
