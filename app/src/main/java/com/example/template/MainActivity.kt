@@ -49,7 +49,6 @@ class MainActivity : AppCompatActivity() {
     private fun noConnectionDialog() {
         val dialog = MaterialAlertDialogBuilder(this)
         dialog.setTitle("خطا در اتصال به اینترنت")
-            .setCancelable(false)
             .setNeutralButton("ورود به تنظیمات") { _, _ ->
                 startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
             }
