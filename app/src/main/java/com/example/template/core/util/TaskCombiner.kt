@@ -46,6 +46,7 @@ class TaskCombiner(vararg requests: CoroutineLiveTask<*>) : CoroutineLiveTask<An
                             setLoadingIfNoErrorLeft()
                         }
                         is Result.Success<*> -> {
+
                             this.postValue(Result.Loading)
                         }
                         is Result.Loading -> {

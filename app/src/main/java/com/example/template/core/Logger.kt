@@ -5,18 +5,26 @@ import androidx.lifecycle.MutableLiveData
 
 object Logger : MediatorLiveData<ErrorEvent>() {
 
-    val errorEvent = MutableLiveData<ErrorEvent>()
+    var errorEvent = MutableLiveData<ErrorEvent>()
 
-    private var lastShownErrorTime = 1L
-    private var lastErrorEvent = Exception()
+    var lastShownErrorTime = 1L
+    var lastErrorEvent = Exception("ali")
 
     init {
+
+    }
+
+    fun testFun(): Boolean {
+        var flag = false
+
         this.addSource(errorEvent) {
             if (lastShownErrorTime <= System.currentTimeMillis() - 5000 || it.exception.javaClass != lastErrorEvent.javaClass) {
                 this.postValue(it)
                 lastErrorEvent = it.exception
                 lastShownErrorTime = System.currentTimeMillis()
+                flag = true
             }
         }
+        return flag
     }
 }
