@@ -26,12 +26,17 @@ class MainActivity : AppCompatActivity() {
             val isNotAuthorized =
                 (it.exception is ServerException && it.exception.meta.statusCode == 401) ||
                         (it.exception is HttpException && it.exception.code() == 401)
-            if (it.exception is UnAuthorizedException || isNotAuthorized) {
-                unauthorizedDialog()
-            } else if (it.exception is NoConnectionException) {
-                noConnectionDialog()
-            } else if (it.exception is NoInternetException) {
-                errorDialog()
+
+            when {
+                it.exception is UnAuthorizedException || isNotAuthorized -> {
+                    unauthorizedDialog()
+                }
+                it.exception is NoConnectionException -> {
+                    noConnectionDialog()
+                }
+                it.exception is NoInternetException -> {
+                    errorDialog()
+                }
             }
         }
     }
@@ -39,7 +44,7 @@ class MainActivity : AppCompatActivity() {
     private fun unauthorizedDialog() {
         val dialog = MaterialAlertDialogBuilder(this)
         dialog.setTitle("دسترسی غیر مجاز")
-            .setCancelable(false)
+            // .setCancelable(false)
             .setNegativeButton("خروج") { _, _ ->
                 finish()
             }
