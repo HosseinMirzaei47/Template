@@ -17,6 +17,7 @@ class HomeViewModel @ViewModelInject constructor(
 
     val users1 = liveTask {
         autoRetry(false)
+
         emit(useCase(1))
     }
 
@@ -26,5 +27,5 @@ class HomeViewModel @ViewModelInject constructor(
         emit(useCase(1))
     }
 
-    val combinedTasks = TaskCombiner(users1, users2).cancelable(true).retryable(false)
+    val combinedTasks = TaskCombiner(users1, users2).cancelable(true).retryable(true)
 }

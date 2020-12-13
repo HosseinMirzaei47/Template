@@ -20,43 +20,45 @@ private const val SUCCESS_STATE = "success"
 
 @BindingAdapter("reactToTask")
 fun <T> ViewGroup.reactToTask(result: BaseLiveTask<Any>) {
+
+
     when (result.value) {
         is Result.Success -> {
-            var stateLayout = situationOfStateLayout(this).first
+            var stateLayout = situationOfStateLayout(this, result).first
             if (stateLayout == null) {
                 this.tag = null
-                stateLayout = situationOfStateLayout(this).first
+                stateLayout = situationOfStateLayout(this, result).first
             }
-            val parent = situationOfStateLayout(this).second
+            val parent = situationOfStateLayout(this, result).second
             showLoadingState(SUCCESS_STATE, stateLayout, parent, result)
         }
         is Result.Loading -> {
-            var stateLayout = situationOfStateLayout(this).first
+            var stateLayout = situationOfStateLayout(this, result).first
             if (stateLayout == null) {
                 this.tag = null
-                stateLayout = situationOfStateLayout(this).first
+                stateLayout = situationOfStateLayout(this, result).first
             }
-            val parent = situationOfStateLayout(this).second
+            val parent = situationOfStateLayout(this, result).second
             showLoadingState(LOAD_STATE, stateLayout, parent, result)
         }
         is Result.Error -> {
-            var stateLayout = situationOfStateLayout(this).first
+            var stateLayout = situationOfStateLayout(this, result).first
             if (stateLayout == null) {
                 this.tag = null
-                stateLayout = situationOfStateLayout(this).first
+                stateLayout = situationOfStateLayout(this, result).first
             }
-            val parent = situationOfStateLayout(this).second
+            val parent = situationOfStateLayout(this, result).second
             showLoadingState(ERROR_STATE, stateLayout, parent, result)
         }
     }
 }
 
-fun situationOfStateLayout(view: View): Pair<View, Any> {
+fun situationOfStateLayout(view: View, result: BaseLiveTask<Any>): Pair<View, Any> {
     when (view) {
         is ConstraintLayout -> {
             Log.d("parent", "ConstraintLayout")
             if (view.tag == null) {
-                val stateLayout = inflateStateLayoutAndSetID(view)
+                val stateLayout = inflateStateLayoutAndSetID(view, result)
                 //    all childes of parent must have id to clone in constraint set
                 //    setConstraintForStateLayout(view, stateLayout, view)
                 view.addView(stateLayout)
@@ -69,8 +71,8 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
                 Log.d("parent", "parent ConstraintLayout")
                 val parent = view.parent as ConstraintLayout
                 if (view.tag == null) {
-                    val stateLayout = inflateStateLayoutAndSetID(parent)
-                    setConstraintForStateLayout(parent, stateLayout)
+                    val stateLayout = inflateStateLayoutAndSetID(parent, result)
+                    setConstraintForStateLayout(parent, stateLayout, view)
                     view.tag = stateLayout.id
                 }
                 return Pair(parent.getViewById(view.tag as Int), parent)
@@ -79,7 +81,7 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
                 val parent = view.parent as ViewGroup
 
                 if (view.tag == null) {
-                    val stateLayout = inflateStateLayoutAndSetID(parent)
+                    val stateLayout = inflateStateLayoutAndSetID(parent, result)
                     parent.addView(stateLayout)
                     view.tag = stateLayout.id
                 }
@@ -89,17 +91,24 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
     }
 }
 
-private fun inflateStateLayoutAndSetID(view: ViewGroup): View {
+private fun inflateStateLayoutAndSetID(view: ViewGroup, result: BaseLiveTask<Any>): View {
     val stateLayout = LayoutInflater.from(view.context)
         .inflate(R.layout.layout_state, view, false)
 
+    /*if (!result.retryable) {
+        stateLayout.ivBtn_refresh.visibility = View.INVISIBLE
+    }
+    if (result.cancelable) {
+        stateLayout.ivBtn_close.visibility = View.INVISIBLE
+    }*/
     stateLayout.id = View.generateViewId()
     return stateLayout
 }
 
 private fun setConstraintForStateLayout(
     parent: ConstraintLayout,
-    stateLayout: View
+    stateLayout: View,
+    view: View
 ) {
     val constraintSet = ConstraintSet()
     constraintSet.clone(parent)
@@ -153,26 +162,39 @@ fun showLoadingState(
                 it.ivBtn_refresh.visibility = View.INVISIBLE
                 it.pb_load.visibility = View.VISIBLE
                 it.tv_status.text = LOAD_STATE
-                it.ivBtn_close.setOnClickListener { _ ->
-                    result.cancel()
-                    it.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.fade_out))
-                    parent.removeView(it)
-                }
+                if (result.cancelable) {
+                    it.ivBtn_close.visibility = View.VISIBLE
+                    it.ivBtn_close.setOnClickListener { _ ->
+                        result.cancel()
+                        it.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.fade_out))
+                        parent.removeView(it)
+                    }
+                } else it.ivBtn_close.visibility = View.INVISIBLE
+
             }
         }
         ERROR_STATE -> {
             stateLayout?.let {
                 it.tv_status.clearAnimation()
-                it.ivBtn_refresh.visibility = View.VISIBLE
-                it.tv_status.text = ERROR_STATE
-                it.pb_load.visibility = View.GONE
+
+                it.ivBtn_close.visibility = View.VISIBLE
                 it.ivBtn_close.setOnClickListener { _ ->
                     it.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.fade_out))
                     parent.removeView(it)
                 }
-                it.ivBtn_refresh.setOnClickListener {
-                    result.retry()
-                }
+
+
+                if (result.retryable) {
+                    it.ivBtn_refresh.visibility = View.VISIBLE
+                    it.ivBtn_refresh.setOnClickListener {
+                        result.retry()
+                    }
+                } else it.ivBtn_refresh.visibility = View.INVISIBLE
+
+                it.tv_status.text = ERROR_STATE
+                it.pb_load.visibility = View.GONE
+
+
             }
         }
         SUCCESS_STATE -> {
