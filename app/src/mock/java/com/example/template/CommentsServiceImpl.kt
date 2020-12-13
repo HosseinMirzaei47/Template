@@ -32,8 +32,6 @@ class CommentServiceImpl(val api: HomeApi) : CommentDataSource {
             Comment("13", "comment 34", "amin", 22, false),
             Comment("14", "comment 54", "kobra", 23, true),
             Comment("15", "comment 32", "soosan", 24, false),
-            Comment("16", "comment 27", "narges", 25, true),
-            Comment("17", "comment 26", "behnoosh", 26, false),
 
 
             )

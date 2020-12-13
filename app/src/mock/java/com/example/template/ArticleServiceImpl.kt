@@ -179,6 +179,6 @@ class ArticleServiceImpl(val api: HomeApi) : ArticleDataSource {
 
     override suspend fun getArticle(userId: Int): List<Article> {
         delay(3000L)
-        return returnResponse(false)
+        return returnResponse(true)
     }
 }

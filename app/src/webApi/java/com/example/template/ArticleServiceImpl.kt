@@ -24,6 +24,7 @@ class ArticleServiceImpl(private val api: HomeApi) : ArticleDataSource {
         return stuff.bodyOrThrow()
     }
 
+
     private fun setupList(): MutableList<Article> {
         val articlesList = mutableListOf(
             Article(
