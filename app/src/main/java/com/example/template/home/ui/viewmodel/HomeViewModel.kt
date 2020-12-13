@@ -27,5 +27,5 @@ class HomeViewModel @ViewModelInject constructor(
         emit(useCase(1))
     }
 
-    val combinedTasks = TaskCombiner(users1, users2).cancelable(true).retryable(true)
+    val combinedTasks = TaskCombiner(users1, users2).cancelable(false).retryable(false)
 }

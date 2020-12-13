@@ -58,7 +58,7 @@ fun situationOfStateLayout(view: View, result: BaseLiveTask<Any>): Pair<View, An
         is ConstraintLayout -> {
             Log.d("parent", "ConstraintLayout")
             if (view.tag == null) {
-                val stateLayout = inflateStateLayoutAndSetID(view, result)
+                val stateLayout = inflateStateLayoutAndSetID(view)
                 //    all childes of parent must have id to clone in constraint set
                 //    setConstraintForStateLayout(view, stateLayout, view)
                 view.addView(stateLayout)
@@ -71,7 +71,7 @@ fun situationOfStateLayout(view: View, result: BaseLiveTask<Any>): Pair<View, An
                 Log.d("parent", "parent ConstraintLayout")
                 val parent = view.parent as ConstraintLayout
                 if (view.tag == null) {
-                    val stateLayout = inflateStateLayoutAndSetID(parent, result)
+                    val stateLayout = inflateStateLayoutAndSetID(parent)
                     setConstraintForStateLayout(parent, stateLayout, view)
                     view.tag = stateLayout.id
                 }
@@ -81,7 +81,7 @@ fun situationOfStateLayout(view: View, result: BaseLiveTask<Any>): Pair<View, An
                 val parent = view.parent as ViewGroup
 
                 if (view.tag == null) {
-                    val stateLayout = inflateStateLayoutAndSetID(parent, result)
+                    val stateLayout = inflateStateLayoutAndSetID(parent)
                     parent.addView(stateLayout)
                     view.tag = stateLayout.id
                 }
@@ -91,16 +91,9 @@ fun situationOfStateLayout(view: View, result: BaseLiveTask<Any>): Pair<View, An
     }
 }
 
-private fun inflateStateLayoutAndSetID(view: ViewGroup, result: BaseLiveTask<Any>): View {
+private fun inflateStateLayoutAndSetID(view: ViewGroup): View {
     val stateLayout = LayoutInflater.from(view.context)
         .inflate(R.layout.layout_state, view, false)
-
-    /*if (!result.retryable) {
-        stateLayout.ivBtn_refresh.visibility = View.INVISIBLE
-    }
-    if (result.cancelable) {
-        stateLayout.ivBtn_close.visibility = View.INVISIBLE
-    }*/
     stateLayout.id = View.generateViewId()
     return stateLayout
 }
