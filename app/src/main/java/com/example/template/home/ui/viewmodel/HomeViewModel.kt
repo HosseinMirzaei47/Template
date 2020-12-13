@@ -2,7 +2,7 @@ package com.example.template.home.ui.viewmodel
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
-import com.example.template.core.util.TaskCombiner
+import com.example.template.core.util.combinedTask
 import com.example.template.core.util.liveTask
 import com.example.template.home.domain.GetArticleUseCase
 import com.example.template.home.domain.GetCommentUseCase
@@ -19,8 +19,12 @@ class HomeViewModel @ViewModelInject constructor(
     }
 
     val users2 = liveTask {
+        retryable(true)
+        cancelable(false)
+        autoRetry(true)
+        retryAttempts(2)
         emit(useCase(1))
     }
 
-    val combinedTasks = TaskCombiner(users1, users2)
+    val combinedTasks = combinedTask(users1, users2)
 }

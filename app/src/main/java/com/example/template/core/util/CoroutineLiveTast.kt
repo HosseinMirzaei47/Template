@@ -18,13 +18,19 @@ internal const val DEFAULT_TIMEOUT = 100L
 @OptIn(ExperimentalTypeInference::class)
 fun <T> liveTask(
     context: CoroutineContext = EmptyCoroutineContext,
-    @BuilderInference block: suspend LiveTaskScope<T>.() -> Unit = {}
-): BaseLiveTask<T> = CoroutineLiveTask(context, block = block)
+    @BuilderInference block: suspend LiveTaskBuilder<T>.() -> Unit = {}
+): LiveTask<T> = CoroutineLiveTask(context, block = block)
+
+@OptIn(ExperimentalTypeInference::class)
+fun combinedTask(
+    vararg requests: LiveTask<*>,
+    @BuilderInference block: suspend LiveTaskBuilder<Any>.() -> Unit = {}
+): LiveTask<Any> = TaskCombiner(*requests)
 
 class CoroutineLiveTask<T>(
     private val context: CoroutineContext = EmptyCoroutineContext,
     private val timeoutInMs: Long = DEFAULT_TIMEOUT,
-    val block: suspend LiveTaskScope<T>.() -> Unit = {},
+    val block: suspend LiveTaskBuilder<T>.() -> Unit = {},
 ) : BaseLiveTask<T>() {
 
     private var blockRunner: TaskRunner<T>? = null
@@ -119,7 +125,7 @@ internal class TaskRunner<T>(
             return
         }
         runningJob = scope.launch {
-            val liveDataScope = LiveTaskScopeImpl(liveData, coroutineContext)
+            val liveDataScope = LiveTaskBuilderImpl(liveData, coroutineContext)
             block(liveDataScope)
             onDone()
         }
@@ -134,10 +140,10 @@ internal class TaskRunner<T>(
     }
 }
 
-internal class LiveTaskScopeImpl<T>(
+internal class LiveTaskBuilderImpl<T>(
     private var target: CoroutineLiveTask<T>,
     context: CoroutineContext
-) : LiveTaskScope<T> {
+) : LiveTaskBuilder<T> {
 
     override val latestValue: Result<T>?
         get() = target.value
@@ -167,14 +173,5 @@ internal class LiveTaskScopeImpl<T>(
     }
 }
 
-internal typealias Block<T> = suspend LiveTaskScope<T>.() -> Unit
+internal typealias Block<T> = suspend LiveTaskBuilder<T>.() -> Unit
 
-interface LiveTaskScope<T> {
-    val latestValue: Result<T>?
-    suspend fun emit(userUseCase: Result<T>)
-    fun retryAttempts(attempts: Int)
-    fun autoRetry(bool: Boolean)
-    fun cancelable(bool: Boolean)
-    fun retryable(bool: Boolean)
-    fun retry()
-}

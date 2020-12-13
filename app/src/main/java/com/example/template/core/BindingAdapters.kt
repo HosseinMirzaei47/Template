@@ -9,8 +9,8 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
-import com.example.template.BaseLiveTask
 import com.example.template.R
+import com.example.template.core.util.LiveTask
 import kotlinx.android.synthetic.main.layout_state.view.*
 
 private const val LOAD_STATE = "loading"
@@ -18,8 +18,8 @@ private const val ERROR_STATE = "error"
 private const val SUCCESS_STATE = "success"
 
 @BindingAdapter("reactToTask")
-fun <T> ViewGroup.reactToTask(result: BaseLiveTask<Any>) {
-    when (result.value) {
+fun ViewGroup.reactToTask(result: LiveTask<Any>) {
+    when (result.result()) {
         is Result.Success -> {
             var stateLayout = situationOfStateLayout(this).first
             if (stateLayout == null) {
@@ -131,7 +131,7 @@ fun showLoadingState(
     state: String,
     stateLayout: View?,
     parent: Any,
-    result: BaseLiveTask<Any>
+    result: LiveTask<Any>
 ) {
     parent as ViewGroup
 
@@ -180,11 +180,11 @@ fun showLoadingState(
 }
 
 @BindingAdapter("visibleOnLoading")
-fun View.visibleOnLoading(result: BaseLiveTask<Any>?) {
-    this.isVisible = Result.Loading == result?.value
+fun View.visibleOnLoading(result: Result<Any>?) {
+    this.isVisible = Result.Loading == result
 }
 
 @BindingAdapter("disableOnLoading")
-fun Button.disableOnLoading(result: BaseLiveTask<Any>?) {
-    this.isEnabled = Result.Loading != result?.value
+fun Button.disableOnLoading(result: Result<Any>?) {
+    this.isEnabled = Result.Loading != result
 }

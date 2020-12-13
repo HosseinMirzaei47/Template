@@ -54,7 +54,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun observeRequestsStatus() {
-        viewModel.combinedTasks.observe(viewLifecycleOwner) { event ->
+        viewModel.combinedTasks.asLiveData().observe(viewLifecycleOwner) { event ->
             when (event) {
                 is Success -> {
                 }
