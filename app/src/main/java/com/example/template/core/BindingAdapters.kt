@@ -18,8 +18,8 @@ private const val ERROR_STATE = "error"
 private const val SUCCESS_STATE = "success"
 
 @BindingAdapter("reactToTask")
-fun ViewGroup.reactToTask(result: LiveTask<Any>) {
-    when (result.result()) {
+fun ViewGroup.reactToTask(result: LiveTask<*>?) {
+    when (result?.result()) {
         is Result.Success -> {
             var stateLayout = situationOfStateLayout(this).first
             if (stateLayout == null) {
@@ -131,7 +131,7 @@ fun showLoadingState(
     state: String,
     stateLayout: View?,
     parent: Any,
-    result: LiveTask<Any>
+    result: LiveTask<*>
 ) {
     parent as ViewGroup
 
@@ -180,11 +180,11 @@ fun showLoadingState(
 }
 
 @BindingAdapter("visibleOnLoading")
-fun View.visibleOnLoading(result: Result<Any>?) {
-    this.isVisible = Result.Loading == result
+fun View.visibleOnLoading(result: LiveTask<*>?) {
+    this.isVisible = Result.Loading == result?.result()
 }
 
 @BindingAdapter("disableOnLoading")
-fun Button.disableOnLoading(result: Result<Any>?) {
-    this.isEnabled = Result.Loading != result
+fun Button.disableOnLoading(result: LiveTask<*>?) {
+    this.isEnabled = Result.Loading != result?.result()
 }

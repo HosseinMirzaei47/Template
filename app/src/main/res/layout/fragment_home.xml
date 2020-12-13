@@ -48,7 +48,7 @@
 
         <Button
             android:id="@+id/submit"
-            disableOnLoading="@{vm.combinedTasks.result()}"
+            disableOnLoading="@{vm.combinedTasks.asLiveData()}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/submit"

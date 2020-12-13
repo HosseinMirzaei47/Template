@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
-import com.example.template.core.Result.*
 import com.example.template.databinding.FragmentHomeBinding
 import com.example.template.home.domain.GetUserUseCase
 import com.example.template.home.ui.viewmodel.HomeViewModel
@@ -54,9 +53,9 @@ class HomeFragment : Fragment() {
     }
 
     private fun observeRequestsStatus() {
-        viewModel.combinedTasks.asLiveData().observe(viewLifecycleOwner) { event ->
+       /* viewModel.combinedTasks.asLiveData().observe(viewLifecycleOwner) { event ->
             when (event) {
-                is Success -> {
+                is Success<*> -> {
                 }
                 is Error -> {
 
@@ -64,7 +63,7 @@ class HomeFragment : Fragment() {
                 is Loading -> {
                 }
             }
-        }
+        }*/
     }
 
 
