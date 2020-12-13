@@ -73,6 +73,7 @@ class CoroutineLiveTask<T>(
     }
 
     private fun retryOnNetworkBack() {
+        this.removeSource(connectionLiveData)
         this.addSource(connectionLiveData) { hasConnection ->
             if (hasConnection) {
                 retry()
@@ -160,6 +161,10 @@ internal class LiveTaskScopeImpl<T>(
     override fun cancelable(bool: Boolean) {
         target.cancelable(bool)
     }
+
+    override fun retryable(bool: Boolean) {
+        target.retryable(bool)
+    }
 }
 
 internal typealias Block<T> = suspend LiveTaskScope<T>.() -> Unit
@@ -170,5 +175,6 @@ interface LiveTaskScope<T> {
     fun retryAttempts(attempts: Int)
     fun autoRetry(bool: Boolean)
     fun cancelable(bool: Boolean)
+    fun retryable(bool: Boolean)
     fun retry()
 }

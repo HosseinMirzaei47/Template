@@ -2,11 +2,17 @@ package com.example.template.core.util
 
 import com.example.template.BaseLiveTask
 import com.example.template.core.Result
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import retrofit2.HttpException
 
+@Suppress("UNCHECKED_CAST")
 class TaskCombiner(vararg requests: BaseLiveTask<*>) : BaseLiveTask<Any>() {
 
     private var taskList = mutableListOf<BaseLiveTask<*>>()
+    private var job: Job = Job()
 
     init {
         requests.forEach { addTaskAsSource(it) }
@@ -16,21 +22,21 @@ class TaskCombiner(vararg requests: BaseLiveTask<*>) : BaseLiveTask<Any>() {
         taskList.add(task)
         this.addSource(task) { result ->
             printStats()
+
             when (result) {
                 is Result.Success -> {
+                    job.cancel()
                     checkIsThereAnyUnSuccess()
                 }
                 is Result.Error -> {
                     if (this.value !is Result.Error) {
+                        job.cancel()
                         val isNotAuthorized = (result.exception is ServerException &&
                                 result.exception.meta.statusCode == 401) ||
                                 (result.exception is HttpException &&
                                         result.exception.code() == 401)
                         when {
-                            result.exception is NoConnectionException -> {
-                                this.postValue(task.value as Result<Any>?)
-                            }
-                            isNotAuthorized -> {
+                            result.exception is NoConnectionException || isNotAuthorized -> {
                                 this.postValue(task.value as Result<Any>?)
                             }
                             else -> {
@@ -42,6 +48,10 @@ class TaskCombiner(vararg requests: BaseLiveTask<*>) : BaseLiveTask<Any>() {
                     }
                 }
                 is Result.Loading -> {
+                    job = GlobalScope.launch {
+                        delay(10000)
+                        this@TaskCombiner.postValue(Result.Error(Exception()))
+                    }
                     when (this.value) {
                         is Result.Error -> {
                             setLoadingIfNoErrorLeft()
@@ -104,7 +114,7 @@ class TaskCombiner(vararg requests: BaseLiveTask<*>) : BaseLiveTask<Any>() {
                 }
             }
         }
-        println("mmb successful: $successes failed :$failed loading :$loading all requests: ${taskList.size}")
+        println("jalil successful: $successes failed :$failed loading :$loading all requests: ${taskList.size}")
     }
 
     override fun retry() {
