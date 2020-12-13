@@ -1,17 +1,18 @@
 package com.example.template.core.util
 
+import com.example.template.BaseLiveTask
 import com.example.template.core.Result
 import retrofit2.HttpException
 
-class TaskCombiner(vararg requests: CoroutineLiveTask<*>) : CoroutineLiveTask<Any>() {
+class TaskCombiner(vararg requests: BaseLiveTask<*>) : BaseLiveTask<Any>() {
 
-    private var taskList = mutableListOf<CoroutineLiveTask<*>>()
+    private var taskList = mutableListOf<BaseLiveTask<*>>()
 
     init {
         requests.forEach { addTaskAsSource(it) }
     }
 
-    private fun addTaskAsSource(task: CoroutineLiveTask<*>) {
+    private fun addTaskAsSource(task: BaseLiveTask<*>) {
         taskList.add(task)
         this.addSource(task) { result ->
             printStats()
@@ -60,29 +61,6 @@ class TaskCombiner(vararg requests: CoroutineLiveTask<*>) : CoroutineLiveTask<An
         }
     }
 
-    fun executeAll() = taskList.forEach { it.execute() }
-
-    fun retryAll() {
-        this.postValue(Result.Loading)
-        val listOfUnSuccesses = taskList.filter { coroutineLiveTask ->
-            coroutineLiveTask.value is Result.Error
-        }
-        listOfUnSuccesses.forEach { coroutineLiveTask ->
-            coroutineLiveTask.retry()
-        }
-    }
-
-    fun cancelAll(value: Result<Any>?) {
-        val listOfUnLoading = taskList.filter { coroutineLiveTask ->
-            coroutineLiveTask.value is Result.Loading
-        }
-
-        listOfUnLoading.forEach { coroutineLiveTask ->
-            coroutineLiveTask.cancel()
-            coroutineLiveTask.postValue(value as Result<Nothing>?)
-        }
-    }
-
     private fun setLoadingIfNoErrorLeft() {
         val hasError = taskList.any {
             it.value is Result.Error
@@ -128,5 +106,28 @@ class TaskCombiner(vararg requests: CoroutineLiveTask<*>) : CoroutineLiveTask<An
             }
         }
         println("mmb successful: $successes failed :$failed loading :$loading all requests: ${taskList.size}")
+    }
+
+    override fun retry() {
+        this.postValue(Result.Loading)
+        val listOfUnSuccesses = taskList.filter { coroutineLiveTask ->
+            coroutineLiveTask.value is Result.Error
+        }
+        listOfUnSuccesses.forEach { coroutineLiveTask ->
+            coroutineLiveTask.retry()
+        }
+    }
+
+    override fun execute() = taskList.forEach { it.execute() }
+
+    override fun cancel() {
+        val listOfUnLoading = taskList.filter { coroutineLiveTask ->
+            coroutineLiveTask.value is Result.Loading
+        }
+
+        listOfUnLoading.forEach { coroutineLiveTask ->
+            coroutineLiveTask.cancel()
+            coroutineLiveTask.postValue(value as Result<Nothing>?)
+        }
     }
 }
