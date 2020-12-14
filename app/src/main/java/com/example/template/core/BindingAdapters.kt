@@ -34,6 +34,13 @@ fun <T> ViewGroup.reactToTask(result: BaseLiveTask<Any>) {
         }
         is Result.Loading -> {
             var stateLayout = situationOfStateLayout(this, result).first
+            stateLayout?.let {
+
+            }.run {
+
+            }
+
+
             if (stateLayout == null) {
                 this.tag = null
                 stateLayout = situationOfStateLayout(this, result).first
