@@ -4,7 +4,7 @@ import com.example.template.core.Result
 
 interface LiveTaskBuilder<T> {
     val latestValue: Result<T>?
-    suspend fun emit(userUseCase: Result<T>)
+    suspend fun emit(result: Result<T>)
     fun retryAttempts(attempts: Int)
     fun autoRetry(bool: Boolean)
     fun cancelable(bool: Boolean)

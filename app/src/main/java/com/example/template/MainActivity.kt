@@ -23,9 +23,9 @@ class MainActivity : AppCompatActivity() {
         DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
 
         Logger.observe(this) {
-            val isNotAuthorized =
-                (it.exception is ServerException && it.exception.meta.statusCode == 401) ||
-                        (it.exception is HttpException && it.exception.code() == 401)
+            val isNotAuthorized = (it.exception is ServerException &&
+                    it.exception.meta.statusCode == 401) ||
+                    (it.exception is HttpException && it.exception.code() == 401)
 
             when {
                 it.exception is UnAuthorizedException || isNotAuthorized -> {

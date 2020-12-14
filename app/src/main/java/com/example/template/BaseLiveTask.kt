@@ -7,13 +7,13 @@ import com.example.template.core.util.LiveTask
 
 internal const val DEFAULT_RETRY_ATTEMPTS = 1
 
-abstract class BaseLiveTask<T> : MediatorLiveData<Result<T>>(), LiveTask<T> {
+abstract class BaseLiveTask<T> : MediatorLiveData<LiveTask<T>>(), LiveTask<T> {
     var retryCounts = 1
     var retryAttempts = DEFAULT_RETRY_ATTEMPTS
+    var latestState: Result<T>? = null
 
     private var cancelable = true
     private var retryable = true
-
 
     fun cancelable(bool: Boolean): BaseLiveTask<T> {
         cancelable = bool
@@ -28,5 +28,5 @@ abstract class BaseLiveTask<T> : MediatorLiveData<Result<T>>(), LiveTask<T> {
     @Suppress("UNCHECKED_CAST")
     override fun asLiveData() = this as LiveData<LiveTask<Result<T>>>
 
-    override fun result() = value
+    override fun result() = latestState
 }

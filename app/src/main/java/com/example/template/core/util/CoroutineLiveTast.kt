@@ -11,21 +11,8 @@ import kotlinx.coroutines.Dispatchers.Main
 import retrofit2.HttpException
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.experimental.ExperimentalTypeInference
 
 internal const val DEFAULT_TIMEOUT = 100L
-
-@OptIn(ExperimentalTypeInference::class)
-fun <T> liveTask(
-    context: CoroutineContext = EmptyCoroutineContext,
-    @BuilderInference block: suspend LiveTaskBuilder<T>.() -> Unit = {}
-): LiveTask<T> = CoroutineLiveTask(context, block = block)
-
-@OptIn(ExperimentalTypeInference::class)
-fun combinedTask(
-    vararg requests: LiveTask<*>,
-    @BuilderInference block: suspend LiveTaskBuilder<Any>.() -> Unit = {}
-): LiveTask<Any> = TaskCombiner(*requests)
 
 class CoroutineLiveTask<T>(
     private val context: CoroutineContext = EmptyCoroutineContext,
@@ -34,12 +21,13 @@ class CoroutineLiveTask<T>(
 ) : BaseLiveTask<T>() {
 
     private var blockRunner: TaskRunner<T>? = null
-    var autoRetry = false
+    var autoRetry = true
 
     init {
         this.addSource(this) {
-            if (it is Result.Error) {
-                it.withError { exception ->
+            val result1 = it.result()
+            if (result1 is Result.Error) {
+                result1.withError { exception ->
                     Logger.errorEvent.postValue(ErrorEvent((exception)))
 
                     val isNotAuthorized =
@@ -63,7 +51,8 @@ class CoroutineLiveTask<T>(
     }
 
     override fun execute() {
-        this.postValue(Result.Loading)
+        latestState = Result.Loading
+        this.postValue(this)
         val supervisorJob = SupervisorJob(context[Job])
         val scope = CoroutineScope(Dispatchers.IO + context + supervisorJob)
         blockRunner = TaskRunner(
@@ -146,12 +135,13 @@ internal class LiveTaskBuilderImpl<T>(
 ) : LiveTaskBuilder<T> {
 
     override val latestValue: Result<T>?
-        get() = target.value
+        get() = target.value?.result()
 
     private val coroutineContext = context + Main.immediate
 
-    override suspend fun emit(userUseCase: Result<T>) = withContext(coroutineContext) {
-        target.value = userUseCase
+    override suspend fun emit(result: Result<T>) = withContext(coroutineContext) {
+        target.latestState = result
+        target.postValue(target)
     }
 
     override fun retry() {}
@@ -174,4 +164,3 @@ internal class LiveTaskBuilderImpl<T>(
 }
 
 internal typealias Block<T> = suspend LiveTaskBuilder<T>.() -> Unit
-
