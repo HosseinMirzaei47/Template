@@ -43,8 +43,6 @@ internal class CombinerBuilderImpl(
     override val latestValue: Result<Any>?
         get() = target.value?.result()
 
-    override fun retry() {}
-
     override fun cancelable(bool: Boolean) {
         target.cancelable(bool)
     }

@@ -1,5 +1,6 @@
 package com.example.template.core
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -19,8 +20,9 @@ private const val ERROR_STATE = "error"
 private const val SUCCESS_STATE = "success"
 
 @BindingAdapter("reactToTask")
-fun <T> ViewGroup.reactToTask(result: LiveTask<*>?) {
-    when (result?.result()) {
+fun <T> ViewGroup.reactToTask(liveTask: LiveTask<*>?) {
+
+    when (liveTask?.result()) {
         is Result.Success -> {
             var stateLayout = situationOfStateLayout(this).first
             if (stateLayout == null) {
@@ -28,7 +30,7 @@ fun <T> ViewGroup.reactToTask(result: LiveTask<*>?) {
                 stateLayout = situationOfStateLayout(this).first
             }
             val parent = situationOfStateLayout(this).second
-            showLoadingState(SUCCESS_STATE, stateLayout, parent, result)
+            showLoadingState(SUCCESS_STATE, stateLayout, parent, liveTask)
         }
         is Result.Loading -> {
             var stateLayout = situationOfStateLayout(this).first
@@ -37,7 +39,7 @@ fun <T> ViewGroup.reactToTask(result: LiveTask<*>?) {
                 stateLayout = situationOfStateLayout(this).first
             }
             val parent = situationOfStateLayout(this).second
-            showLoadingState(LOAD_STATE, stateLayout, parent, result)
+            showLoadingState(LOAD_STATE, stateLayout, parent, liveTask)
         }
         is Result.Error -> {
             var stateLayout = situationOfStateLayout(this).first
@@ -46,7 +48,7 @@ fun <T> ViewGroup.reactToTask(result: LiveTask<*>?) {
                 stateLayout = situationOfStateLayout(this).first
             }
             val parent = situationOfStateLayout(this).second
-            showLoadingState(ERROR_STATE, stateLayout, parent, result)
+            showLoadingState(ERROR_STATE, stateLayout, parent, liveTask)
         }
     }
 }
@@ -54,6 +56,7 @@ fun <T> ViewGroup.reactToTask(result: LiveTask<*>?) {
 fun situationOfStateLayout(view: View): Pair<View, Any> {
     when (view) {
         is ConstraintLayout -> {
+            Log.d("parent", "ConstraintLayout")
             if (view.tag == null) {
                 val stateLayout = inflateStateLayoutAndSetID(view)
                 //    all childes of parent must have id to clone in constraint set
@@ -65,14 +68,16 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
         }
         else -> {
             if (view.parent is ConstraintLayout) {
+                Log.d("parent", "parent ConstraintLayout")
                 val parent = view.parent as ConstraintLayout
                 if (view.tag == null) {
                     val stateLayout = inflateStateLayoutAndSetID(parent)
-                    setConstraintForStateLayout(parent, stateLayout)
+                    setConstraintForStateLayout(parent, stateLayout, view)
                     view.tag = stateLayout.id
                 }
                 return Pair(parent.getViewById(view.tag as Int), parent)
             } else {
+                Log.d("parent", "Otheeeeeeeeeer")
                 val parent = view.parent as ViewGroup
 
                 if (view.tag == null) {
@@ -89,39 +94,39 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
 private fun inflateStateLayoutAndSetID(view: ViewGroup): View {
     val stateLayout = LayoutInflater.from(view.context)
         .inflate(R.layout.layout_state, view, false)
-
     stateLayout.id = View.generateViewId()
     return stateLayout
 }
 
 private fun setConstraintForStateLayout(
     parent: ConstraintLayout,
-    stateLayout: View
+    stateLayout: View,
+    view: View
 ) {
     val constraintSet = ConstraintSet()
     constraintSet.clone(parent)
     constraintSet.connect(
         stateLayout.id,
         ConstraintSet.TOP,
-        ConstraintSet.PARENT_ID,
+        view.id,
         ConstraintSet.TOP
     )
     constraintSet.connect(
         stateLayout.id,
         ConstraintSet.BOTTOM,
-        ConstraintSet.PARENT_ID,
+        view.id,
         ConstraintSet.BOTTOM
     )
     constraintSet.connect(
         stateLayout.id,
         ConstraintSet.END,
-        ConstraintSet.PARENT_ID,
+        view.id,
         ConstraintSet.END
     )
     constraintSet.connect(
         stateLayout.id,
         ConstraintSet.START,
-        ConstraintSet.PARENT_ID,
+        view.id,
         ConstraintSet.START
     )
     parent.addView(stateLayout)
@@ -150,26 +155,39 @@ fun showLoadingState(
                 it.ivBtn_refresh.visibility = View.INVISIBLE
                 it.pb_load.visibility = View.VISIBLE
                 it.tv_status.text = LOAD_STATE
-                it.ivBtn_close.setOnClickListener { _ ->
-                    result.cancel()
-                    it.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.fade_out))
-                    parent.removeView(it)
-                }
+                if ((result as BaseLiveTask<*>).cancelable) {
+                    it.ivBtn_close.visibility = View.VISIBLE
+                    it.ivBtn_close.setOnClickListener { _ ->
+                        result.cancel()
+                        it.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.fade_out))
+                        parent.removeView(it)
+                    }
+                } else it.ivBtn_close.visibility = View.INVISIBLE
+
             }
         }
         ERROR_STATE -> {
             stateLayout?.let {
                 it.tv_status.clearAnimation()
-                it.ivBtn_refresh.visibility = View.VISIBLE
-                it.tv_status.text = ERROR_STATE
-                it.pb_load.visibility = View.GONE
+
+                it.ivBtn_close.visibility = View.VISIBLE
                 it.ivBtn_close.setOnClickListener { _ ->
                     it.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.fade_out))
                     parent.removeView(it)
                 }
-                it.ivBtn_refresh.setOnClickListener {
-                    result.retry()
-                }
+
+
+                if ((result as BaseLiveTask<*>).retryable) {
+                    it.ivBtn_refresh.visibility = View.VISIBLE
+                    it.ivBtn_refresh.setOnClickListener {
+                        result.retry()
+                    }
+                } else it.ivBtn_refresh.visibility = View.INVISIBLE
+
+                it.tv_status.text = ERROR_STATE
+                it.pb_load.visibility = View.GONE
+
+
             }
         }
         SUCCESS_STATE -> {
@@ -181,11 +199,11 @@ fun showLoadingState(
 }
 
 @BindingAdapter("visibleOnLoading")
-fun View.visibleOnLoading(result: LiveTask<*>?) {
-    this.isVisible = Result.Loading == result?.result()
+fun View.visibleOnLoading(liveTask: LiveTask<*>?) {
+    this.isVisible = Result.Loading == liveTask?.result()
 }
 
 @BindingAdapter("disableOnLoading")
-fun Button.disableOnLoading(result: LiveTask<*>?) {
-    this.isEnabled = Result.Loading != result?.result()
+fun Button.disableOnLoading(liveTask: LiveTask<*>?) {
+    this.isEnabled = Result.Loading != liveTask?.result()
 }

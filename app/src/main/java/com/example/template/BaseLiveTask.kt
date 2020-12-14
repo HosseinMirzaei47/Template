@@ -12,8 +12,8 @@ abstract class BaseLiveTask<T> : MediatorLiveData<LiveTask<T>>(), LiveTask<T> {
     var retryAttempts = DEFAULT_RETRY_ATTEMPTS
     var latestState: Result<T>? = null
 
-    private var cancelable = true
-    private var retryable = true
+    var cancelable = true
+    var retryable = true
 
     fun cancelable(bool: Boolean): BaseLiveTask<T> {
         cancelable = bool
