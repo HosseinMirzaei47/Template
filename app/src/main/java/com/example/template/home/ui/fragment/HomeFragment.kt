@@ -38,8 +38,6 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setOnClicks()
-
-        observeRequestsStatus()
     }
 
     private fun setOnClicks() {
@@ -51,20 +49,5 @@ class HomeFragment : Fragment() {
             viewModel.combinedTasks.execute()
         }
     }
-
-    private fun observeRequestsStatus() {
-       /* viewModel.combinedTasks.asLiveData().observe(viewLifecycleOwner) { event ->
-            when (event) {
-                is Success<*> -> {
-                }
-                is Error -> {
-
-                }
-                is Loading -> {
-                }
-            }
-        }*/
-    }
-
 
 }

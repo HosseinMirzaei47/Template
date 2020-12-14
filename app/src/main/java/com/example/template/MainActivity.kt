@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
     private fun unauthorizedDialog() {
         val dialog = MaterialAlertDialogBuilder(this)
         dialog.setTitle("دسترسی غیر مجاز")
-            // .setCancelable(false)
+            .setCancelable(false)
             .setNegativeButton("خروج") { _, _ ->
                 finish()
             }
@@ -54,8 +54,11 @@ class MainActivity : AppCompatActivity() {
     private fun noConnectionDialog() {
         val dialog = MaterialAlertDialogBuilder(this)
         dialog.setTitle("خطا در اتصال به اینترنت")
-            .setNeutralButton("ورود به تنظیمات") { _, _ ->
+            .setPositiveButton("ورود به تنظیمات") { _, _ ->
                 startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+            }
+            .setNegativeButton("باشه") { _, _ ->
+
             }
             .show()
     }

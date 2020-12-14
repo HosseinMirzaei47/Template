@@ -19,12 +19,9 @@ class HomeViewModel @ViewModelInject constructor(
     }
 
     val users2 = liveTask {
-        retryable(true)
-        cancelable(false)
-        autoRetry(true)
-        retryAttempts(2)
         emit(useCase(1))
     }
 
     val combinedTasks = combinedTask(users1, users2)
+
 }

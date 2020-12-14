@@ -6,8 +6,10 @@ import com.example.template.core.Logger
 import com.example.template.core.MyApp.Companion.connectionLiveData
 import com.example.template.core.Result
 import com.example.template.core.withError
-import kotlinx.coroutines.*
-import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import retrofit2.HttpException
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -25,9 +27,9 @@ class CoroutineLiveTask<T>(
 
     init {
         this.addSource(this) {
-            val result1 = it.result()
-            if (result1 is Result.Error) {
-                result1.withError { exception ->
+            val taskResult = it.result()
+            if (taskResult is Result.Error) {
+                taskResult.withError { exception ->
                     Logger.errorEvent.postValue(ErrorEvent((exception)))
 
                     val isNotAuthorized =
@@ -95,72 +97,3 @@ class CoroutineLiveTask<T>(
         blockRunner?.cancel()
     }
 }
-
-internal class TaskRunner<T>(
-    private val liveData: CoroutineLiveTask<T>,
-    private val block: Block<T>,
-    private val timeoutInMs: Long = DEFAULT_TIMEOUT,
-    private val scope: CoroutineScope,
-    private val onDone: () -> Unit
-) {
-    private var runningJob: Job? = null
-
-    private var cancellationJob: Job? = null
-
-    fun maybeRun() {
-        cancellationJob?.cancel()
-        cancellationJob = null
-        if (runningJob != null) {
-            return
-        }
-        runningJob = scope.launch {
-            val liveDataScope = LiveTaskBuilderImpl(liveData, coroutineContext)
-            block(liveDataScope)
-            onDone()
-        }
-    }
-
-    fun cancel() {
-        cancellationJob = scope.launch(Main.immediate) {
-            delay(timeoutInMs)
-            runningJob?.cancel()
-            runningJob = null
-        }
-    }
-}
-
-internal class LiveTaskBuilderImpl<T>(
-    private var target: CoroutineLiveTask<T>,
-    context: CoroutineContext
-) : LiveTaskBuilder<T> {
-
-    override val latestValue: Result<T>?
-        get() = target.value?.result()
-
-    private val coroutineContext = context + Main.immediate
-
-    override suspend fun emit(result: Result<T>) = withContext(coroutineContext) {
-        target.latestState = result
-        target.postValue(target)
-    }
-
-    override fun retry() {}
-
-    override fun retryAttempts(attempts: Int) {
-        target.retryAttempts = attempts
-    }
-
-    override fun autoRetry(bool: Boolean) {
-        target.autoRetry = bool
-    }
-
-    override fun cancelable(bool: Boolean) {
-        target.cancelable(bool)
-    }
-
-    override fun retryable(bool: Boolean) {
-        target.retryable(bool)
-    }
-}
-
-internal typealias Block<T> = suspend LiveTaskBuilder<T>.() -> Unit

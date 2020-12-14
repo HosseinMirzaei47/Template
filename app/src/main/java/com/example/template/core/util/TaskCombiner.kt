@@ -2,12 +2,23 @@ package com.example.template.core.util
 
 import com.example.template.BaseLiveTask
 import com.example.template.core.Result
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import retrofit2.HttpException
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 @Suppress("UNCHECKED_CAST")
-class TaskCombiner(vararg requests: LiveTask<*>) : BaseLiveTask<Any>() {
+class TaskCombiner(
+    vararg requests: LiveTask<*>,
+    private val context: CoroutineContext = EmptyCoroutineContext,
+    val block: suspend CombinerBuilder.() -> Unit
+) : BaseLiveTask<Any>() {
 
     private var taskList = mutableListOf<LiveTask<*>>()
+    private var blockRunner: CombineRunner? = null
 
     init {
         requests.forEach { addTaskAsSource(it) }
@@ -31,13 +42,11 @@ class TaskCombiner(vararg requests: LiveTask<*>) : BaseLiveTask<Any>() {
                                         result.exception.code() == 401)
                         when {
                             result.exception is NoConnectionException || isNotAuthorized -> {
-                                this.latestState = task.result() as Result<Any>?
-                                postValue(this)
+                                applyResult(task)
                             }
                             else -> {
                                 if ((task as BaseLiveTask<Any>).retryCounts > task.retryAttempts) {
-                                    this.latestState = task.result()
-                                    postValue(this)
+                                    applyResult(task.result())
                                 }
                             }
                         }
@@ -49,14 +58,12 @@ class TaskCombiner(vararg requests: LiveTask<*>) : BaseLiveTask<Any>() {
                             setLoadingIfNoErrorLeft()
                         }
                         is Result.Success<*> -> {
-                            this.latestState = Result.Loading
-                            postValue(this)
+                            applyResult(Result.Loading)
                         }
                         is Result.Loading -> {
                         }
                         else -> {
-                            this.latestState = Result.Loading
-                            postValue(this)
+                            applyResult(Result.Loading)
                         }
                     }
                 }
@@ -69,8 +76,7 @@ class TaskCombiner(vararg requests: LiveTask<*>) : BaseLiveTask<Any>() {
             it.result() is Result.Error
         }
         if (!hasError) {
-            this.latestState = Result.Loading
-            postValue(this)
+            applyResult(Result.Loading)
         }
     }
 
@@ -79,16 +85,14 @@ class TaskCombiner(vararg requests: LiveTask<*>) : BaseLiveTask<Any>() {
             it.result() is Result.Loading || it.result() is Result.Error
         }
         if (!anyRequestLeft) {
-            this.latestState = Result.Success(Any())
-            postValue(this)
+            applyResult(Result.Success(Any()))
         } else {
             if (this.value?.result() is Result.Loading) {
                 val oneOfErrors = taskList.find { coroutineLiveTask ->
                     coroutineLiveTask.result() is Result.Error
                 }
                 oneOfErrors?.let {
-                    this.latestState = it.result() as Result<Any>?
-                    postValue(this)
+                    applyResult(it)
                 }
             }
         }
@@ -115,8 +119,7 @@ class TaskCombiner(vararg requests: LiveTask<*>) : BaseLiveTask<Any>() {
     }
 
     override fun retry() {
-        this.latestState = Result.Loading
-        postValue(this)
+        applyResult(Result.Loading)
         val listOfUnSuccesses = taskList.filter { coroutineLiveTask ->
             coroutineLiveTask.result() is Result.Error
         }
@@ -125,7 +128,22 @@ class TaskCombiner(vararg requests: LiveTask<*>) : BaseLiveTask<Any>() {
         }
     }
 
-    override fun execute() = taskList.forEach { it.execute() }
+    override fun execute() {
+        taskList.forEach { it.execute() }
+
+        val supervisorJob = SupervisorJob(context[Job])
+        val scope = CoroutineScope(Dispatchers.IO + context + supervisorJob)
+        blockRunner = CombineRunner(
+            liveData = this,
+            block = block,
+            timeoutInMs = DEFAULT_TIMEOUT,
+            scope = scope
+        ) {
+            blockRunner = null
+        }
+
+        blockRunner?.maybeRun()
+    }
 
     override fun cancel() {
         val listOfUnLoading = taskList.filter { coroutineLiveTask ->
@@ -134,7 +152,16 @@ class TaskCombiner(vararg requests: LiveTask<*>) : BaseLiveTask<Any>() {
 
         listOfUnLoading.forEach { coroutineLiveTask ->
             coroutineLiveTask.cancel()
-            // (coroutineLiveTask as BaseLiveTask).postValue(value as Result<Nothing>?)
         }
+    }
+
+    private fun applyResult(result: Result<Any>?) {
+        this.latestState = result
+        postValue(this)
+    }
+
+    private fun applyResult(task: LiveTask<*>) {
+        this.latestState = task.result() as Result<Any>?
+        postValue(this)
     }
 }

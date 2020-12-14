@@ -11,3 +11,10 @@ interface LiveTaskBuilder<T> {
     fun retryable(bool: Boolean)
     fun retry()
 }
+
+interface CombinerBuilder {
+    val latestValue: Result<Any>?
+    fun cancelable(bool: Boolean)
+    fun retryable(bool: Boolean)
+    fun retry()
+}
