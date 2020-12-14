@@ -9,6 +9,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
+import com.example.template.BaseLiveTask
 import com.example.template.R
 import com.example.template.core.util.LiveTask
 import kotlinx.android.synthetic.main.layout_state.view.*
@@ -18,7 +19,7 @@ private const val ERROR_STATE = "error"
 private const val SUCCESS_STATE = "success"
 
 @BindingAdapter("reactToTask")
-fun ViewGroup.reactToTask(result: LiveTask<*>?) {
+fun <T> ViewGroup.reactToTask(result: LiveTask<*>?) {
     when (result?.result()) {
         is Result.Success -> {
             var stateLayout = situationOfStateLayout(this).first
