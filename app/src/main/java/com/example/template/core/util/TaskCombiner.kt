@@ -129,7 +129,6 @@ class TaskCombiner(
     }
 
     override fun execute() {
-        taskList.forEach { it.execute() }
 
         val supervisorJob = SupervisorJob(context[Job])
         val scope = CoroutineScope(Dispatchers.IO + context + supervisorJob)
@@ -143,6 +142,8 @@ class TaskCombiner(
         }
 
         blockRunner?.maybeRun()
+
+        taskList.forEach { it.execute() }
     }
 
     override fun cancel() {

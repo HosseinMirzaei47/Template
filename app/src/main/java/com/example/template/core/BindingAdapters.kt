@@ -1,6 +1,5 @@
 package com.example.template.core
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -56,7 +55,6 @@ fun <T> ViewGroup.reactToTask(liveTask: LiveTask<*>?) {
 fun situationOfStateLayout(view: View): Pair<View, Any> {
     when (view) {
         is ConstraintLayout -> {
-            Log.d("parent", "ConstraintLayout")
             if (view.tag == null) {
                 val stateLayout = inflateStateLayoutAndSetID(view)
                 //    all childes of parent must have id to clone in constraint set
@@ -68,7 +66,6 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
         }
         else -> {
             if (view.parent is ConstraintLayout) {
-                Log.d("parent", "parent ConstraintLayout")
                 val parent = view.parent as ConstraintLayout
                 if (view.tag == null) {
                     val stateLayout = inflateStateLayoutAndSetID(parent)
@@ -77,7 +74,6 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
                 }
                 return Pair(parent.getViewById(view.tag as Int), parent)
             } else {
-                Log.d("parent", "Otheeeeeeeeeer")
                 val parent = view.parent as ViewGroup
 
                 if (view.tag == null) {
@@ -151,7 +147,7 @@ fun showLoadingState(
                         R.anim.fade_out_repeatition
                     )
                 )
-                it.layoutParams.height = 60
+                it.layoutParams.height = 150
                 it.ivBtn_refresh.visibility = View.INVISIBLE
                 it.pb_load.visibility = View.VISIBLE
                 it.tv_status.text = LOAD_STATE

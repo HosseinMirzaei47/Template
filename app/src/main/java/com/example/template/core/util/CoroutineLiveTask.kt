@@ -53,8 +53,7 @@ class CoroutineLiveTask<T>(
     }
 
     override fun execute() {
-        latestState = Result.Loading
-        this.postValue(this)
+        applyResult(Result.Loading)
         val supervisorJob = SupervisorJob(context[Job])
         val scope = CoroutineScope(Dispatchers.IO + context + supervisorJob)
         blockRunner = TaskRunner(
@@ -65,7 +64,6 @@ class CoroutineLiveTask<T>(
         ) {
             blockRunner = null
         }
-
         blockRunner?.maybeRun()
     }
 
@@ -95,5 +93,16 @@ class CoroutineLiveTask<T>(
 
     override fun cancel() {
         blockRunner?.cancel()
+    }
+
+
+    fun applyResult(result: Result<T>?) {
+        this.latestState = result
+        postValue(this)
+    }
+
+    fun applyResult(task: LiveTask<T>) {
+        this.latestState = task.result() as Result<T>?
+        postValue(this)
     }
 }

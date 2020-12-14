@@ -48,8 +48,7 @@ internal class LiveTaskBuilderImpl<T>(
     private val coroutineContext = context + Dispatchers.Main.immediate
 
     override suspend fun emit(result: Result<T>) = withContext(coroutineContext) {
-        target.latestState = result
-        target.postValue(target)
+        target.applyResult(result)
     }
 
     override fun retry() {}
