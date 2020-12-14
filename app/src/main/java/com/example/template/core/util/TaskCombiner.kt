@@ -2,58 +2,68 @@ package com.example.template.core.util
 
 import com.example.template.BaseLiveTask
 import com.example.template.core.Result
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import retrofit2.HttpException
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
-class TaskCombiner(vararg requests: BaseLiveTask<*>) : BaseLiveTask<Any>() {
+@Suppress("UNCHECKED_CAST")
+class TaskCombiner(
+    vararg requests: LiveTask<*>,
+    private val context: CoroutineContext = EmptyCoroutineContext,
+    val block: suspend CombinerBuilder.() -> Unit
+) : BaseLiveTask<Any>() {
 
-    private var taskList = mutableListOf<BaseLiveTask<*>>()
+    private var taskList = mutableListOf<LiveTask<*>>()
+    private var blockRunner: CombineRunner? = null
 
     init {
         requests.forEach { addTaskAsSource(it) }
     }
 
-    private fun addTaskAsSource(task: BaseLiveTask<*>) {
+    private fun addTaskAsSource(task: LiveTask<*>) {
         taskList.add(task)
-        this.addSource(task) { result ->
+        val asLiveData = task.asLiveData()
+        this.addSource(asLiveData) { liveTask ->
             printStats()
-            when (result) {
+
+            when (val result = liveTask.result()) {
                 is Result.Success -> {
                     checkIsThereAnyUnSuccess()
                 }
                 is Result.Error -> {
-                    if (this.value !is Result.Error) {
+                    if (this.value?.result() !is Result.Error) {
                         val isNotAuthorized = (result.exception is ServerException &&
                                 result.exception.meta.statusCode == 401) ||
                                 (result.exception is HttpException &&
                                         result.exception.code() == 401)
                         when {
-                            result.exception is NoConnectionException -> {
-                                this.postValue(task.value as Result<Any>?)
-                            }
-                            isNotAuthorized -> {
-                                this.postValue(task.value as Result<Any>?)
+                            result.exception is NoConnectionException || isNotAuthorized -> {
+                                applyResult(task)
                             }
                             else -> {
-                                if (task.retryCounts > task.retryAttempts) {
-                                    this.postValue(task.value as Result<Any>?)
+                                if ((task as BaseLiveTask<Any>).retryCounts > task.retryAttempts) {
+                                    applyResult(task.result())
                                 }
                             }
                         }
                     }
                 }
                 is Result.Loading -> {
-                    when (this.value) {
+                    when (this.value?.result()) {
                         is Result.Error -> {
                             setLoadingIfNoErrorLeft()
                         }
                         is Result.Success<*> -> {
-
-                            this.postValue(Result.Loading)
+                            applyResult(Result.Loading)
                         }
                         is Result.Loading -> {
                         }
                         else -> {
-                            this.postValue(Result.Loading)
+                            applyResult(Result.Loading)
                         }
                     }
                 }
@@ -63,26 +73,26 @@ class TaskCombiner(vararg requests: BaseLiveTask<*>) : BaseLiveTask<Any>() {
 
     private fun setLoadingIfNoErrorLeft() {
         val hasError = taskList.any {
-            it.value is Result.Error
+            it.result() is Result.Error
         }
         if (!hasError) {
-            this.postValue(Result.Loading)
+            applyResult(Result.Loading)
         }
     }
 
     private fun checkIsThereAnyUnSuccess() {
         val anyRequestLeft = taskList.any {
-            it.value is Result.Loading || it.value is Result.Error
+            it.result() is Result.Loading || it.result() is Result.Error
         }
         if (!anyRequestLeft) {
-            this.postValue(Result.Success(Any()))
+            applyResult(Result.Success(Any()))
         } else {
-            if (this.value is Result.Loading) {
+            if (this.value?.result() is Result.Loading) {
                 val oneOfErrors = taskList.find { coroutineLiveTask ->
-                    coroutineLiveTask.value is Result.Error
+                    coroutineLiveTask.result() is Result.Error
                 }
                 oneOfErrors?.let {
-                    this.postValue(it.value as Result<Any>?)
+                    applyResult(it)
                 }
             }
         }
@@ -93,7 +103,7 @@ class TaskCombiner(vararg requests: BaseLiveTask<*>) : BaseLiveTask<Any>() {
         var failed = 0
         var loading = 0
         taskList.forEach { coroutineLiveTask ->
-            when (coroutineLiveTask.value) {
+            when (coroutineLiveTask.result()) {
                 is Result.Success -> {
                     successes++
                 }
@@ -105,29 +115,53 @@ class TaskCombiner(vararg requests: BaseLiveTask<*>) : BaseLiveTask<Any>() {
                 }
             }
         }
-        println("mmb successful: $successes failed :$failed loading :$loading all requests: ${taskList.size}")
+        println("jalil successful: $successes failed :$failed loading :$loading all requests: ${taskList.size}")
     }
 
     override fun retry() {
-        this.postValue(Result.Loading)
+        applyResult(Result.Loading)
         val listOfUnSuccesses = taskList.filter { coroutineLiveTask ->
-            coroutineLiveTask.value is Result.Error
+            coroutineLiveTask.result() is Result.Error
         }
         listOfUnSuccesses.forEach { coroutineLiveTask ->
             coroutineLiveTask.retry()
         }
     }
 
-    override fun execute() = taskList.forEach { it.execute() }
+    override fun execute() {
+        taskList.forEach { it.execute() }
+
+        val supervisorJob = SupervisorJob(context[Job])
+        val scope = CoroutineScope(Dispatchers.IO + context + supervisorJob)
+        blockRunner = CombineRunner(
+            liveData = this,
+            block = block,
+            timeoutInMs = DEFAULT_TIMEOUT,
+            scope = scope
+        ) {
+            blockRunner = null
+        }
+
+        blockRunner?.maybeRun()
+    }
 
     override fun cancel() {
         val listOfUnLoading = taskList.filter { coroutineLiveTask ->
-            coroutineLiveTask.value is Result.Loading
+            coroutineLiveTask.result() is Result.Loading
         }
 
         listOfUnLoading.forEach { coroutineLiveTask ->
             coroutineLiveTask.cancel()
-            coroutineLiveTask.postValue(value as Result<Nothing>?)
         }
+    }
+
+    private fun applyResult(result: Result<Any>?) {
+        this.latestState = result
+        postValue(this)
+    }
+
+    private fun applyResult(task: LiveTask<*>) {
+        this.latestState = task.result() as Result<Any>?
+        postValue(this)
     }
 }

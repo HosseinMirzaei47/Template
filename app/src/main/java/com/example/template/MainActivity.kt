@@ -23,15 +23,20 @@ class MainActivity : AppCompatActivity() {
         DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
 
         Logger.observe(this) {
-            val isNotAuthorized =
-                (it.exception is ServerException && it.exception.meta.statusCode == 401) ||
-                        (it.exception is HttpException && it.exception.code() == 401)
-            if (it.exception is UnAuthorizedException || isNotAuthorized) {
-                unauthorizedDialog()
-            } else if (it.exception is NoConnectionException) {
-                noConnectionDialog()
-            } else if (it.exception is NoInternetException) {
-                errorDialog()
+            val isNotAuthorized = (it.exception is ServerException &&
+                    it.exception.meta.statusCode == 401) ||
+                    (it.exception is HttpException && it.exception.code() == 401)
+
+            when {
+                it.exception is UnAuthorizedException || isNotAuthorized -> {
+                    unauthorizedDialog()
+                }
+                it.exception is NoConnectionException -> {
+                    noConnectionDialog()
+                }
+                it.exception is NoInternetException -> {
+                    errorDialog()
+                }
             }
         }
     }
@@ -49,8 +54,11 @@ class MainActivity : AppCompatActivity() {
     private fun noConnectionDialog() {
         val dialog = MaterialAlertDialogBuilder(this)
         dialog.setTitle("خطا در اتصال به اینترنت")
-            .setNeutralButton("ورود به تنظیمات") { _, _ ->
+            .setPositiveButton("ورود به تنظیمات") { _, _ ->
                 startActivity(Intent(Settings.ACTION_WIFI_SETTINGS))
+            }
+            .setNegativeButton("باشه") { _, _ ->
+
             }
             .show()
     }

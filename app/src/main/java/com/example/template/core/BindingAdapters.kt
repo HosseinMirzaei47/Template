@@ -12,6 +12,7 @@ import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
 import com.example.template.BaseLiveTask
 import com.example.template.R
+import com.example.template.core.util.LiveTask
 import kotlinx.android.synthetic.main.layout_state.view.*
 
 private const val LOAD_STATE = "loading"
@@ -19,48 +20,40 @@ private const val ERROR_STATE = "error"
 private const val SUCCESS_STATE = "success"
 
 @BindingAdapter("reactToTask")
-fun <T> ViewGroup.reactToTask(result: BaseLiveTask<Any>) {
+fun <T> ViewGroup.reactToTask(liveTask: LiveTask<*>?) {
 
-
-    when (result.value) {
+    when (liveTask?.result()) {
         is Result.Success -> {
-            var stateLayout = situationOfStateLayout(this, result).first
+            var stateLayout = situationOfStateLayout(this).first
             if (stateLayout == null) {
                 this.tag = null
-                stateLayout = situationOfStateLayout(this, result).first
+                stateLayout = situationOfStateLayout(this).first
             }
-            val parent = situationOfStateLayout(this, result).second
-            showLoadingState(SUCCESS_STATE, stateLayout, parent, result)
+            val parent = situationOfStateLayout(this).second
+            showLoadingState(SUCCESS_STATE, stateLayout, parent, liveTask)
         }
         is Result.Loading -> {
-            var stateLayout = situationOfStateLayout(this, result).first
-            stateLayout?.let {
-
-            }.run {
-
-            }
-
-
+            var stateLayout = situationOfStateLayout(this).first
             if (stateLayout == null) {
                 this.tag = null
-                stateLayout = situationOfStateLayout(this, result).first
+                stateLayout = situationOfStateLayout(this).first
             }
-            val parent = situationOfStateLayout(this, result).second
-            showLoadingState(LOAD_STATE, stateLayout, parent, result)
+            val parent = situationOfStateLayout(this).second
+            showLoadingState(LOAD_STATE, stateLayout, parent, liveTask)
         }
         is Result.Error -> {
-            var stateLayout = situationOfStateLayout(this, result).first
+            var stateLayout = situationOfStateLayout(this).first
             if (stateLayout == null) {
                 this.tag = null
-                stateLayout = situationOfStateLayout(this, result).first
+                stateLayout = situationOfStateLayout(this).first
             }
-            val parent = situationOfStateLayout(this, result).second
-            showLoadingState(ERROR_STATE, stateLayout, parent, result)
+            val parent = situationOfStateLayout(this).second
+            showLoadingState(ERROR_STATE, stateLayout, parent, liveTask)
         }
     }
 }
 
-fun situationOfStateLayout(view: View, result: BaseLiveTask<Any>): Pair<View, Any> {
+fun situationOfStateLayout(view: View): Pair<View, Any> {
     when (view) {
         is ConstraintLayout -> {
             Log.d("parent", "ConstraintLayout")
@@ -144,7 +137,7 @@ fun showLoadingState(
     state: String,
     stateLayout: View?,
     parent: Any,
-    result: BaseLiveTask<Any>
+    result: LiveTask<*>
 ) {
     parent as ViewGroup
 
@@ -162,7 +155,7 @@ fun showLoadingState(
                 it.ivBtn_refresh.visibility = View.INVISIBLE
                 it.pb_load.visibility = View.VISIBLE
                 it.tv_status.text = LOAD_STATE
-                if (result.cancelable) {
+                if ((result as BaseLiveTask<*>).cancelable) {
                     it.ivBtn_close.visibility = View.VISIBLE
                     it.ivBtn_close.setOnClickListener { _ ->
                         result.cancel()
@@ -184,7 +177,7 @@ fun showLoadingState(
                 }
 
 
-                if (result.retryable) {
+                if ((result as BaseLiveTask<*>).retryable) {
                     it.ivBtn_refresh.visibility = View.VISIBLE
                     it.ivBtn_refresh.setOnClickListener {
                         result.retry()
@@ -206,11 +199,11 @@ fun showLoadingState(
 }
 
 @BindingAdapter("visibleOnLoading")
-fun View.visibleOnLoading(result: BaseLiveTask<Any>?) {
-    this.isVisible = Result.Loading == result?.value
+fun View.visibleOnLoading(liveTask: LiveTask<*>?) {
+    this.isVisible = Result.Loading == liveTask?.result()
 }
 
 @BindingAdapter("disableOnLoading")
-fun Button.disableOnLoading(result: BaseLiveTask<Any>?) {
-    this.isEnabled = Result.Loading != result?.value
+fun Button.disableOnLoading(liveTask: LiveTask<*>?) {
+    this.isEnabled = Result.Loading != liveTask?.result()
 }
