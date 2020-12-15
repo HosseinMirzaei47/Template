@@ -13,8 +13,8 @@ import kotlin.coroutines.EmptyCoroutineContext
 @Suppress("UNCHECKED_CAST")
 class TaskCombiner(
     vararg requests: LiveTask<*>,
-    private val context: CoroutineContext = EmptyCoroutineContext,
-    val block: suspend CombinerBuilder.() -> Unit
+    val context: CoroutineContext = EmptyCoroutineContext,
+    val block: suspend CombinerBuilder.() -> Unit = {}
 ) : BaseLiveTask<Any>() {
 
     private var taskList = mutableListOf<LiveTask<*>>()
