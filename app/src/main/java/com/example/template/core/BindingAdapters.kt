@@ -22,7 +22,7 @@ private const val SUCCESS_STATE = "success"
 fun <T> ViewGroup.reactToTask(liveTask: LiveTask<*>?) {
 
     when (liveTask?.result()) {
-        is Result.Success -> {
+        is com.example.template.core.Result.Success -> {
             var stateLayout = situationOfStateLayout(this).first
             if (stateLayout == null) {
                 this.tag = null
@@ -31,7 +31,7 @@ fun <T> ViewGroup.reactToTask(liveTask: LiveTask<*>?) {
             val parent = situationOfStateLayout(this).second
             showLoadingState(SUCCESS_STATE, stateLayout, parent, liveTask)
         }
-        is Result.Loading -> {
+        is com.example.template.core.Result.Loading -> {
             var stateLayout = situationOfStateLayout(this).first
             if (stateLayout == null) {
                 this.tag = null
@@ -40,7 +40,7 @@ fun <T> ViewGroup.reactToTask(liveTask: LiveTask<*>?) {
             val parent = situationOfStateLayout(this).second
             showLoadingState(LOAD_STATE, stateLayout, parent, liveTask)
         }
-        is Result.Error -> {
+        is com.example.template.core.Result.Error -> {
             var stateLayout = situationOfStateLayout(this).first
             if (stateLayout == null) {
                 this.tag = null
@@ -196,10 +196,10 @@ fun showLoadingState(
 
 @BindingAdapter("visibleOnLoading")
 fun View.visibleOnLoading(liveTask: LiveTask<*>?) {
-    this.isVisible = Result.Loading == liveTask?.result()
+    this.isVisible = com.example.template.core.Result.Loading == liveTask?.result()
 }
 
 @BindingAdapter("disableOnLoading")
 fun Button.disableOnLoading(liveTask: LiveTask<*>?) {
-    this.isEnabled = Result.Loading != liveTask?.result()
+    this.isEnabled = com.example.template.core.Result.Loading != liveTask?.result()
 }

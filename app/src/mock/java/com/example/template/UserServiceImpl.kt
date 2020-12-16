@@ -6,6 +6,8 @@ import com.example.template.home.data.servicemodels.Ad
 import com.example.template.home.data.servicemodels.Data
 import com.example.template.home.data.servicemodels.UserRes
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 
 class UserServiceImpl(private val api: HomeApi) : UserDataSource {
@@ -62,6 +64,13 @@ class UserServiceImpl(private val api: HomeApi) : UserDataSource {
     override suspend fun getUsers(page: Int): UserRes {
         delay(3000)
         return returnResponse(true)
+    }
+
+    override suspend fun getUsersFlow(page: Int): Flow<UserRes> {
+        return flow {
+            delay(3000)
+            emit(returnResponse(false))
+        }
     }
 
 

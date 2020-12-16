@@ -1,8 +1,5 @@
 package com.example.template.core.usecases
 
-import com.example.template.core.Result
-import com.example.template.core.Result.Error
-import com.example.template.core.Result.Success
 import com.example.template.core.util.detectException
 import com.example.template.core.util.readServerError
 import kotlinx.coroutines.CancellationException
@@ -13,24 +10,24 @@ import java.io.IOException
 
 abstract class CoroutineUseCaseNoParameter<R>(private val coroutineDispatcher: CoroutineDispatcher) {
 
-    suspend operator fun invoke(): Result<R> {
+    suspend operator fun invoke(): com.example.template.core.Result<R> {
         return try {
             withContext(coroutineDispatcher) {
-                Success(execute())
+                com.example.template.core.Result.Success(execute())
             }
         } catch (e: CancellationException) {
-            Error(e)
+            com.example.template.core.Result.Error(e)
         } catch (e: HttpException) {
             val parsedError = try {
                 readServerError(e)
             } catch (f: Exception) {
                 e
             }
-            Error(parsedError)
+            com.example.template.core.Result.Error(parsedError)
         } catch (e: IOException) {
-            Error(e.detectException())
+            com.example.template.core.Result.Error(e.detectException())
         } catch (e: Exception) {
-            Error(e)
+            com.example.template.core.Result.Error(e)
         }
     }
 

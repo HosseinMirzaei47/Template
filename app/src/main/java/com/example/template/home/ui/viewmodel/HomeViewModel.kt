@@ -4,24 +4,30 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
 import com.example.template.core.util.combinedTask
 import com.example.template.core.util.liveTask
-import com.example.template.home.domain.GetArticleUseCase
-import com.example.template.home.domain.GetCommentUseCase
-import com.example.template.home.domain.GetUserUseCase
+import com.example.template.home.domain.*
 
 class HomeViewModel @ViewModelInject constructor(
     private val useCase: GetUserUseCase,
     private val articleUseCase: GetArticleUseCase,
-    private val commentUseCase: GetCommentUseCase
+    private val commentUseCase: GetCommentUseCase,
+    flowUseCase: GetUserFlowUseCase,
+    testUseCase: TestUseCase
 ) : ViewModel() {
 
-    val users1 = liveTask {
+
+    // حالت سینتکس قبلی با قابلیت emit های چندگانه
+    val user1 = liveTask {
         emit(useCase(1))
     }
 
-    val users2 = liveTask {
-        emit(useCase(1))
-    }
+    // حالت استفاده از flow
+    val user2 = flowUseCase.asLiveTask(5)
 
-    val combinedTasks = combinedTask(users1, users2)
+    // حالت استفاده ی معمولی به صورت سینتکس جدید
+    val user3 = testUseCase.asLiveTask("5")
+
+
+    val combinedTasks = combinedTask(user1, user2, user3)
+
 
 }

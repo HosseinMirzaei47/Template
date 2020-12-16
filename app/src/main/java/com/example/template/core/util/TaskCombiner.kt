@@ -1,7 +1,6 @@
 package com.example.template.core.util
 
 import com.example.template.BaseLiveTask
-import com.example.template.core.Result
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -31,39 +30,41 @@ class TaskCombiner(
             printStats()
 
             when (val result = liveTask.result()) {
-                is Result.Success -> {
+                is com.example.template.core.Result.Success -> {
                     checkIsThereAnyUnSuccess()
                 }
-                is Result.Error -> {
-                    if (this.value?.result() !is Result.Error) {
+                is com.example.template.core.Result.Error -> {
+                    if (this.value?.result() !is com.example.template.core.Result.Error) {
                         val isNotAuthorized = (result.exception is ServerException &&
                                 result.exception.meta.statusCode == 401) ||
                                 (result.exception is HttpException &&
                                         result.exception.code() == 401)
+
                         when {
                             result.exception is NoConnectionException || isNotAuthorized -> {
                                 applyResult(task)
                             }
                             else -> {
-                                if ((task as BaseLiveTask<Any>).retryCounts > task.retryAttempts) {
+                                task as BaseLiveTask<Any>
+                                if ((task).retryCounts > task.retryAttempts) {
                                     applyResult(task.result())
                                 }
                             }
                         }
                     }
                 }
-                is Result.Loading -> {
+                is com.example.template.core.Result.Loading -> {
                     when (this.value?.result()) {
-                        is Result.Error -> {
+                        is com.example.template.core.Result.Error -> {
                             setLoadingIfNoErrorLeft()
                         }
-                        is Result.Success<*> -> {
-                            applyResult(Result.Loading)
+                        is com.example.template.core.Result.Success<*> -> {
+                            applyResult(com.example.template.core.Result.Loading)
                         }
-                        is Result.Loading -> {
+                        is com.example.template.core.Result.Loading -> {
                         }
                         else -> {
-                            applyResult(Result.Loading)
+                            applyResult(com.example.template.core.Result.Loading)
                         }
                     }
                 }
@@ -73,23 +74,23 @@ class TaskCombiner(
 
     private fun setLoadingIfNoErrorLeft() {
         val hasError = taskList.any {
-            it.result() is Result.Error
+            it.result() is com.example.template.core.Result.Error
         }
         if (!hasError) {
-            applyResult(Result.Loading)
+            applyResult(com.example.template.core.Result.Loading)
         }
     }
 
     private fun checkIsThereAnyUnSuccess() {
         val anyRequestLeft = taskList.any {
-            it.result() is Result.Loading || it.result() is Result.Error
+            it.result() is com.example.template.core.Result.Loading || it.result() is com.example.template.core.Result.Error
         }
         if (!anyRequestLeft) {
-            applyResult(Result.Success(Any()))
+            applyResult(com.example.template.core.Result.Success(Any()))
         } else {
-            if (this.value?.result() is Result.Loading) {
+            if (this.value?.result() is com.example.template.core.Result.Loading) {
                 val oneOfErrors = taskList.find { coroutineLiveTask ->
-                    coroutineLiveTask.result() is Result.Error
+                    coroutineLiveTask.result() is com.example.template.core.Result.Error
                 }
                 oneOfErrors?.let {
                     applyResult(it)
@@ -104,31 +105,31 @@ class TaskCombiner(
         var loading = 0
         taskList.forEach { coroutineLiveTask ->
             when (coroutineLiveTask.result()) {
-                is Result.Success -> {
+                is com.example.template.core.Result.Success -> {
                     successes++
                 }
-                is Result.Error -> {
+                is com.example.template.core.Result.Error -> {
                     failed++
                 }
-                Result.Loading -> {
+                com.example.template.core.Result.Loading -> {
                     loading++
                 }
             }
         }
-        println("jalil successful: $successes failed :$failed loading :$loading all requests: ${taskList.size}")
+        println("mmb successful: $successes failed :$failed loading :$loading all requests: ${taskList.size}")
     }
 
     override fun retry() {
-        applyResult(Result.Loading)
+        applyResult(com.example.template.core.Result.Loading)
         val listOfUnSuccesses = taskList.filter { coroutineLiveTask ->
-            coroutineLiveTask.result() is Result.Error
+            coroutineLiveTask.result() is com.example.template.core.Result.Error
         }
         listOfUnSuccesses.forEach { coroutineLiveTask ->
             coroutineLiveTask.retry()
         }
     }
 
-    override fun execute() {
+    override fun run(): LiveTask<Any> {
 
         val supervisorJob = SupervisorJob(context[Job])
         val scope = CoroutineScope(Dispatchers.IO + context + supervisorJob)
@@ -143,12 +144,13 @@ class TaskCombiner(
 
         blockRunner?.maybeRun()
 
-        taskList.forEach { it.execute() }
+        taskList.forEach { it.run() }
+        return this
     }
 
     override fun cancel() {
         val listOfUnLoading = taskList.filter { coroutineLiveTask ->
-            coroutineLiveTask.result() is Result.Loading
+            coroutineLiveTask.result() is com.example.template.core.Result.Loading
         }
 
         listOfUnLoading.forEach { coroutineLiveTask ->
@@ -156,13 +158,13 @@ class TaskCombiner(
         }
     }
 
-    private fun applyResult(result: Result<Any>?) {
+    private fun applyResult(result: com.example.template.core.Result<Any>?) {
         this.latestState = result
         postValue(this)
     }
 
     private fun applyResult(task: LiveTask<*>) {
-        this.latestState = task.result() as Result<Any>?
+        this.latestState = task.result() as com.example.template.core.Result<Any>?
         postValue(this)
     }
 }
