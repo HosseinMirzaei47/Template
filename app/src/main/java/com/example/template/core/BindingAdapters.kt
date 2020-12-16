@@ -1,22 +1,34 @@
 package com.example.template.core
 
+import android.app.AlertDialog
+import android.app.Dialog
+import android.graphics.BlurMaskFilter
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.Button
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.os.persistableBundleOf
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
 import com.example.template.BaseLiveTask
 import com.example.template.R
 import com.example.template.core.util.LiveTask
+import eightbitlab.com.blurview.BlurView
+import jp.wasabeef.blurry.Blurry
 import kotlinx.android.synthetic.main.layout_state.view.*
+import kotlinx.android.synthetic.main.progress_dialog.*
+import kotlinx.android.synthetic.main.progress_dialog.view.*
 
 private const val LOAD_STATE = "loading"
 private const val ERROR_STATE = "error"
 private const val SUCCESS_STATE = "success"
+
+private lateinit var progressDialog: Dialog
 
 @BindingAdapter("reactToTask")
 fun <T> ViewGroup.reactToTask(liveTask: LiveTask<*>?) {
@@ -141,6 +153,7 @@ fun showLoadingState(
 
         LOAD_STATE -> {
             stateLayout?.let {
+                Blurry.with(parent.context).radius(25).sampling(5).onto(parent)
                 it.tv_status.startAnimation(
                     AnimationUtils.loadAnimation(
                         it.context,
@@ -164,8 +177,8 @@ fun showLoadingState(
         }
         ERROR_STATE -> {
             stateLayout?.let {
+                Blurry.delete(parent)
                 it.tv_status.clearAnimation()
-
                 it.ivBtn_close.visibility = View.VISIBLE
                 it.ivBtn_close.setOnClickListener { _ ->
                     it.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.fade_out))
@@ -203,3 +216,4 @@ fun View.visibleOnLoading(liveTask: LiveTask<*>?) {
 fun Button.disableOnLoading(liveTask: LiveTask<*>?) {
     this.isEnabled = Result.Loading != liveTask?.result()
 }
+
