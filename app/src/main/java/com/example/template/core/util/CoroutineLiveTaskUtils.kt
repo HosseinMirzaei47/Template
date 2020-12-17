@@ -59,15 +59,11 @@ internal class LiveTaskBuilderImpl<T>(
     override suspend fun emit(result: Flow<T>) {
         result
             .onStart {
-                println("mmb onstart")
                 target.applyResult(com.example.template.core.Result.Loading)
             }
             .catch { e ->
-                println("mmb cache")
-                println("mmb $e")
                 target.applyResult(com.example.template.core.Result.Error(Exception(e)))
             }.collect {
-                println("mmb on colect")
                 target.applyResult(Result.Success(it))
             }
     }
