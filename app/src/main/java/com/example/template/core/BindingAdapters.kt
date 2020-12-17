@@ -1,6 +1,5 @@
 package com.example.template.core
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,7 +22,7 @@ private const val SUCCESS_STATE = "success"
 fun <T> ViewGroup.reactToTask(liveTask: LiveTask<*>?) {
 
     when (liveTask?.result()) {
-        is Result.Success -> {
+        is com.example.template.core.Result.Success -> {
             var stateLayout = situationOfStateLayout(this).first
             if (stateLayout == null) {
                 this.tag = null
@@ -32,7 +31,7 @@ fun <T> ViewGroup.reactToTask(liveTask: LiveTask<*>?) {
             val parent = situationOfStateLayout(this).second
             showLoadingState(SUCCESS_STATE, stateLayout, parent, liveTask)
         }
-        is Result.Loading -> {
+        is com.example.template.core.Result.Loading -> {
             var stateLayout = situationOfStateLayout(this).first
             if (stateLayout == null) {
                 this.tag = null
@@ -41,7 +40,7 @@ fun <T> ViewGroup.reactToTask(liveTask: LiveTask<*>?) {
             val parent = situationOfStateLayout(this).second
             showLoadingState(LOAD_STATE, stateLayout, parent, liveTask)
         }
-        is Result.Error -> {
+        is com.example.template.core.Result.Error -> {
             var stateLayout = situationOfStateLayout(this).first
             if (stateLayout == null) {
                 this.tag = null
@@ -56,7 +55,6 @@ fun <T> ViewGroup.reactToTask(liveTask: LiveTask<*>?) {
 fun situationOfStateLayout(view: View): Pair<View, Any> {
     when (view) {
         is ConstraintLayout -> {
-            Log.d("parent", "ConstraintLayout")
             if (view.tag == null) {
                 val stateLayout = inflateStateLayoutAndSetID(view)
                 //    all childes of parent must have id to clone in constraint set
@@ -68,7 +66,6 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
         }
         else -> {
             if (view.parent is ConstraintLayout) {
-                Log.d("parent", "parent ConstraintLayout")
                 val parent = view.parent as ConstraintLayout
                 if (view.tag == null) {
                     val stateLayout = inflateStateLayoutAndSetID(parent)
@@ -77,7 +74,6 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
                 }
                 return Pair(parent.getViewById(view.tag as Int), parent)
             } else {
-                Log.d("parent", "Otheeeeeeeeeer")
                 val parent = view.parent as ViewGroup
 
                 if (view.tag == null) {
@@ -151,7 +147,7 @@ fun showLoadingState(
                         R.anim.fade_out_repeatition
                     )
                 )
-                it.layoutParams.height = 60
+                it.layoutParams.height = 150
                 it.ivBtn_refresh.visibility = View.INVISIBLE
                 it.pb_load.visibility = View.VISIBLE
                 it.tv_status.text = LOAD_STATE
@@ -200,10 +196,10 @@ fun showLoadingState(
 
 @BindingAdapter("visibleOnLoading")
 fun View.visibleOnLoading(liveTask: LiveTask<*>?) {
-    this.isVisible = Result.Loading == liveTask?.result()
+    this.isVisible = com.example.template.core.Result.Loading == liveTask?.result()
 }
 
 @BindingAdapter("disableOnLoading")
 fun Button.disableOnLoading(liveTask: LiveTask<*>?) {
-    this.isEnabled = Result.Loading != liveTask?.result()
+    this.isEnabled = com.example.template.core.Result.Loading != liveTask?.result()
 }

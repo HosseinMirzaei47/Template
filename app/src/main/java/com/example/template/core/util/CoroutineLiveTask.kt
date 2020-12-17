@@ -52,9 +52,8 @@ class CoroutineLiveTask<T>(
         }
     }
 
-    override fun execute() {
-        latestState = Result.Loading
-        this.postValue(this)
+    override fun run(): CoroutineLiveTask<T> {
+        applyResult(com.example.template.core.Result.Loading)
         val supervisorJob = SupervisorJob(context[Job])
         val scope = CoroutineScope(Dispatchers.IO + context + supervisorJob)
         blockRunner = TaskRunner(
@@ -65,8 +64,8 @@ class CoroutineLiveTask<T>(
         ) {
             blockRunner = null
         }
-
         blockRunner?.maybeRun()
+        return this
     }
 
     private fun retryOnNetworkBack() {
@@ -90,10 +89,21 @@ class CoroutineLiveTask<T>(
 
     override fun retry() {
         this.removeSource(connectionLiveData)
-        execute()
+        run()
     }
 
     override fun cancel() {
         blockRunner?.cancel()
+    }
+
+
+    fun applyResult(result: com.example.template.core.Result<T>?) {
+        this.latestState = result
+        postValue(this)
+    }
+
+    fun applyResult(task: LiveTask<T>) {
+        this.latestState = task.result() as com.example.template.core.Result<T>?
+        postValue(this)
     }
 }

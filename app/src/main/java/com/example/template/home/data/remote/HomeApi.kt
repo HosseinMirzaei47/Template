@@ -10,4 +10,5 @@ interface HomeApi {
     suspend fun getUsers(
         @Query("page") page: Int
     ): Response<UserRes>
+
 }
