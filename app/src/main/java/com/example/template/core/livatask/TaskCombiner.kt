@@ -1,6 +1,7 @@
-package com.example.template.core.util
+package com.example.template.core.livatask
 
-import com.example.template.BaseLiveTask
+import com.example.template.core.util.NoConnectionException
+import com.example.template.core.util.ServerException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job

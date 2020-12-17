@@ -1,10 +1,11 @@
-package com.example.template.core.util
+package com.example.template.core.livatask
 
-import com.example.template.BaseLiveTask
 import com.example.template.core.ErrorEvent
 import com.example.template.core.Logger
 import com.example.template.core.MyApp.Companion.connectionLiveData
 import com.example.template.core.Result
+import com.example.template.core.util.NoConnectionException
+import com.example.template.core.util.ServerException
 import com.example.template.core.withError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
