@@ -24,7 +24,7 @@ class HomeViewModel @ViewModelInject constructor(
     val user2 = flowUseCase.asLiveTask(5)
 
     // حالت استفاده ی معمولی به صورت سینتکس جدید
-    val user3 = testUseCase.asLiveTask("5")
+    val user3 = testUseCase.asLiveTask(5)
 
 
     val combinedTasks = combinedTask(user1, user2, user3)
