@@ -33,7 +33,8 @@ android {
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
-
+        renderscriptTargetApi 24
+        renderscriptSupportModeEnabled true
         testInstrumentationRunner "com.example.template.HiltTestRunner"
     }
 
@@ -223,5 +224,7 @@ dependencies {
 
     implementation 'jp.wasabeef:blurry:4.0.0'
     implementation 'com.eightbitlab:blurview:1.6.5'
+    implementation 'com.ms-square:etsyblur:0.2.1'
+    implementation 'at.favre.lib:dali:0.4.0'
 
 }

@@ -1,27 +1,26 @@
 package com.example.template.core
 
-import android.app.AlertDialog
 import android.app.Dialog
-import android.graphics.BlurMaskFilter
-import android.graphics.Paint
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import android.widget.Button
-import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
-import androidx.core.os.persistableBundleOf
+import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
+import androidx.core.view.postDelayed
 import androidx.databinding.BindingAdapter
 import com.example.template.BaseLiveTask
 import com.example.template.R
 import com.example.template.core.util.LiveTask
-import eightbitlab.com.blurview.BlurView
+import com.ms_square.etsyblur.Blur
+import com.ms_square.etsyblur.BlurConfig
 import jp.wasabeef.blurry.Blurry
-import kotlinx.android.synthetic.main.layout_state.view.*
-import kotlinx.android.synthetic.main.progress_dialog.*
 import kotlinx.android.synthetic.main.progress_dialog.view.*
 
 private const val LOAD_STATE = "loading"
@@ -31,7 +30,7 @@ private const val SUCCESS_STATE = "success"
 private lateinit var progressDialog: Dialog
 
 @BindingAdapter("reactToTask")
-fun <T> ViewGroup.reactToTask(liveTask: LiveTask<*>?) {
+fun <T> View.reactToTask(liveTask: LiveTask<*>?) {
 
     when (liveTask?.result()) {
         is Result.Success -> {
@@ -72,6 +71,7 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
                 //    all childes of parent must have id to clone in constraint set
                 //    setConstraintForStateLayout(view, stateLayout, view)
                 view.addView(stateLayout)
+                ViewCompat.setElevation(stateLayout,100000F)
                 view.tag = stateLayout.id
             }
             return Pair(view.getViewById(view.tag as Int), view)
@@ -101,7 +101,9 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
 
 private fun inflateStateLayoutAndSetID(view: ViewGroup): View {
     val stateLayout = LayoutInflater.from(view.context)
-        .inflate(R.layout.layout_state, view, false)
+        .inflate(R.layout.progress_dialog, view, false)
+    Log.i("TAG", view.toString())
+    Blurry.with(view.context).radius(20).sampling(5).onto(view)
     stateLayout.id = View.generateViewId()
     return stateLayout
 }
@@ -148,53 +150,83 @@ fun showLoadingState(
     result: LiveTask<*>
 ) {
     parent as ViewGroup
-
+    fun BlurConfig() : BlurConfig {
+        return BlurConfig.Builder()
+            .debug(true)
+            .build();
+    }
     when (state) {
-
         LOAD_STATE -> {
             stateLayout?.let {
-                Blurry.with(parent.context).radius(25).sampling(5).onto(parent)
-                it.tv_status.startAnimation(
-                    AnimationUtils.loadAnimation(
-                        it.context,
-                        R.anim.fade_out_repeatition
-                    )
-                )
-                it.layoutParams.height = 150
-                it.ivBtn_refresh.visibility = View.INVISIBLE
-                it.pb_load.visibility = View.VISIBLE
-                it.tv_status.text = LOAD_STATE
-                if ((result as BaseLiveTask<*>).cancelable) {
-                    it.ivBtn_close.visibility = View.VISIBLE
-                    it.ivBtn_close.setOnClickListener { _ ->
-                        result.cancel()
-                        it.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.fade_out))
-                        parent.removeView(it)
-                    }
-                } else it.ivBtn_close.visibility = View.INVISIBLE
+                Log.i("bang", parent.toString())
+                it.tv_progressBar.text = LOAD_STATE
+                if (!(result as BaseLiveTask<*>).cancelable){
+                    it.btn_progress_close.visibility = View.INVISIBLE
+                }
+                it.btn_progress_close.setOnClickListener { view ->
+                    Blurry.delete(parent)
+                    result.cancel()
+                    parent.removeView(it)
+                }
+//                it.tv_status.startAnimation(
+//                    AnimationUtils.loadAnimation(
+//                        it.context,
+//                        R.anim.fade_out_repeatition
+//                    )
+//                )
+//                it.layoutParams.height = 150
+//                it.ivBtn_refresh.visibility = View.INVISIBLE
+//                it.pb_load.visibility = View.VISIBLE
+//                it.tv_status.text = LOAD_STATE
+//                if ((result as BaseLiveTask<*>).cancelable) {
+//                    it.ivBtn_close.visibility = View.VISIBLE
+//                    it.ivBtn_close.setOnClickListener { _ ->
+//                        result.cancel()
+//                        it.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.fade_out))
+//                        parent.removeView(it)
+//                    }
+//                } else it.ivBtn_close.visibility = View.INVISIBLE
 
             }
         }
         ERROR_STATE -> {
             stateLayout?.let {
-                Blurry.delete(parent)
-                it.tv_status.clearAnimation()
-                it.ivBtn_close.visibility = View.VISIBLE
-                it.ivBtn_close.setOnClickListener { _ ->
-                    it.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.fade_out))
+                it.loading.visibility = View.INVISIBLE
+                it.show_result.visibility = View.VISIBLE
+                it.tv_show.text = ERROR_STATE
+                if (!(result as BaseLiveTask<*>).cancelable){
+                    it.btn_cancel.visibility = View.INVISIBLE
+                }
+                it.btn_cancel.setOnClickListener { view ->
+                    Blurry.delete(parent)
+                    result.cancel()
                     parent.removeView(it)
                 }
-
-
-                if ((result as BaseLiveTask<*>).retryable) {
-                    it.ivBtn_refresh.visibility = View.VISIBLE
-                    it.ivBtn_refresh.setOnClickListener {
-                        result.retry()
-                    }
-                } else it.ivBtn_refresh.visibility = View.INVISIBLE
-
-                it.tv_status.text = ERROR_STATE
-                it.pb_load.visibility = View.GONE
+                if (!(result as BaseLiveTask<*>).retryable){
+                    it.btn_retry.visibility = View.INVISIBLE
+                }
+                it.btn_retry.setOnClickListener { view ->
+                    Blurry.delete(parent)
+                    result.retry()
+                    parent.removeView(it)
+                }
+//                it.tv_status.clearAnimation()
+//                it.ivBtn_close.visibility = View.VISIBLE
+//                it.ivBtn_close.setOnClickListener { _ ->
+//                    it.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.fade_out))
+//                    parent.removeView(it)
+//                }
+//
+//
+//                if ((result as BaseLiveTask<*>).retryable) {
+//                    it.ivBtn_refresh.visibility = View.VISIBLE
+//                    it.ivBtn_refresh.setOnClickListener {
+//                        result.retry()
+//                    }
+//                } else it.ivBtn_refresh.visibility = View.INVISIBLE
+//
+//                it.tv_status.text = ERROR_STATE
+//                it.pb_load.visibility = View.GONE
 
 
             }
