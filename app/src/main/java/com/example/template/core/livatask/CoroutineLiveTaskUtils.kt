@@ -1,5 +1,8 @@
 package com.example.template.core.livatask
 
+import androidx.annotation.MainThread
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import com.example.template.core.Result
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
@@ -69,6 +72,11 @@ internal class LiveTaskBuilderImpl<T>(
             }
     }
 
+    override suspend fun emit(source: LiveData<LiveTask<T>>): DisposableHandle =
+        withContext(coroutineContext) {
+            return@withContext target.emitSource(source)
+        }
+
     override fun retry() {}
 
     override fun retryAttempts(attempts: Int) {
@@ -86,6 +94,48 @@ internal class LiveTaskBuilderImpl<T>(
     override fun retryable(bool: Boolean) {
         target.retryable(bool)
     }
+}
+
+internal class Emitted(
+    private val source: LiveData<*>,
+    private val mediator: MediatorLiveData<*>
+) : DisposableHandle {
+    // @MainThread
+    private var disposed = false
+
+    /**
+     * Unlike [dispose] which cannot be sync because it not a coroutine (and we do not want to
+     * lock), this version is a suspend function and does not return until source is removed.
+     */
+    suspend fun disposeNow() = withContext(Dispatchers.Main.immediate) {
+        removeSource()
+    }
+
+    override fun dispose() {
+        CoroutineScope(Dispatchers.Main.immediate).launch {
+            removeSource()
+        }
+    }
+
+    @MainThread
+    private fun removeSource() {
+        if (!disposed) {
+            mediator.removeSource(source)
+            disposed = true
+        }
+    }
+}
+
+internal suspend fun <T> MediatorLiveData<LiveTask<T>>.addDisposableEmit(
+    source: LiveData<LiveTask<T>>
+): Emitted = withContext(Dispatchers.Main.immediate) {
+    addSource(source) {
+        value = it
+    }
+    Emitted(
+        source = source,
+        mediator = this@addDisposableEmit
+    )
 }
 
 internal typealias Block<T> = suspend LiveTaskBuilder<T>.() -> Unit
