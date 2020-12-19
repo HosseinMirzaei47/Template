@@ -27,7 +27,6 @@ private const val LOAD_STATE = "loading"
 private const val ERROR_STATE = "error"
 private const val SUCCESS_STATE = "success"
 
-private lateinit var progressDialog: Dialog
 
 @BindingAdapter("reactToTask")
 fun <T> View.reactToTask(liveTask: LiveTask<*>?) {
@@ -168,25 +167,6 @@ fun showLoadingState(
                     result.cancel()
                     parent.removeView(it)
                 }
-//                it.tv_status.startAnimation(
-//                    AnimationUtils.loadAnimation(
-//                        it.context,
-//                        R.anim.fade_out_repeatition
-//                    )
-//                )
-//                it.layoutParams.height = 150
-//                it.ivBtn_refresh.visibility = View.INVISIBLE
-//                it.pb_load.visibility = View.VISIBLE
-//                it.tv_status.text = LOAD_STATE
-//                if ((result as BaseLiveTask<*>).cancelable) {
-//                    it.ivBtn_close.visibility = View.VISIBLE
-//                    it.ivBtn_close.setOnClickListener { _ ->
-//                        result.cancel()
-//                        it.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.fade_out))
-//                        parent.removeView(it)
-//                    }
-//                } else it.ivBtn_close.visibility = View.INVISIBLE
-
             }
         }
         ERROR_STATE -> {
@@ -210,25 +190,6 @@ fun showLoadingState(
                     result.retry()
                     parent.removeView(it)
                 }
-//                it.tv_status.clearAnimation()
-//                it.ivBtn_close.visibility = View.VISIBLE
-//                it.ivBtn_close.setOnClickListener { _ ->
-//                    it.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.fade_out))
-//                    parent.removeView(it)
-//                }
-//
-//
-//                if ((result as BaseLiveTask<*>).retryable) {
-//                    it.ivBtn_refresh.visibility = View.VISIBLE
-//                    it.ivBtn_refresh.setOnClickListener {
-//                        result.retry()
-//                    }
-//                } else it.ivBtn_refresh.visibility = View.INVISIBLE
-//
-//                it.tv_status.text = ERROR_STATE
-//                it.pb_load.visibility = View.GONE
-
-
             }
         }
         SUCCESS_STATE -> {
