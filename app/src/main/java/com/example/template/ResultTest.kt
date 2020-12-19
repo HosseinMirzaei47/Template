@@ -5,7 +5,3 @@ sealed class ResultTest<out R> {
     data class CustomError(val exception: Exception) : ResultTest<Nothing>()
     object CustomLoading : ResultTest<Nothing>()
 }
-
-
-
-
