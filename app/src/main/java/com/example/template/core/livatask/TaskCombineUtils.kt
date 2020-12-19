@@ -1,6 +1,5 @@
-package com.example.template.core.util
+package com.example.template.core.livatask
 
-import com.example.template.core.Result
 import kotlinx.coroutines.*
 
 internal class CombineRunner(
@@ -40,7 +39,7 @@ internal class CombinerBuilderImpl(
     private var target: TaskCombiner,
 ) : CombinerBuilder {
 
-    override val latestValue: Result<Any>?
+    override val latestValue: com.example.template.core.Result<Any>?
         get() = target.value?.result()
 
     override fun cancelable(bool: Boolean) {

@@ -1,16 +1,15 @@
-package com.example.template
+package com.example.template.core.livatask
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import com.example.template.core.Result
-import com.example.template.core.util.LiveTask
 
 internal const val DEFAULT_RETRY_ATTEMPTS = 1
 
 abstract class BaseLiveTask<T> : MediatorLiveData<LiveTask<T>>(), LiveTask<T> {
     var retryCounts = 1
     var retryAttempts = DEFAULT_RETRY_ATTEMPTS
-    var latestState: Result<T>? = null
+    var latestState: com.example.template.core.Result<T>? = null
 
     var cancelable = true
     var retryable = true

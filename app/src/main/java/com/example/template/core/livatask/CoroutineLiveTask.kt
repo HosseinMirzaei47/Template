@@ -1,10 +1,11 @@
-package com.example.template.core.util
+package com.example.template.core.livatask
 
-import com.example.template.BaseLiveTask
 import com.example.template.core.ErrorEvent
 import com.example.template.core.Logger
 import com.example.template.core.MyApp.Companion.connectionLiveData
 import com.example.template.core.Result
+import com.example.template.core.util.NoConnectionException
+import com.example.template.core.util.ServerException
 import com.example.template.core.withError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -52,8 +53,8 @@ class CoroutineLiveTask<T>(
         }
     }
 
-    override fun execute() {
-        applyResult(Result.Loading)
+    override fun run(): CoroutineLiveTask<T> {
+        applyResult(com.example.template.core.Result.Loading)
         val supervisorJob = SupervisorJob(context[Job])
         val scope = CoroutineScope(Dispatchers.IO + context + supervisorJob)
         blockRunner = TaskRunner(
@@ -65,6 +66,7 @@ class CoroutineLiveTask<T>(
             blockRunner = null
         }
         blockRunner?.maybeRun()
+        return this
     }
 
     private fun retryOnNetworkBack() {
@@ -88,7 +90,7 @@ class CoroutineLiveTask<T>(
 
     override fun retry() {
         this.removeSource(connectionLiveData)
-        execute()
+        run()
     }
 
     override fun cancel() {
@@ -96,13 +98,13 @@ class CoroutineLiveTask<T>(
     }
 
 
-    fun applyResult(result: Result<T>?) {
+    fun applyResult(result: com.example.template.core.Result<T>?) {
         this.latestState = result
         postValue(this)
     }
 
     fun applyResult(task: LiveTask<T>) {
-        this.latestState = task.result() as Result<T>?
+        this.latestState = task.result() as com.example.template.core.Result<T>?
         postValue(this)
     }
 }

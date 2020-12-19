@@ -1,4 +1,4 @@
-package com.example.template.core.util
+package com.example.template.core.livatask
 
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
