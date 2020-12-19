@@ -172,9 +172,6 @@ fun showLoadingState(
                 it.loading.visibility = View.INVISIBLE
                 it.show_result.visibility = View.VISIBLE
                 it.tv_show.text = ERROR_STATE
-                if (!(result as BaseLiveTask<*>).cancelable) {
-                    it.btn_cancel.visibility = View.INVISIBLE
-                }
                 it.btn_cancel.setOnClickListener { view ->
                     Blurry.delete(parent)
                     result.cancel()
