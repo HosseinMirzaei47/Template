@@ -27,7 +27,9 @@ class HomeViewModel @ViewModelInject constructor(
     val user3 = testUseCase.asLiveTask(5)
 
 
-    val combinedTasks = combinedTask(user1, user2, user3)
+    val combinedTasks = combinedTask(user1, user2, user3) {
+
+    }
 
 
 }

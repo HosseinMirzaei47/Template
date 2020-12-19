@@ -37,6 +37,7 @@ internal class TaskRunner<T>(
             delay(timeoutInMs)
             runningJob?.cancel()
             runningJob = null
+            liveData.applyResult(Result.Error(CancellationException()))
         }
     }
 }

@@ -1,9 +1,5 @@
 package com.example.template.core
 
-import android.app.Dialog
-import android.graphics.Bitmap
-import android.graphics.Color
-import android.graphics.drawable.BitmapDrawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -13,15 +9,14 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.ViewCompat
 import androidx.core.view.isVisible
-import androidx.core.view.postDelayed
 import androidx.databinding.BindingAdapter
-import com.example.template.BaseLiveTask
 import com.example.template.R
-import com.example.template.core.util.LiveTask
-import com.ms_square.etsyblur.Blur
+import com.example.template.core.livatask.BaseLiveTask
+import com.example.template.core.livatask.LiveTask
 import com.ms_square.etsyblur.BlurConfig
 import jp.wasabeef.blurry.Blurry
 import kotlinx.android.synthetic.main.progress_dialog.view.*
+import kotlin.coroutines.cancellation.CancellationException
 
 private const val LOAD_STATE = "loading"
 private const val ERROR_STATE = "error"
@@ -51,13 +46,16 @@ fun <T> View.reactToTask(liveTask: LiveTask<*>?) {
             showLoadingState(LOAD_STATE, stateLayout, parent, liveTask)
         }
         is Result.Error -> {
-            var stateLayout = situationOfStateLayout(this).first
-            if (stateLayout == null) {
-                this.tag = null
-                stateLayout = situationOfStateLayout(this).first
+            if ((liveTask.result() as Result.Error).exception !is CancellationException) {
+                var stateLayout = situationOfStateLayout(this).first
+                if (stateLayout == null) {
+                    this.tag = null
+                    stateLayout = situationOfStateLayout(this).first
+                }
+                val parent = situationOfStateLayout(this).second
+                showLoadingState(ERROR_STATE, stateLayout, parent, liveTask)
             }
-            val parent = situationOfStateLayout(this).second
-            showLoadingState(ERROR_STATE, stateLayout, parent, liveTask)
+
         }
     }
 }
@@ -70,7 +68,7 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
                 //    all childes of parent must have id to clone in constraint set
                 //    setConstraintForStateLayout(view, stateLayout, view)
                 view.addView(stateLayout)
-                ViewCompat.setElevation(stateLayout,100000F)
+                ViewCompat.setElevation(stateLayout, 100000F)
                 view.tag = stateLayout.id
             }
             return Pair(view.getViewById(view.tag as Int), view)
@@ -149,7 +147,7 @@ fun showLoadingState(
     result: LiveTask<*>
 ) {
     parent as ViewGroup
-    fun BlurConfig() : BlurConfig {
+    fun BlurConfig(): BlurConfig {
         return BlurConfig.Builder()
             .debug(true)
             .build();
@@ -159,7 +157,7 @@ fun showLoadingState(
             stateLayout?.let {
                 Log.i("bang", parent.toString())
                 it.tv_progressBar.text = LOAD_STATE
-                if (!(result as BaseLiveTask<*>).cancelable){
+                if (!(result as BaseLiveTask<*>).cancelable) {
                     it.btn_progress_close.visibility = View.INVISIBLE
                 }
                 it.btn_progress_close.setOnClickListener { view ->
@@ -174,7 +172,7 @@ fun showLoadingState(
                 it.loading.visibility = View.INVISIBLE
                 it.show_result.visibility = View.VISIBLE
                 it.tv_show.text = ERROR_STATE
-                if (!(result as BaseLiveTask<*>).cancelable){
+                if (!(result as BaseLiveTask<*>).cancelable) {
                     it.btn_cancel.visibility = View.INVISIBLE
                 }
                 it.btn_cancel.setOnClickListener { view ->
@@ -182,7 +180,7 @@ fun showLoadingState(
                     result.cancel()
                     parent.removeView(it)
                 }
-                if (!(result as BaseLiveTask<*>).retryable){
+                if (!(result as BaseLiveTask<*>).retryable) {
                     it.btn_retry.visibility = View.INVISIBLE
                 }
                 it.btn_retry.setOnClickListener { view ->
