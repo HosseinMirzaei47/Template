@@ -5,10 +5,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import com.example.template.core.Result
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.*
 import kotlin.coroutines.CoroutineContext
 
 internal class TaskRunner<T>(
@@ -50,12 +47,12 @@ internal class LiveTaskBuilderImpl<T>(
     context: CoroutineContext
 ) : LiveTaskBuilder<T> {
 
-    override val latestValue: com.example.template.core.Result<T>?
+    override val latestValue: Result<T>?
         get() = target.value?.result()
 
     private val coroutineContext = context + Dispatchers.Main.immediate
 
-    override suspend fun emit(result: com.example.template.core.Result<T>) =
+    override suspend fun emit(result: Result<T>) =
         withContext(coroutineContext) {
             target.applyResult(result)
         }
@@ -63,21 +60,20 @@ internal class LiveTaskBuilderImpl<T>(
     override suspend fun emit(result: Flow<T>) {
         result
             .onStart {
-                target.applyResult(com.example.template.core.Result.Loading)
+                target.applyResult(Result.Loading)
             }
             .catch { e ->
-                target.applyResult(com.example.template.core.Result.Error(Exception(e)))
-            }.collect {
+                target.applyResult(Result.Error(Exception(e)))
+            }
+            .collect {
                 target.applyResult(Result.Success(it))
             }
     }
 
-    override suspend fun emit(source: LiveData<LiveTask<T>>): DisposableHandle =
+    override suspend fun emitSource(source: LiveData<Result<T>>): DisposableHandle =
         withContext(coroutineContext) {
             return@withContext target.emitSource(source)
         }
-
-    override fun retry() {}
 
     override fun retryAttempts(attempts: Int) {
         target.retryAttempts = attempts
@@ -125,17 +121,4 @@ internal class Emitted(
         }
     }
 }
-
-internal suspend fun <T> MediatorLiveData<LiveTask<T>>.addDisposableEmit(
-    source: LiveData<LiveTask<T>>
-): Emitted = withContext(Dispatchers.Main.immediate) {
-    addSource(source) {
-        value = it
-    }
-    Emitted(
-        source = source,
-        mediator = this@addDisposableEmit
-    )
-}
-
 internal typealias Block<T> = suspend LiveTaskBuilder<T>.() -> Unit

@@ -1,5 +1,7 @@
 package com.example.template
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.liveData
 import com.example.template.home.data.remote.HomeApi
 import com.example.template.home.data.remote.UserDataSource
 import com.example.template.home.data.servicemodels.Ad
@@ -66,10 +68,17 @@ class UserServiceImpl(private val api: HomeApi) : UserDataSource {
         return returnResponse(false)
     }
 
+    override fun getUsersLiveData(page: Int): LiveData<UserRes> = liveData {
+        for (x in 0..5) {
+            delay(5000)
+            emit(returnSuccessResponse())
+        }
+    }
+
     override suspend fun getUsersFlow(page: Int): Flow<UserRes> {
         return flow {
             delay(3000)
-            emit(returnResponse(false))
+            emit(returnResponse(true))
         }
     }
 

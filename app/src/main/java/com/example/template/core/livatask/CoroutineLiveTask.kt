@@ -23,6 +23,8 @@ class CoroutineLiveTask<T>(
 
     private var blockRunner: TaskRunner<T>? = null
     var autoRetry = true
+    private var emittedSource: Emitted? = null
+
 
     init {
         this.addSource(this) {
@@ -95,9 +97,8 @@ class CoroutineLiveTask<T>(
         blockRunner?.cancel()
     }
 
-    private var emittedSource: Emitted? = null
 
-    internal suspend fun emitSource(source: LiveData<LiveTask<T>>): DisposableHandle {
+    internal suspend fun emitSource(source: LiveData<Result<T>>): DisposableHandle {
         clearSource()
         val newSource = addDisposableEmit(source)
         emittedSource = newSource

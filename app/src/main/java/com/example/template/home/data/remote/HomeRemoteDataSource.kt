@@ -22,4 +22,6 @@ class HomeRemoteDataSource @Inject constructor(
         commentDataSource.getComments(articleId)
 
 
+    fun getUsersLiveData(page: Int) =
+        userDataSource.getUsersLiveData(page)
 }

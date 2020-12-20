@@ -9,12 +9,11 @@ interface LiveTaskBuilder<T> {
     val latestValue: Result<T>?
     suspend fun emit(result: Result<T>)
     suspend fun emit(result: Flow<T>)
-    suspend fun emit(result: LiveData<LiveTask<T>>): DisposableHandle
+    suspend fun emitSource(source: LiveData<Result<T>>): DisposableHandle
     fun retryAttempts(attempts: Int)
     fun autoRetry(bool: Boolean)
     fun cancelable(bool: Boolean)
     fun retryable(bool: Boolean)
-    fun retry()
 }
 
 interface CombinerBuilder {
