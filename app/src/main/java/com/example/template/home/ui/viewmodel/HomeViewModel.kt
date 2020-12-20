@@ -2,8 +2,8 @@ package com.example.template.home.ui.viewmodel
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
-import com.example.template.core.util.combinedTask
-import com.example.template.core.util.liveTask
+import com.example.template.core.livatask.combinedTask
+import com.example.template.core.livatask.liveTask
 import com.example.template.home.domain.*
 
 class HomeViewModel @ViewModelInject constructor(
@@ -27,7 +27,9 @@ class HomeViewModel @ViewModelInject constructor(
     val user3 = testUseCase.asLiveTask(5)
 
 
-    val combinedTasks = combinedTask(user1, user2, user3)
+    val combinedTasks = combinedTask(user1, user2, user3) {
+
+    }
 
 
 }

@@ -1,10 +1,8 @@
-package com.example.template.core.util
+package com.example.template.core.livatask
 
-import com.example.template.BaseLiveTask
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
+import com.example.template.core.util.NoConnectionException
+import com.example.template.core.util.ServerException
+import kotlinx.coroutines.*
 import retrofit2.HttpException
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -41,7 +39,7 @@ class TaskCombiner(
                                         result.exception.code() == 401)
 
                         when {
-                            result.exception is NoConnectionException || isNotAuthorized -> {
+                            result.exception is NoConnectionException || isNotAuthorized || result.exception is CancellationException -> {
                                 applyResult(task)
                             }
                             else -> {

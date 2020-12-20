@@ -6,6 +6,7 @@ sealed class Result<out R> {
     object Loading : com.example.template.core.Result<Nothing>()
 }
 
+
 inline fun <T> com.example.template.core.Result<T>.withResult(
     onLoading: (Boolean) -> Unit,
     onSuccess: (T) -> Unit,
@@ -19,6 +20,9 @@ inline fun <T> com.example.template.core.Result<T>.withResult(
         is com.example.template.core.Result.Error -> {
             onLoading(false)
             onError(exception)
+        }
+        is Result.Loading -> {
+            onLoading(true)
         }
     }
 }
@@ -36,6 +40,9 @@ inline fun <T> com.example.template.core.Result<T>.customMap(
         is com.example.template.core.Result.Error -> {
             onLoading(false)
             onError(exception)
+        }
+        is Result.Loading -> {
+            onLoading(true)
         }
     }
 }

@@ -1,12 +1,13 @@
 package com.example.template.core.usecases
 
-import com.example.template.core.util.LiveTask
-import com.example.template.core.util.liveTask
+import com.example.template.core.IoDispatcher
+import com.example.template.core.livatask.LiveTask
+import com.example.template.core.livatask.liveTask
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 
-abstract class FlowUseCase<in P, R>(private val coroutineDispatcher: CoroutineDispatcher) {
+abstract class FlowUseCase<in P, R>(@IoDispatcher private val coroutineDispatcher: CoroutineDispatcher) {
     suspend operator fun invoke(parameters: P): Flow<R> =
         execute(parameters)
             .flowOn(coroutineDispatcher)

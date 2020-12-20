@@ -1,4 +1,4 @@
-package com.example.template.core.util
+package com.example.template.core.livatask
 
 import com.example.template.core.Result
 import kotlinx.coroutines.*

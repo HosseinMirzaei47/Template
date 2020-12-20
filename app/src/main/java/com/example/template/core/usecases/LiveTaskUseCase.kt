@@ -1,12 +1,14 @@
-package com.example.template.home.ui.viewmodel
+package com.example.template.core.usecases
 
+import com.example.template.core.IoDispatcher
 import com.example.template.core.Result
-import com.example.template.core.usecases.runRequestThrowException
-import com.example.template.core.util.LiveTask
-import com.example.template.core.util.liveTask
+import com.example.template.core.livatask.LiveTask
+import com.example.template.core.livatask.liveTask
 import kotlinx.coroutines.CoroutineDispatcher
 
-abstract class LiveTaskUseCase<in P, R>(private val coroutineDispatcher: CoroutineDispatcher) {
+abstract class LiveTaskUseCase<in P, R>(
+    @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
+) {
     private var parameter: P? = null
 
     private val task: LiveTask<R> by lazy {

@@ -1,8 +1,8 @@
-package com.example.template
+package com.example.template.core.livatask
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import com.example.template.core.util.LiveTask
+import com.example.template.core.Result
 
 internal const val DEFAULT_RETRY_ATTEMPTS = 1
 
@@ -25,7 +25,7 @@ abstract class BaseLiveTask<T> : MediatorLiveData<LiveTask<T>>(), LiveTask<T> {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun asLiveData() = this as LiveData<LiveTask<com.example.template.core.Result<T>>>
+    override fun asLiveData() = this as LiveData<LiveTask<Result<T>>>
 
     override fun result() = latestState
 }

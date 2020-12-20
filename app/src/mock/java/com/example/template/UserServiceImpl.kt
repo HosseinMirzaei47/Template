@@ -63,7 +63,7 @@ class UserServiceImpl(private val api: HomeApi) : UserDataSource {
 
     override suspend fun getUsers(page: Int): UserRes {
         delay(3000)
-        return returnResponse(true)
+        return returnResponse(false)
     }
 
     override suspend fun getUsersFlow(page: Int): Flow<UserRes> {
