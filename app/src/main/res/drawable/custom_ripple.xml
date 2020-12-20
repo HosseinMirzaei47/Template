@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <layer-list>
+            <item>
+                <shape>
+                    <solid android:color="#ffffff" />
+                </shape>
+            </item>
+            <item>
+                <ripple android:color="@color/black">
+                    <item android:id="@android:id/mask" android:drawable="@android:color/white" />
+                </ripple>
+            </item>
+        </layer-list>
+    </item>
+
+</selector>

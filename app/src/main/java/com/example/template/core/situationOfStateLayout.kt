@@ -8,9 +8,9 @@ import androidx.constraintlayout.widget.ConstraintSet
 import com.example.template.R
 
 interface Situation {
-    fun inflateStateLayout(view: ViewGroup): View {
+    fun inflateStateLayout(view: ViewGroup, layout: Int): View {
         val stateLayout = LayoutInflater.from(view.context)
-            .inflate(R.layout.layout_state, view, false)
+            .inflate(layout, view, false)
         stateLayout.id = View.generateViewId()
         stateLayout.translationZ = 10F
         return stateLayout
@@ -19,10 +19,11 @@ interface Situation {
     fun execute(): Pair<View, Any>
 }
 
-class IsConstrainLayout(private val parent: ConstraintLayout, val view: View) : Situation {
+class IsConstrainLayout(private val parent: ConstraintLayout, val view: View, val layout: Int) :
+    Situation {
     override fun execute(): Pair<View, Any> {
         if (view.tag == null) {
-            val stateLayout = inflateStateLayout(parent)
+            val stateLayout = inflateStateLayout(parent, layout)
             setConstraintForStateLayout(stateLayout)
             stateLayout.translationZ = 10F
             parent.bringChildToFront(stateLayout)
@@ -66,12 +67,12 @@ class IsConstrainLayout(private val parent: ConstraintLayout, val view: View) : 
     }
 }
 
-class IsNotConstrainLayout(val view: View) : Situation {
+class IsNotConstrainLayout(val view: View, val layout: Int) : Situation {
     override fun execute(): Pair<View, Any> {
 
         val parent = view.parent as ViewGroup
         if (view.tag == null) {
-            val stateLayout = inflateStateLayout(parent)
+            val stateLayout = inflateStateLayout(parent, layout)
             parent.addView(stateLayout)
             stateLayout.translationZ = 10F
             stateLayout.bringToFront()
@@ -84,21 +85,26 @@ class IsNotConstrainLayout(val view: View) : Situation {
 }
 
 class SituationFactory() {
-    fun createSituation(view: View): Situation =
+    fun createSituation(view: View, layout: Int): Situation =
         when (view) {
             is ConstraintLayout ->
-                IsConstrainLayout(view, view)
+                IsConstrainLayout(view, view, layout)
 
             else -> {
                 if (view.parent is ConstraintLayout)
-                    IsConstrainLayout(view.parent as ConstraintLayout, view)
+                    IsConstrainLayout(view.parent as ConstraintLayout, view, layout)
                 else
-                    IsNotConstrainLayout(view)
+                    IsNotConstrainLayout(view, layout)
             }
         }
 
-    fun executeState(view: View): Pair<View, Any> {
-        val situation = createSituation(view).execute()
+    fun executeState(view: View, type: Type): Pair<View, Any> {
+        val layout: Int = when (type) {
+            Type.INDICATOR -> R.layout.loading_indicator
+            Type.SANDY_CLOCK -> R.layout.loading_sandy_clock
+            Type.LINEAR -> R.layout.loading_linear
+        }
+        val situation = createSituation(view, layout).execute()
         var stateLayout = situation.first
         if (stateLayout == null) {
             view.tag = null

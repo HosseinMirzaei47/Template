@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/tools">
 
     <data>
 
@@ -23,11 +24,24 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constrant1"
             android:layout_width="match_parent"
-            reactToTask="@{vm.combinedTasks.asLiveData()}"
             android:layout_height="100dp"
+            bind:reactToTask="@{vm.combinedTasks.asLiveData()}"
+            bind:type="@{type.INDICATOR}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constrant2"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constrant1"
+            bind:reactToTask="@{vm.combinedTasks.asLiveData()}"
+            bind:type="@{type.SANDY_CLOCK}">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -42,9 +56,10 @@
             android:id="@+id/submit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            reactToTask="@{vm.combinedTasks.asLiveData()}"
+            disableOnLoading="@{vm.combinedTasks.asLiveData()}"
+            bind:reactToTask="@{vm.combinedTasks.asLiveData()}"
             android:text="@string/submit"
-            type="@{type.INDICATOR}"
+            bind:type="@{type.LINEAR}"
             android:layout_marginLeft="40dp"
             android:layout_marginRight="40dp"
             android:background="#FFFFFF"
