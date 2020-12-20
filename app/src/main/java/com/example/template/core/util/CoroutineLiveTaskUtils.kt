@@ -33,10 +33,11 @@ internal class TaskRunner<T>(
     }
 
     fun cancel() {
-        cancellationJob = scope.launch(Dispatchers.Main.immediate) {
+        cancellationJob = scope.launch(Dispatchers.IO) {
             delay(timeoutInMs)
             runningJob?.cancel()
             runningJob = null
+            liveData.applyResult(Result.Error(CancellationException()))
         }
     }
 }
@@ -46,12 +47,12 @@ internal class LiveTaskBuilderImpl<T>(
     context: CoroutineContext
 ) : LiveTaskBuilder<T> {
 
-    override val latestValue: com.example.template.core.Result<T>?
+    override val latestValue: Result<T>?
         get() = target.value?.result()
 
     private val coroutineContext = context + Dispatchers.Main.immediate
 
-    override suspend fun emit(result: com.example.template.core.Result<T>) =
+    override suspend fun emit(result: Result<T>) =
         withContext(coroutineContext) {
             target.applyResult(result)
         }

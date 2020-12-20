@@ -11,7 +11,7 @@ import java.io.IOException
 
 abstract class CoroutineUseCase<in P, R>(private val coroutineDispatcher: CoroutineDispatcher) {
 
-    suspend operator fun invoke(parameters: P): com.example.template.core.Result<R> {
+    suspend operator fun invoke(parameters: P): Result<R> {
         return withContext(coroutineDispatcher) {
             runRequestThrowException(coroutineDispatcher) { execute(parameters) }
         }
@@ -27,21 +27,21 @@ suspend fun <R> runRequestThrowException(
 ): Result<R> {
     return try {
         withContext(coroutineDispatcher) {
-            com.example.template.core.Result.Success(action())
+            Result.Success(action())
         }
     } catch (e: CancellationException) {
-        com.example.template.core.Result.Error(e)
+        Result.Error(e)
     } catch (e: HttpException) {
         val parsedError = try {
             readServerError(e)
         } catch (f: Exception) {
             e
         }
-        com.example.template.core.Result.Error(parsedError)
+        Result.Error(parsedError)
     } catch (e: IOException) {
-        com.example.template.core.Result.Error(e.detectException())
+        Result.Error(e.detectException())
     } catch (e: Exception) {
-        com.example.template.core.Result.Error(e)
+        Result.Error(e)
     }
 
 }

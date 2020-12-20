@@ -1,3 +1,4 @@
+
 package com.example.template
 
 import org.junit.Assert.assertEquals
@@ -13,5 +14,15 @@ class ExampleUnitTest {
     fun addition_isCorrect() {
         assertEquals(4, 2 + 2)
 
+        for (i in 0..10) {
+            println("i $i")
+            outer@ for (j in 0..10) {
+
+                println("j $j")
+
+                if (j == 4) break@outer
+            }
+            println("k $i")
+        }
     }
 }

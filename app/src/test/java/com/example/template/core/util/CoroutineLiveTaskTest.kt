@@ -3,29 +3,34 @@ package com.example.template.core.util
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.template.core.Result
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import java.util.concurrent.CancellationException
 
-class TaskCombinerTest {
+
+class CoroutineLiveTaskTest {
 
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
-    lateinit var taskCombiner: TaskCombiner
 
     private val liveData1 = liveTask {
-        emit(Result.Success(6))
+
+        emit(Result.Loading)
     }
     private val liveData2 = liveTask {
-        emit(Result.Success(96))
+        delay(25000)
+        emit(Result.Success("sad"))
     }
 
     private val liveData3 = liveTask {
         emit(Result.Success(5))
     }
+
     private val liveData4 = liveTask {
         emit(Result.Success(6))
     }
@@ -39,29 +44,31 @@ class TaskCombinerTest {
         emit(Result.Success(9))
     }
 
-
     @Before
     fun setup() {
-        taskCombiner = TaskCombiner(
-            liveData1,
-            liveData2,
-            liveData3,
-            liveData4,
-            liveData5,
-            liveData6,
-            liveData7
-
-        )
     }
+
 
     @Test
-    fun `task combiner test`() {
-        runBlocking {
-            taskCombiner.run()
-            delay(100)
-            val orAwaitValue = taskCombiner.getOrAwaitValue()
-            val result = orAwaitValue.result()
-            assertThat(result is Result.Success).isTrue()
-        }
+    fun `test emit loading to live task`() {
+        liveData1.run()
+        assertThat(liveData1.asLiveData().value?.result() is Result.Loading).isTrue()
     }
+
+    @ExperimentalCoroutinesApi
+    @Test
+    fun `test cancel live task`() {
+        liveData2.run()
+        liveData2.cancel()
+
+        runBlocking {
+
+            delay(150)
+            assertThat((liveData2.result() as Result.Error).exception is CancellationException).isTrue()
+
+        }
+
+
+    }
+
 }

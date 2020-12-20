@@ -58,8 +58,8 @@ fun situationOfStateLayout(view: View): Pair<View, Any> {
             if (view.tag == null) {
                 val stateLayout = inflateStateLayoutAndSetID(view)
                 //    all childes of parent must have id to clone in constraint set
-                //    setConstraintForStateLayout(view, stateLayout, view)
-                view.addView(stateLayout)
+                setConstraintForStateLayout(view, stateLayout, view)
+//                view.addView(stateLayout)
                 view.tag = stateLayout.id
             }
             return Pair(view.getViewById(view.tag as Int), view)
