@@ -17,7 +17,7 @@ abstract class LiveTaskUseCase<in P, R>(
                 val result =
                     runRequestThrowException(coroutineDispatcher) { execute(params = it) }
                 emit(result)
-            } ?: kotlin.run {
+            } ?: this.run {
                 emit(Result.Error(KotlinNullPointerException()))
             }
         }

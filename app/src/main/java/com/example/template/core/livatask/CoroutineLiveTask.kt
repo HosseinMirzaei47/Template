@@ -1,5 +1,6 @@
 package com.example.template.core.livatask
 
+import androidx.lifecycle.LiveData
 import com.example.template.core.ErrorEvent
 import com.example.template.core.Logger
 import com.example.template.core.MyApp.Companion.connectionLiveData
@@ -22,6 +23,8 @@ class CoroutineLiveTask<T>(
 
     private var blockRunner: TaskRunner<T>? = null
     var autoRetry = true
+    private var emittedSource: Emitted? = null
+
 
     init {
         this.addSource(this) {
@@ -94,6 +97,18 @@ class CoroutineLiveTask<T>(
         blockRunner?.cancel()
     }
 
+
+    internal suspend fun emitSource(source: LiveData<Result<T>>): DisposableHandle {
+        clearSource()
+        val newSource = addDisposableEmit(source)
+        emittedSource = newSource
+        return newSource
+    }
+
+    internal suspend fun clearSource() {
+        emittedSource?.disposeNow()
+        emittedSource = null
+    }
 
     fun applyResult(result: com.example.template.core.Result<T>?) {
         this.latestState = result
