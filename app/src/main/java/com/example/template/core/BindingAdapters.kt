@@ -16,7 +16,7 @@ import com.example.template.core.livatask.LiveTask
 import com.ms_square.etsyblur.BlurConfig
 import jp.wasabeef.blurry.Blurry
 import kotlinx.android.synthetic.main.progress_dialog.view.*
-import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.CancellationException
 
 private const val LOAD_STATE = "loading"
 private const val ERROR_STATE = "error"
@@ -25,7 +25,6 @@ private const val SUCCESS_STATE = "success"
 
 @BindingAdapter("reactToTask")
 fun <T> View.reactToTask(liveTask: LiveTask<*>?) {
-
     when (liveTask?.result()) {
         is Result.Success -> {
             var stateLayout = situationOfStateLayout(this).first

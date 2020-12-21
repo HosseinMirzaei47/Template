@@ -36,9 +36,8 @@ abstract class BaseLiveTask<T> : MediatorLiveData<LiveTask<T>>(), LiveTask<T> {
         source: LiveData<Result<T>>
     ): Emitted = withContext(Dispatchers.Main.immediate) {
         addSource(source) {
-            value = liveTask {
-                emit(it)
-            }.run()
+            latestState = it
+            value = this@BaseLiveTask
         }
         Emitted(source = source, mediator = this@BaseLiveTask)
     }
