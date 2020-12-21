@@ -1,15 +1,13 @@
-package com.example.template.core.util
+package com.example.template.core.livatask
 
-import com.example.template.BaseLiveTask
 import com.example.template.core.ErrorEvent
 import com.example.template.core.Logger
 import com.example.template.core.MyApp.Companion.connectionLiveData
 import com.example.template.core.Result
+import com.example.template.core.util.NoConnectionException
+import com.example.template.core.util.ServerException
 import com.example.template.core.withError
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.*
 import retrofit2.HttpException
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -41,7 +39,7 @@ class CoroutineLiveTask<T>(
                             if (autoRetry) retryOnNetworkBack()
                         }
                         else -> {
-                            if (retryCounts <= retryAttempts && !isNotAuthorized) {
+                            if (retryCounts <= retryAttempts && !isNotAuthorized && exception !is CancellationException) {
                                 retryCounts++
                                 this.retry()
                             }

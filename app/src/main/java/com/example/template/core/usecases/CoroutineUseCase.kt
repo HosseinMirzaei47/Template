@@ -1,5 +1,6 @@
 package com.example.template.core.usecases
 
+import com.example.template.core.IoDispatcher
 import com.example.template.core.Result
 import com.example.template.core.util.detectException
 import com.example.template.core.util.readServerError
@@ -9,7 +10,7 @@ import kotlinx.coroutines.withContext
 import retrofit2.HttpException
 import java.io.IOException
 
-abstract class CoroutineUseCase<in P, R>(private val coroutineDispatcher: CoroutineDispatcher) {
+abstract class CoroutineUseCase<in P, R>(@IoDispatcher private val coroutineDispatcher: CoroutineDispatcher) {
 
     suspend operator fun invoke(parameters: P): com.example.template.core.Result<R> {
         return withContext(coroutineDispatcher) {

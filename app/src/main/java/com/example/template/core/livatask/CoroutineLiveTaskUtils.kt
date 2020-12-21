@@ -1,4 +1,4 @@
-package com.example.template.core.util
+package com.example.template.core.livatask
 
 import com.example.template.core.Result
 import kotlinx.coroutines.*
@@ -37,6 +37,7 @@ internal class TaskRunner<T>(
             delay(timeoutInMs)
             runningJob?.cancel()
             runningJob = null
+            liveData.applyResult(Result.Error(CancellationException()))
         }
     }
 }
