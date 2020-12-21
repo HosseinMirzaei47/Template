@@ -8,7 +8,11 @@ class HomeRepository @Inject constructor(
 ) {
     suspend fun getUsers(page: Int) = homeRemoteDataSource.getUsers(page)
 
+    suspend fun getUsersFlow(page: Int) = homeRemoteDataSource.getUsersFlow(page)
+
     suspend fun getArticles(userId: Int) = homeRemoteDataSource.getArticle(userId)
 
     suspend fun getComments(articleId: String) = homeRemoteDataSource.getComments(articleId)
+
+    fun getUsersLiveData(page: Int) = homeRemoteDataSource.getUsersLiveData(page)
 }

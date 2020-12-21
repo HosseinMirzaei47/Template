@@ -2,29 +2,37 @@ package com.example.template.home.ui.viewmodel
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
-import com.example.template.core.util.TaskCombiner
-import com.example.template.core.util.liveTask
-import com.example.template.home.domain.GetArticleUseCase
-import com.example.template.home.domain.GetCommentUseCase
-import com.example.template.home.domain.GetUserUseCase
+import com.example.template.core.livatask.combinedTask
+import com.example.template.core.livatask.liveTask
+import com.example.template.home.domain.*
 
 class HomeViewModel @ViewModelInject constructor(
     private val useCase: GetUserUseCase,
     private val articleUseCase: GetArticleUseCase,
-    private val commentUseCase: GetCommentUseCase
+    private val commentUseCase: GetCommentUseCase,
+    flowUseCase: GetUserFlowUseCase,
+    testUseCase: TestUseCase,
+    liveDataUseCase: GetUserUseCaseLiveData
 ) : ViewModel() {
 
 
-    val users1 = liveTask {
-        autoRetry(false)
-        emit(useCase(1))
+    // حالت سینتکس قبلی با قابلیت emit های چندگانه
+    val user1 = liveTask {
+        emitSource(liveDataUseCase(2))
     }
 
-    val users2 = liveTask {
-        retryAttempts(10)
-        autoRetry(false)
-        emit(useCase(1))
+
+
+    // حالت استفاده از flow
+    val user2 = flowUseCase.asLiveTask(5)
+
+    // حالت استفاده ی معمولی به صورت سینتکس جدید
+    val user3 = testUseCase.asLiveTask(5)
+
+
+    val combinedTasks = combinedTask(user1, user2, user3) {
+
     }
 
-    val combinedTasks = TaskCombiner(users1, users2).cancelable(true).retryable(false)
+
 }

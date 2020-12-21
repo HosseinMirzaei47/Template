@@ -6,6 +6,7 @@ import com.example.template.UserServiceImpl
 import com.example.template.core.util.Constants.BASE_URL
 import com.example.template.home.data.remote.ArticleDataSource
 import com.example.template.home.data.remote.CommentDataSource
+import com.example.template.home.data.remote.HomeApi
 import com.example.template.home.data.remote.UserDataSource
 import dagger.Module
 import dagger.Provides
@@ -31,11 +32,13 @@ object RetrofitModule {
     fun provideOkHttpClient(
         logging: HttpLoggingInterceptor
     ) =
-        OkHttpClient.Builder().addNetworkInterceptor(Interceptor { chain -> chain.proceed(request = chain.request()) }).addInterceptor { chain ->
-            val newBuilder = chain.request().newBuilder()
-            val request = newBuilder.build()
-            chain.proceed(request)
-        }.addNetworkInterceptor(logging)
+        OkHttpClient.Builder()
+            .addNetworkInterceptor(Interceptor { chain -> chain.proceed(request = chain.request()) })
+            .addInterceptor { chain ->
+                val newBuilder = chain.request().newBuilder()
+                val request = newBuilder.build()
+                chain.proceed(request)
+            }.addNetworkInterceptor(logging)
             .build()
 
 
@@ -51,15 +54,19 @@ object RetrofitModule {
 
     @Singleton
     @Provides
-    fun provideDemoUserServiceApi(retrofit: Retrofit): UserDataSource = UserServiceImpl(retrofit)
+    fun provideUserApi(retrofit: Retrofit) = retrofit.create(HomeApi::class.java)
 
     @Singleton
     @Provides
-    fun provideDemoArticleServiceApi(retrofit: Retrofit): ArticleDataSource =
-        ArticleServiceImpl(retrofit)
+    fun provideDemoUserServiceApi(homeApi: HomeApi): UserDataSource = UserServiceImpl(homeApi)
 
     @Singleton
     @Provides
-    fun provideDemoCommentServiceApi(retrofit: Retrofit): CommentDataSource =
-        CommentServiceImpl(retrofit)
+    fun provideDemoArticleServiceApi(homeApi: HomeApi): ArticleDataSource =
+        ArticleServiceImpl(homeApi)
+
+    @Singleton
+    @Provides
+    fun provideDemoCommentServiceApi(homeApi: HomeApi): CommentDataSource =
+        CommentServiceImpl(homeApi)
 }
