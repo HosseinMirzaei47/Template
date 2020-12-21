@@ -42,6 +42,7 @@ class LoadingState : State {
                         ivBtn_close_indicator.setOnClickListener { _ ->
                             result.cancel()
                             startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_out))
+                            it.tag = null
                             parent.removeView(it)
                         }
                     } else ivBtn_close_indicator.visibility = View.INVISIBLE
@@ -59,6 +60,7 @@ class LoadingState : State {
                         ivBtn_close_sandy_clock.setOnClickListener { _ ->
                             result.cancel()
                             startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_out))
+                            it.tag = null
                             parent.removeView(it)
                         }
                     } else ivBtn_close_sandy_clock.visibility = View.INVISIBLE
@@ -78,6 +80,7 @@ class LoadingState : State {
                         ivBtn_close_linear.setOnClickListener { _ ->
                             result.cancel()
                             startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_out))
+                            it.tag = null
                             parent.removeView(it)
                         }
                     } else ivBtn_close_linear.visibility = View.INVISIBLE
@@ -97,10 +100,20 @@ class ErrorState : State {
     ) {
         if (type == Type.INDICATOR) {
             stateLayout?.let {
+//                val border = GradientDrawable()
+//                border.setColor(0x1) //white background
+//                border.setStroke(1, 0x1f54245) //black border with full opacity
+//                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
+//                    it.setBackgroundDrawable(border)
+//                } else {
+//                    it.setBackground(border)
+//                }
+
                 it.ivBtn_close_indicator.visibility = View.VISIBLE
                 it.tv_error_indicator.visibility = View.VISIBLE
                 it.ivBtn_close_indicator.setOnClickListener { _ ->
                     it.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.fade_out))
+                    it.tag = null
                     parent.removeView(it)
                 }
                 if ((result as BaseLiveTask<*>).retryable) {
@@ -117,6 +130,7 @@ class ErrorState : State {
                 it.tv_error_sandy_clock.visibility = View.VISIBLE
                 it.ivBtn_close_sandy_clock.setOnClickListener { _ ->
                     it.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.fade_out))
+                    it.tag = null
                     parent.removeView(it)
                 }
                 if ((result as BaseLiveTask<*>).retryable) {
@@ -134,6 +148,7 @@ class ErrorState : State {
                 it.tv_error_linear.visibility = View.VISIBLE
                 it.ivBtn_close_linear.setOnClickListener { _ ->
                     it.startAnimation(AnimationUtils.loadAnimation(it.context, R.anim.fade_out))
+                    it.tag = null
                     parent.removeView(it)
                 }
                 if ((result as BaseLiveTask<*>).retryable) {

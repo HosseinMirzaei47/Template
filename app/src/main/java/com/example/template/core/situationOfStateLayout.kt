@@ -108,7 +108,7 @@ class SituationFactory() {
         var stateLayout = situation.first
         if (stateLayout == null) {
             view.tag = null
-            stateLayout = situation.first
+            stateLayout = createSituation(view, layout).execute().first
         }
         val parent = situation.second
         return Pair(stateLayout, parent)
