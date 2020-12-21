@@ -12,7 +12,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/container"
-        reactToTask="@{vm.user1.asLiveData()}"
+        reactToTask="@{vm.combinedTasks.asLiveData()}"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
