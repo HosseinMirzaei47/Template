@@ -1,30 +1,27 @@
-package com.example.template.core
+package com.example.template.core.bindingadapter
 
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.core.view.isVisible
 import androidx.databinding.BindingAdapter
-import com.example.template.core.util.LiveTask
-
-enum class Type {
-    INDICATOR, LINEAR, SANDY_CLOCK
-}
+import com.example.template.core.Result
+import com.example.template.core.livatask.LiveTask
 
 @BindingAdapter(value = ["bind:reactToTask", "bind:type"], requireAll = true)
 fun <T> View.reactToTask(liveTask: LiveTask<*>?, type: Type) {
     when (liveTask?.result()) {
         is Result.Success -> {
             val state = SituationFactory().executeState(this, type)
-            SuccessState().handleState(state.first, state.second as ViewGroup, liveTask, type)
+            type.loading().success(state.first, state.second as ViewGroup, liveTask)
         }
         is Result.Loading -> {
             val state = SituationFactory().executeState(this, type)
-            LoadingState().handleState(state.first, state.second as ViewGroup, liveTask, type)
+            type.loading().loading(state.first, state.second as ViewGroup, liveTask)
         }
         is Result.Error -> {
             val state = SituationFactory().executeState(this, type)
-            ErrorState().handleState(state.first, state.second as ViewGroup, liveTask, type)
+            type.loading().error(state.first, state.second as ViewGroup, liveTask)
         }
     }
 }

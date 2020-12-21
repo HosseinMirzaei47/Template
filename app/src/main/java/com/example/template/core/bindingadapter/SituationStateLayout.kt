@@ -1,4 +1,4 @@
-package com.example.template.core
+package com.example.template.core.bindingadapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -103,6 +103,8 @@ class SituationFactory() {
             Type.INDICATOR -> R.layout.loading_indicator
             Type.SANDY_CLOCK -> R.layout.loading_sandy_clock
             Type.LINEAR -> R.layout.loading_linear
+            Type.CIRCULAR -> R.layout.loading_circular
+            Type.BOUNCING -> R.layout.loading_bouncing
         }
         val situation = createSituation(view, layout).execute()
         var stateLayout = situation.first

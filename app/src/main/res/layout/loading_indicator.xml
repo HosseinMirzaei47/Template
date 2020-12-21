@@ -4,27 +4,54 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cv_result_state_indicator"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="match_parent"
     android:background="@drawable/custom_ripple"
+    android:backgroundTint="@color/teal_700"
     android:clickable="true"
     android:elevation="10dp"
     android:focusable="true"
     android:layoutDirection="rtl">
 
-    <TextView
-        android:id="@+id/tv_error_indicator"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_error_indicator"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="click to retry"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:translationZ="2dp"
+        android:layout_height="match_parent"
         android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/iv_retry_indicator"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginTop="2dp"
+            android:layout_marginRight="120dp"
+            android:contentDescription="@string/close_state_layout"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_retry"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tint="#ffffff" />
+
+        <TextView
+            android:id="@+id/tv_error_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:gravity="center"
+            android:text="Click to retry"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:translationZ="2dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/iv_retry_indicator"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
     <!--    <app.frantic.loadingdots.LoadingDots-->
     <!--        android:id="@+id/progressBar_indicator"-->
@@ -50,8 +77,8 @@
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/progressBar_indicator"
-        android:layout_width="320dp"
-        android:layout_height="180dp"
+        android:layout_width="280dp"
+        android:layout_height="160dp"
         android:layout_gravity="center"
         android:layout_marginBottom="10dp"
         android:scaleType="fitXY"
@@ -60,7 +87,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:lottie_autoPlay="true"
-        app:lottie_colorFilter="#000000"
+        app:lottie_colorFilter="#ffffff"
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/indicator"
         app:lottie_speed="0.9" />
@@ -69,14 +96,14 @@
         android:id="@+id/ivBtn_close_indicator"
         android:layout_width="12dp"
         android:layout_height="12dp"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="12dp"
         android:contentDescription="@string/close_state_layout"
         android:scaleType="fitXY"
         android:src="@drawable/ic_close"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="#000000" />
+        app:tint="#ffffff" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

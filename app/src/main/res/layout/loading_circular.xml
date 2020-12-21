@@ -2,7 +2,7 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/cv_result_state_sandy_clock"
+    android:id="@+id/cv_result_state_circular"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/custom_ripple"
@@ -11,16 +11,16 @@
     android:layoutDirection="rtl">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cl_container_sandy_clock"
+        android:id="@+id/cl_container_circular"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_constraintBottom_toBottomOf="@+id/cv_result_state_sandy_clock"
-        app:layout_constraintTop_toTopOf="@+id/cv_result_state_sandy_clock">
+        app:layout_constraintBottom_toBottomOf="@+id/cv_result_state_circular"
+        app:layout_constraintTop_toTopOf="@+id/cv_result_state_circular">
 
         <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/progressBar_sandy_clock"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:id="@+id/progressBar_circular"
+            android:layout_width="32dp"
+            android:layout_height="32dp"
             android:layout_gravity="center"
             android:layout_marginTop="2dp"
             android:layout_marginRight="100dp"
@@ -32,10 +32,10 @@
             app:lottie_autoPlay="true"
             app:lottie_colorFilter="#000000"
             app:lottie_loop="true"
-            app:lottie_rawRes="@raw/sandy_clock" />
+            app:lottie_rawRes="@raw/circular" />
 
         <TextView
-            android:id="@+id/tv_loading_sandy_clock"
+            android:id="@+id/tv_loading_circular"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
@@ -45,11 +45,11 @@
             android:textSize="20sp"
             android:translationZ="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/progressBar_sandy_clock"
+            app:layout_constraintEnd_toStartOf="@+id/progressBar_circular"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/cl_error_sandy_clock"
+            android:id="@+id/cl_error_circular"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:visibility="invisible"
@@ -59,7 +59,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
-                android:id="@+id/iv_retry_sandy_clock"
+                android:id="@+id/iv_retry_circular"
                 android:layout_width="18dp"
                 android:layout_height="18dp"
                 android:layout_marginTop="2dp"
@@ -74,7 +74,7 @@
                 app:tint="#000000" />
 
             <TextView
-                android:id="@+id/tv_error_sandy_clock"
+                android:id="@+id/tv_error_circular"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="8dp"
@@ -84,7 +84,7 @@
                 android:textSize="20sp"
                 android:translationZ="2dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/iv_retry_sandy_clock"
+                app:layout_constraintEnd_toStartOf="@+id/iv_retry_circular"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -92,7 +92,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageView
-        android:id="@+id/ivBtn_close_sandy_clock"
+        android:id="@+id/ivBtn_close_circular"
         android:layout_width="12dp"
         android:layout_height="12dp"
         android:layout_marginStart="12dp"

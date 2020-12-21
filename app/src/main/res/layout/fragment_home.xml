@@ -11,7 +11,7 @@
 
         <variable
             name="type"
-            type="com.example.template.core.Type" />
+            type="com.example.template.core.bindingadapter.Type" />
 
     </data>
 
@@ -26,7 +26,7 @@
             android:layout_width="match_parent"
             android:layout_height="100dp"
             bind:reactToTask="@{vm.combinedTasks.asLiveData()}"
-            bind:type="@{type.INDICATOR}"
+            bind:type="@{type.LINEAR}"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -45,6 +45,30 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constrant3"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constrant2"
+            bind:reactToTask="@{vm.combinedTasks.asLiveData()}"
+            bind:type="@{type.CIRCULAR}">
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constrant4"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/constrant3"
+            bind:reactToTask="@{vm.combinedTasks.asLiveData()}"
+            bind:type="@{type.BOUNCING}">
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline"
             android:layout_width="wrap_content"
@@ -55,14 +79,14 @@
         <Button
             android:id="@+id/submit"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             disableOnLoading="@{vm.combinedTasks.asLiveData()}"
             bind:reactToTask="@{vm.combinedTasks.asLiveData()}"
             android:text="@string/submit"
-            bind:type="@{type.LINEAR}"
+            android:backgroundTint="@color/teal_700"
             android:layout_marginLeft="40dp"
             android:layout_marginRight="40dp"
-            android:background="#FFFFFF"
+            bind:type="@{type.INDICATOR}"
             android:gravity="center"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
@@ -71,8 +95,9 @@
         <Button
             android:id="@+id/gotonext"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:text="@string/navigate"
+            android:backgroundTint="@color/teal_700"
             android:textColor="@color/white"
             android:textSize="14sp"
             android:layout_marginLeft="40dp"

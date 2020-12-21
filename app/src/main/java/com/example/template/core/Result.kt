@@ -1,23 +1,23 @@
 package com.example.template.core
 
 sealed class Result<out R> {
-    data class Success<out T>(val data: T) : com.example.template.core.Result<T>()
+    data class Success<out T>(val data: T) : Result<T>()
     data class Error(val exception: Exception) : com.example.template.core.Result<Nothing>()
     object Loading : com.example.template.core.Result<Nothing>()
 }
 
 
-inline fun <T> com.example.template.core.Result<T>.withResult(
+inline fun <T> Result<T>.withResult(
     onLoading: (Boolean) -> Unit,
     onSuccess: (T) -> Unit,
-    onError: (Exception) -> Unit
+    onError: (Exception) -> Unit,
 ) {
     when (this) {
-        is com.example.template.core.Result.Success -> {
+        is Result.Success -> {
             onLoading(false)
             onSuccess(data)
         }
-        is com.example.template.core.Result.Error -> {
+        is Result.Error -> {
             onLoading(false)
             onError(exception)
         }
@@ -27,17 +27,17 @@ inline fun <T> com.example.template.core.Result<T>.withResult(
     }
 }
 
-inline fun <T> com.example.template.core.Result<T>.customMap(
+inline fun <T> Result<T>.customMap(
     onLoading: (Boolean) -> Unit,
     onSuccess: (T) -> Unit,
-    onError: (Exception) -> Unit
+    onError: (Exception) -> Unit,
 ) {
     when (this) {
-        is com.example.template.core.Result.Success -> {
+        is Result.Success -> {
             onLoading(false)
             onSuccess(data)
         }
-        is com.example.template.core.Result.Error -> {
+        is Result.Error -> {
             onLoading(false)
             onError(exception)
         }
@@ -47,8 +47,8 @@ inline fun <T> com.example.template.core.Result<T>.customMap(
     }
 }
 
-inline fun <T> com.example.template.core.Result<T>.withError(
-    onError: (Exception) -> Unit
+inline fun <T> Result<T>.withError(
+    onError: (Exception) -> Unit,
 ) {
     if (this is Result.Error) onError(exception)
 }
