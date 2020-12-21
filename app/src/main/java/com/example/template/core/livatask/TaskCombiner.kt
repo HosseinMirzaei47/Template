@@ -79,17 +79,17 @@ class TaskCombiner(
         }
     }
 
-    private fun checkIsThereAnyUnSuccess() {
-        val anyRequestLeft = taskList.any {
-            it.result() is com.example.template.core.Result.Loading || it.result() is com.example.template.core.Result.Error
-        }
-        if (!anyRequestLeft) {
-            applyResult(com.example.template.core.Result.Success(Any()))
-        } else {
-            if (this.value?.result() is com.example.template.core.Result.Loading) {
-                val oneOfErrors = taskList.find { coroutineLiveTask ->
-                    coroutineLiveTask.result() is com.example.template.core.Result.Error
-                }
+     private fun checkIsThereAnyUnSuccess() {
+         val anyRequestLeft = taskList.any {
+             it.result() is com.example.template.core.Result.Loading || it.result() is com.example.template.core.Result.Error
+         }
+         if (!anyRequestLeft) {
+             applyResult(com.example.template.core.Result.Success(Any()))
+         } else {
+             if (this.value?.result() is com.example.template.core.Result.Loading) {
+                 val oneOfErrors = taskList.find { coroutineLiveTask ->
+                     coroutineLiveTask.result() is com.example.template.core.Result.Error
+                 }
                 oneOfErrors?.let {
                     applyResult(it)
                 }

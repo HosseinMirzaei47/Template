@@ -1,8 +1,13 @@
-package com.example.template.core.util
+package com.example.template.core.livetask
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.template.core.Result
+import com.example.template.core.livatask.CoroutineLiveTask
+import com.example.template.core.livatask.TaskCombiner
+import com.example.template.core.livatask.liveTask
+import com.example.template.core.util.getOrAwaitValue
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
@@ -20,7 +25,7 @@ class TaskCombinerTest {
         emit(Result.Success(6))
     }
     private val liveData2 = liveTask {
-        emit(Result.Success(96))
+        emit(Result.Success(65))
     }
 
     private val liveData3 = liveTask {
@@ -40,6 +45,7 @@ class TaskCombinerTest {
     }
 
 
+
     @Before
     fun setup() {
         taskCombiner = TaskCombiner(
@@ -48,8 +54,7 @@ class TaskCombinerTest {
             liveData3,
             liveData4,
             liveData5,
-            liveData6,
-            liveData7
+            liveData6
 
         )
     }
@@ -59,9 +64,42 @@ class TaskCombinerTest {
         runBlocking {
             taskCombiner.run()
             delay(100)
-            val orAwaitValue = taskCombiner.getOrAwaitValue()
-            val result = orAwaitValue.result()
+            val result = taskCombiner.getOrAwaitValue().result()
             assertThat(result is Result.Success).isTrue()
         }
     }
+
+    @Test
+    fun `test run of live data`() {
+        val result = liveData7.run()
+        runBlocking {
+            delay(100L)
+        }
+        assertThat(result.result() is Result.Success).isTrue()
+    }
+
+    @Test
+    fun `test cancel method _ result error must be cancellation exception`() {
+        taskCombiner.run()
+
+        runBlocking {
+            taskCombiner.cancel()
+            delay(100L)
+            assertThat(
+                (taskCombiner.getOrAwaitValue()
+                    .result() as Result.Error).exception is CancellationException
+            ).isTrue()
+
+        }
+    }
+
+    @Test
+    fun `test apply result of live data`() {
+        (liveData1 as CoroutineLiveTask).latestState =
+            Result.Error(Exception("some error happened"))
+
+        assertThat((liveData1.result() as Result.Error).exception.message).isEqualTo("some error happened")
+    }
+
+
 }

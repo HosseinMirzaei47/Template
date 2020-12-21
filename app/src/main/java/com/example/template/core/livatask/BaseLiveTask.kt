@@ -9,7 +9,7 @@ internal const val DEFAULT_RETRY_ATTEMPTS = 1
 abstract class BaseLiveTask<T> : MediatorLiveData<LiveTask<T>>(), LiveTask<T> {
     var retryCounts = 1
     var retryAttempts = DEFAULT_RETRY_ATTEMPTS
-    var latestState: com.example.template.core.Result<T>? = null
+    var latestState: Result<T>? = null
 
     var cancelable = true
     var retryable = true
