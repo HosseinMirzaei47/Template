@@ -1,5 +1,6 @@
 package com.example.template.home.data.remote
 
+import androidx.lifecycle.LiveData
 import com.example.template.home.data.servicemodels.Article
 import com.example.template.home.data.servicemodels.Comment
 import com.example.template.home.data.servicemodels.UserRes
@@ -21,6 +22,7 @@ class HomeRemoteDataSource @Inject constructor(
     suspend fun getComments(articleId: String): List<Comment> =
         commentDataSource.getComments(articleId)
 
-    fun getUsersLiveData(page: Int) =
-        userDataSource.getUsersLiveData(page)
+    fun getUsersLiveData(page: Int): LiveData<UserRes> {
+        return userDataSource.getUsersLiveData(page)
+    }
 }
