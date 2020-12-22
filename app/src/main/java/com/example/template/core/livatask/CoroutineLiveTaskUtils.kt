@@ -52,12 +52,15 @@ internal class LiveTaskBuilderImpl<T>(
 
     private val coroutineContext = context + Dispatchers.Main.immediate
 
-    override suspend fun emit(result: Result<T>) =
+    override suspend fun emit(result: Result<T>) {
+        target.clearSource()
         withContext(coroutineContext) {
             target.applyResult(result)
         }
+    }
 
     override suspend fun emit(result: Flow<T>) {
+        target.clearSource()
         result
             .onStart {
                 target.applyResult(Result.Loading)

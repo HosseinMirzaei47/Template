@@ -69,10 +69,10 @@ class UserServiceImpl(private val api: HomeApi) : UserDataSource {
     }
 
     override fun getUsersLiveData(page: Int): LiveData<UserRes> = liveData {
-        for (x in 0..5) {
-            delay(5000)
-            emit(returnSuccessResponse())
-        }
+        //for (x in 0..5) {
+        delay(2000)
+        emit(returnSuccessResponse())
+        //  }
     }
 
     override suspend fun getUsersFlow(page: Int): Flow<UserRes> {
