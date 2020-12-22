@@ -12,10 +12,6 @@ class UiSampleViewModel @ViewModelInject constructor() : ViewModel() {
         emit(Result.Success(cityListFill()))
     }
 
-    val s = liveTask {
-        emit(Result.Loading)
-    }
-
     private suspend fun cityListFill(): MutableList<String> {
         delay(2000)
         return mutableListOf("N/A", "Mashhad", "Tehran", "Shiraz")
