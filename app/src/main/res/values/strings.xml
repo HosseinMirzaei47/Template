@@ -7,4 +7,7 @@
     <string name="submit">submit</string>
     <string name="please_wait">please wait</string>
     <string name="navigate">Navigate</string>
+    <string name="loading">Loading</string>
+    <string name="click_to_retry">Click to retry</string>
+    <string name="todo">todo</string>
 </resources>

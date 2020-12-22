@@ -4,24 +4,22 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import androidx.lifecycle.map
 import com.example.template.core.IoDispatcher
-import com.example.template.core.Result
+import com.example.template.core.LiveTaskResult
 import kotlinx.coroutines.CoroutineDispatcher
 
 abstract class LiveDataUseCase<in P, R>(@IoDispatcher private val coroutineDispatcher: CoroutineDispatcher) {
 
-
-    operator fun invoke(parameters: P): LiveData<Result<R>> {
+    operator fun invoke(parameters: P): LiveData<LiveTaskResult<R>> {
         return try {
             execute(parameters).map {
-                Result.Success(it)
+                LiveTaskResult.Success(it)
             }
         } catch (e: Exception) {
             liveData {
-                Result.Error(e)
+                LiveTaskResult.Error(e)
             }
         }
     }
 
     protected abstract fun execute(parameters: P): LiveData<R>
-
 }

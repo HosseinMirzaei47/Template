@@ -39,7 +39,7 @@ internal class CombinerBuilderImpl(
     private var target: TaskCombiner,
 ) : CombinerBuilder {
 
-    override val latestValue: com.example.template.core.Result<Any>?
+    override val latestValue: com.example.template.core.LiveTaskResult<Any>?
         get() = target.value?.result()
 
     override fun cancelable(bool: Boolean) {

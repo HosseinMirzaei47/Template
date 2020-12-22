@@ -12,8 +12,6 @@ class GetUserUseCaseLiveData @Inject constructor(
     private val homeRepository: HomeRepository,
     @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) : LiveDataUseCase<Int, UserRes>(coroutineDispatcher) {
-
     override fun execute(parameters: Int): LiveData<UserRes> =
         homeRepository.getUsersLiveData(parameters)
-
 }

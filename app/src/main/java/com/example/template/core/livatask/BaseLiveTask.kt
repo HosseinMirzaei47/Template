@@ -2,7 +2,7 @@ package com.example.template.core.livatask
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import com.example.template.core.Result
+import com.example.template.core.LiveTaskResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -11,7 +11,7 @@ internal const val DEFAULT_RETRY_ATTEMPTS = 1
 abstract class BaseLiveTask<T> : MediatorLiveData<LiveTask<T>>(), LiveTask<T> {
     var retryCounts = 1
     var retryAttempts = DEFAULT_RETRY_ATTEMPTS
-    var latestState: com.example.template.core.Result<T>? = null
+    var latestState: LiveTaskResult<T>? = null
 
     var cancelable = true
     var retryable = true
@@ -27,13 +27,13 @@ abstract class BaseLiveTask<T> : MediatorLiveData<LiveTask<T>>(), LiveTask<T> {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun asLiveData() = this as LiveData<LiveTask<Result<T>>>
+    override fun asLiveData() = this as LiveData<LiveTask<LiveTaskResult<T>>>
 
     override fun result() = latestState
 
 
     internal suspend fun addDisposableEmit(
-        source: LiveData<Result<T>>
+        source: LiveData<LiveTaskResult<T>>,
     ): Emitted = withContext(Dispatchers.Main.immediate) {
         addSource(source) {
             latestState = it
