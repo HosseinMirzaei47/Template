@@ -16,6 +16,28 @@
             app:destination="@id/homeFragment" />
 
     </fragment>
+    <fragment
+        android:id="@+id/uiSampleSelectorFragment"
+        android:name="com.example.template.home.ui.fragment.UiSampleSelectorFragment"
+        android:label="fragment_ui_sample_selector"
+        tools:layout="@layout/fragment_ui_sample_selector">
+        <action
+            android:id="@+id/action_uiSampleSelectorFragment_to_uiSampleFragment2"
+            app:destination="@id/uiSampleFragment2" />
+        <action
+            android:id="@+id/action_uiSampleSelectorFragment_to_uiSampleFragment1"
+            app:destination="@id/uiSampleFragment1" />
+    </fragment>
+    <fragment
+        android:id="@+id/uiSampleFragment2"
+        android:name="com.example.template.home.ui.fragment.UiSampleFragment2"
+        android:label="fragment_ui_sample2"
+        tools:layout="@layout/fragment_ui_sample2" />
+    <fragment
+        android:id="@+id/uiSampleFragment1"
+        android:name="com.example.template.home.ui.fragment.UiSampleFragment1"
+        android:label="UiSampleFragment1"
+        tools:layout="@layout/fragment_ui_sample1" />
 
 
 </navigation>
