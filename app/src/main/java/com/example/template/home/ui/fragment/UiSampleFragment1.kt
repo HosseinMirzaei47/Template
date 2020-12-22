@@ -7,11 +7,11 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.template.R
 import com.example.template.core.withResult
-import com.example.template.databinding.FragmentUiSample1Binding
 import com.example.template.home.ui.viewmodel.UiSampleViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_ui_sample1.*
@@ -19,7 +19,6 @@ import kotlinx.android.synthetic.main.fragment_ui_sample1.*
 @AndroidEntryPoint
 class UiSampleFragment1 : Fragment() {
 
-    private lateinit var binding: FragmentUiSample1Binding
     private val viewModel: UiSampleViewModel by viewModels()
 
     override fun onCreateView(
@@ -33,22 +32,32 @@ class UiSampleFragment1 : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         var cityList = mutableListOf<String>()
+        var regionList = mutableListOf<String>()
 
         val cityAdapter: ArrayAdapter<String> = ArrayAdapter<String>(
             requireContext(),
             android.R.layout.simple_spinner_item, cityList
         )
 
+        val regionAdapter: ArrayAdapter<String> = ArrayAdapter<String>(
+            requireContext(),
+            android.R.layout.simple_spinner_item, regionList
+        )
+
         viewModel.cityList.asLiveData().observe(viewLifecycleOwner, {
             it.result()?.withResult(
-                {
-
+                { isLoading ->
+                    if (isLoading) {
+                        Toast.makeText(requireContext(), "city loading", Toast.LENGTH_SHORT)
+                            .show()
+                    }
                 },
                 {
                     it.withResult(
                         {},
                         { list ->
-                            cityList = list
+                            //cityList = list
+                            cityAdapter.notifyDataSetChanged()
                         },
                         {}
                     )
@@ -57,10 +66,35 @@ class UiSampleFragment1 : Fragment() {
 
                 }
             )
-            cityAdapter.notifyDataSetChanged()
         })
 
+        viewModel.regionList.asLiveData().observe(viewLifecycleOwner, {
+            it.result()?.withResult(
+                { isLoading ->
+                    if (isLoading) {
+                        Toast.makeText(requireContext(), "regions loading", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                },
+                {
+                    it.withResult(
+                        {},
+                        { list ->
+                            regionList = list
+                            regionAdapter.notifyDataSetChanged()
+                        },
+                        {}
+                    )
+                },
+                {
+
+                }
+            )
+        })
+        // loading
+
         city_sp.adapter = cityAdapter
+        region_sp.adapter = regionAdapter
 
         city_sp.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(
@@ -69,11 +103,13 @@ class UiSampleFragment1 : Fragment() {
                 position: Int,
                 id: Long
             ) {
-                // send new request with the region
-                val region = parent.selectedItem.toString()
+                viewModel.regionUseCase.setParams(parent.selectedItem.toString())
+                viewModel.regionList.retry()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
+
+        viewModel.cityList.run()
     }
 }
