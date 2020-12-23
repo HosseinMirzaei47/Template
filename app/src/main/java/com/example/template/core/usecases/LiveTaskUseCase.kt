@@ -38,7 +38,7 @@ abstract class LiveTaskUseCase<in P, R>(@IoDispatcher private val coroutineDispa
         return task
     }
 
-    private fun setParams(parameter: P): LiveTaskUseCase<P, R> {
+    fun setParams(parameter: P): LiveTaskUseCase<P, R> {
         this.parameter = parameter
         return this
     }
