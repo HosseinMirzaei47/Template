@@ -11,7 +11,7 @@
 
         <variable
             name="type"
-            type="com.example.template.core.bindingadapter.Type" />
+            type="com.example.template.core.bindingadapter.ProgressType" />
 
     </data>
 

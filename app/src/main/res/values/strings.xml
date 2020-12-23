@@ -10,4 +10,7 @@
     <string name="loading">Loading</string>
     <string name="click_to_retry">Click to retry</string>
     <string name="todo">todo</string>
+    <string name="tv_loading">Loading</string>
+    <string name="tv_retry">Click to retry</string>
+    <string name="tv_close">Close</string>
 </resources>

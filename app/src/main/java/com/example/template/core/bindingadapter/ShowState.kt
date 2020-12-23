@@ -323,7 +323,7 @@ class BlurCircularLoading : State {
     override fun error(stateLayout: View?, parent: ViewGroup, result: LiveTask<*>) {
         stateLayout?.let {
             it.apply {
-                if ((result.result() as Result.Error).exception is CancellationException) {
+                if ((result.result() as LiveTaskResult.Error).exception is CancellationException) {
                     startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_out))
                     tag = null
                     parent.removeView(it)
