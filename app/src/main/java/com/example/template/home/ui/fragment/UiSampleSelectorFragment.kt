@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.example.template.R
+import kotlinx.android.synthetic.main.fragment_ui_sample3.*
 import kotlinx.android.synthetic.main.fragment_ui_sample_selector.*
 
 class UiSampleSelectorFragment : Fragment() {
@@ -27,6 +28,10 @@ class UiSampleSelectorFragment : Fragment() {
 
         text_watcher_ui_btn.setOnClickListener {
             findNavController().navigate(UiSampleSelectorFragmentDirections.actionUiSampleSelectorFragmentToUiSampleFragment2())
+        }
+
+        notification_ui_btn.setOnClickListener {
+            findNavController().navigate(UiSampleSelectorFragmentDirections.actionUiSampleSelectorFragmentToUiSampleFragment3())
         }
     }
 }

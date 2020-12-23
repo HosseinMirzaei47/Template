@@ -30,6 +30,9 @@
         <action
             android:id="@+id/action_uiSampleSelectorFragment_to_uiSampleFragment1"
             app:destination="@id/uiSampleFragment1" />
+        <action
+            android:id="@+id/action_uiSampleSelectorFragment_to_uiSampleFragment3"
+            app:destination="@id/uiSampleFragment3" />
     </fragment>
     <fragment
         android:id="@+id/uiSampleFragment2"
@@ -41,6 +44,11 @@
         android:name="com.example.template.home.ui.fragment.UiSampleFragment1"
         android:label="UiSampleFragment1"
         tools:layout="@layout/fragment_ui_sample1" />
+    <fragment
+        android:id="@+id/uiSampleFragment3"
+        android:name="com.example.template.home.ui.fragment.UiSampleFragment3"
+        android:label="fragment_ui_sample3"
+        tools:layout="@layout/fragment_ui_sample3" />
 
 
 </navigation>
