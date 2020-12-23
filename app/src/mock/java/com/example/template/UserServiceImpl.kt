@@ -70,7 +70,6 @@ class UserServiceImpl(private val api: HomeApi) : UserDataSource {
             returnResponse(true)
 
         } else {
-            println("mmb error getusers")
             returnResponse(false)
 
         }
@@ -82,20 +81,16 @@ class UserServiceImpl(private val api: HomeApi) : UserDataSource {
             emit(returnSuccessResponse())
         } else {
             emit(returnSuccessResponse())
-            println("mmb error getusersLiveData")
-            // emit(returnErrorResponse())
+            //emit(returnErrorResponse())
         }
     }
 
-    override suspend fun getUsersFlow(page: Int): Flow<UserRes> {
-        return flow {
-            delay(Random.nextLong(1000, 4000))
-            if (Random.nextBoolean()) {
-                emit(returnSuccessResponse())
-            } else {
-                println("mmb error getusersFlow")
-                emit(returnErrorResponse())
-            }
+    override suspend fun getUsersFlow(page: Int): Flow<UserRes> = flow {
+        delay(Random.nextLong(1000, 4000))
+        if (Random.nextBoolean()) {
+            emit(returnSuccessResponse())
+        } else {
+            emit(returnErrorResponse())
         }
     }
 
