@@ -43,7 +43,13 @@ class UiSampleFragment2 : Fragment() {
 
         viewModel.cities.asLiveData().observe(viewLifecycleOwner) {
             it.result()?.withResult(
-                {},
+                {isLoading ->
+                    if (isLoading){
+                        pb.visibility = View.VISIBLE
+                    } else if (!isLoading){
+                        pb.visibility = View.GONE
+                    }
+                },
                 { list ->
                     myAdapter.list = list
                     myAdapter.notifyDataSetChanged()
