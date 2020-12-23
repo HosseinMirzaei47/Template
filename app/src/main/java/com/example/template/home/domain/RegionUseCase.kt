@@ -11,7 +11,9 @@ class RegionUseCase @Inject constructor(
 ) : LiveTaskUseCase<String, MutableList<String>>(coroutineDispatcher) {
 
     override suspend fun execute(params: String): MutableList<String> {
-        delay(3000)
+        if (params != "N/A") {
+            delay(2000)
+        }
         return when (params) {
             "Mashhad" -> {
                 mutableListOf(
@@ -42,6 +44,7 @@ class RegionUseCase @Inject constructor(
                 )
             }
             else -> {
+//                throw Exception("N/A")
                 mutableListOf(
                     "N/A"
                 )

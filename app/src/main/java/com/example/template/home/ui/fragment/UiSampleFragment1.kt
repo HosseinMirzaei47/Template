@@ -7,12 +7,10 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.template.R
-import com.example.template.core.Result
 import com.example.template.core.withResult
+import com.example.template.databinding.FragmentUiSample1Binding
 import com.example.template.home.ui.viewmodel.UiSampleViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_ui_sample1.*
@@ -20,20 +18,29 @@ import kotlinx.android.synthetic.main.fragment_ui_sample1.*
 @AndroidEntryPoint
 class UiSampleFragment1 : Fragment() {
 
+    private lateinit var binding: FragmentUiSample1Binding
     private val viewModel: UiSampleViewModel by viewModels()
+    var isCityAssigned = false
+    var isRegionAssigned = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_ui_sample1, container, false)
+    ): View {
+        binding = FragmentUiSample1Binding.inflate(
+            inflater, container, false
+        ).apply {
+            lifecycleOwner = viewLifecycleOwner
+            vm = viewModel
+        }
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        var cityList = mutableListOf<String>()
-        var regionList = mutableListOf<String>()
+        val cityList = mutableListOf<String>()
+        val regionList = mutableListOf<String>()
 
         val cityAdapter: ArrayAdapter<String> = ArrayAdapter<String>(
             requireContext(),
@@ -45,68 +52,43 @@ class UiSampleFragment1 : Fragment() {
             android.R.layout.simple_spinner_item, regionList
         )
 
-        viewModel.cityList.asLiveData().observe(viewLifecycleOwner, { it ->
-            println("mmb $it")
-            println("mmb ${it.result()}")
-            when (val result =it.result()) {
-                is Result.Success -> {
-                    println("mmb ${result.data}")
-                }
-                is Result.Error -> {
+        viewModel.cityList.asLiveData().observe(viewLifecycleOwner) {
+            it.result()?.let { result ->
+                result.withResult(
+                    {},
+                    { list ->
+                        cityAdapter.addAll(list)
+                    },
+                    {
 
-                }
-                Result.Loading -> {
-                }
+                    }
+                )
             }
-//            it.result()?.let { result ->
-//                result.withResult(
-//                    { isLoading ->
-//                        if (isLoading) {
-//                            Toast.makeText(requireContext(), "city loading", Toast.LENGTH_SHORT)
-//                                .show()
-//                        }
-//                    },
-//                    {
-////                    it.withResult(
-////                        {},
-////                        { list ->
-////                            //cityList = list
-////                            cityAdapter.notifyDataSetChanged()
-////                        },
-////                        {}
-////                    )
-//                    },
-//                    {
-//
-//                    }
-//                )
-//            }
-        })
+        }
 
         viewModel.regionList.asLiveData().observe(viewLifecycleOwner, {
             it.result()?.withResult(
-                { isLoading ->
-                    if (isLoading) {
-                        Toast.makeText(requireContext(), "regions loading", Toast.LENGTH_SHORT)
-                            .show()
-                    }
+                {},
+                { list ->
+                    regionAdapter.clear()
+                    regionAdapter.addAll(list)
                 },
-                {
-                    it.withResult(
-                        {},
-                        { list ->
-                            regionList = list
-                            regionAdapter.notifyDataSetChanged()
-                        },
-                        {}
-                    )
-                },
-                {
-
+                { exception ->
+                    regionAdapter.clear()
+                    regionAdapter.addAll(exception.message)
                 }
             )
         })
-        // loading
+        viewModel.regionCode.asLiveData().observe(viewLifecycleOwner, {
+            it.result()?.withResult(
+                {},
+                { list ->
+                    code_tv.text = list[0]
+                },
+                {
+                }
+            )
+        })
 
         city_sp.adapter = cityAdapter
         region_sp.adapter = regionAdapter
@@ -118,12 +100,55 @@ class UiSampleFragment1 : Fragment() {
                 position: Int,
                 id: Long
             ) {
+                isCityAssigned = parent.selectedItem.toString() != "N/A"
                 viewModel.regionUseCase.setParams(parent.selectedItem.toString())
                 viewModel.regionList.retry()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
+
+        region_sp.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(
+                parent: AdapterView<*>,
+                view: View,
+                position: Int,
+                id: Long
+            ) {
+                isRegionAssigned = parent.selectedItem.toString() != "N/A"
+                viewModel.regionCodeUseCase.setParams(parent.selectedItem.toString())
+                viewModel.regionCode.retry()
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
+        viewModel.regionCode.asLiveData().observe(viewLifecycleOwner) {
+            println("mmb ${it.result()}")
+        }
+
+        viewModel.combined.asLiveData().observe(viewLifecycleOwner, {
+            it.result()?.withResult(
+                { isLoading ->
+                    if (isLoading) {
+                        println("mmbd in loading....")
+                        submit_btn.isEnabled = false
+                        submit_btn.text = "N/A"
+                    }
+                },
+                {
+                    println("mmbd in tooo")
+                    println("mmbd in $isCityAssigned && $isRegionAssigned")
+                    if (isCityAssigned && isRegionAssigned) {
+                        submit_btn.isEnabled = true
+                        submit_btn.text = "Submit"
+                    }
+                },
+                {
+
+                }
+            )
+        })
 
         viewModel.cityList.run()
     }
