@@ -34,4 +34,3 @@ abstract class LiveTaskUseCase<in P, R>(
         return task
     }
 }
-

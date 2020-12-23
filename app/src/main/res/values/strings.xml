@@ -7,4 +7,7 @@
     <string name="submit">submit</string>
     <string name="please_wait">please wait</string>
     <string name="navigate">Navigate</string>
+    <string name="tv_retry">Click to retry</string>
+    <string name="tv_close">Close</string>
+    <string name="tv_loading">Loading</string>
 </resources>

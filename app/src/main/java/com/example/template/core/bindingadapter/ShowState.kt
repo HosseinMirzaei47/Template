@@ -7,6 +7,7 @@ import com.example.template.R
 import com.example.template.core.Result
 import com.example.template.core.livatask.BaseLiveTask
 import com.example.template.core.livatask.LiveTask
+import kotlinx.android.synthetic.main.loading_blur_circular.view.*
 import kotlinx.android.synthetic.main.loading_bouncing.view.*
 import kotlinx.android.synthetic.main.loading_circular.view.*
 import kotlinx.android.synthetic.main.loading_indicator.view.*
@@ -14,17 +15,22 @@ import kotlinx.android.synthetic.main.loading_linear.view.*
 import kotlinx.android.synthetic.main.loading_sandy_clock.view.*
 import kotlin.coroutines.cancellation.CancellationException
 
-enum class Type {
-    INDICATOR, LINEAR, SANDY_CLOCK, CIRCULAR, BOUNCING
+enum class ProgressType {
+    INDICATOR, LINEAR, SANDY_CLOCK, CIRCULAR, BOUNCING, BLUR_CIRCULAR
 }
 
-fun Type.loading() =
+enum class Theme {
+    DARK, LIGHT
+}
+
+fun ProgressType.loading() =
     when (this) {
-        Type.INDICATOR -> IndicatorLoading()
-        Type.SANDY_CLOCK -> SandyClockLoading()
-        Type.LINEAR -> LinearLoading()
-        Type.CIRCULAR -> CircularLoading()
-        Type.BOUNCING -> BouncingLoading()
+        ProgressType.INDICATOR -> IndicatorLoading()
+        ProgressType.SANDY_CLOCK -> SandyClockLoading()
+        ProgressType.LINEAR -> LinearLoading()
+        ProgressType.CIRCULAR -> CircularLoading()
+        ProgressType.BOUNCING -> BouncingLoading()
+        ProgressType.BLUR_CIRCULAR -> BlurCircularLoading()
     }
 
 interface State {
@@ -55,7 +61,6 @@ class IndicatorLoading : State {
     override fun loading(stateLayout: View?, parent: ViewGroup, result: LiveTask<*>) {
         stateLayout?.let {
             it.apply {
-                layoutParams.height = 150
                 cl_error_indicator.visibility = View.INVISIBLE
                 progressBar_indicator.visibility = View.VISIBLE
                 if ((result as BaseLiveTask<*>).cancelable) {
@@ -111,7 +116,6 @@ class SandyClockLoading : State {
     override fun loading(stateLayout: View?, parent: ViewGroup, result: LiveTask<*>) {
         stateLayout?.let {
             it.apply {
-                layoutParams.height = 150
                 cl_error_sandy_clock.visibility = View.GONE
                 progressBar_sandy_clock.visibility = View.VISIBLE
                 tv_loading_sandy_clock.visibility = View.VISIBLE
@@ -159,7 +163,6 @@ class LinearLoading : State {
     override fun loading(stateLayout: View?, parent: ViewGroup, result: LiveTask<*>) {
         stateLayout?.let {
             it.apply {
-                layoutParams.height = 150
                 cl_error_linear.visibility = View.GONE
                 progressBar_linear.visibility = View.VISIBLE
                 tv_loading_linear.visibility = View.VISIBLE
@@ -210,7 +213,6 @@ class CircularLoading : State {
     override fun loading(stateLayout: View?, parent: ViewGroup, result: LiveTask<*>) {
         stateLayout?.let {
             it.apply {
-                layoutParams.height = 150
                 cl_error_circular.visibility = View.GONE
                 progressBar_circular.visibility = View.VISIBLE
                 tv_loading_circular.visibility = View.VISIBLE
@@ -258,7 +260,6 @@ class BouncingLoading : State {
     override fun loading(stateLayout: View?, parent: ViewGroup, result: LiveTask<*>) {
         stateLayout?.let {
             it.apply {
-                layoutParams.height = 150
                 cl_error_bouncing.visibility = View.GONE
                 progressBar_bouncing.visibility = View.VISIBLE
                 tv_loading_bouncing.visibility = View.VISIBLE
@@ -295,6 +296,53 @@ class BouncingLoading : State {
                     } else cl_container_bouncing.visibility = View.INVISIBLE
                     progressBar_bouncing.visibility = View.GONE
                     tv_loading_bouncing.visibility = View.GONE
+                }
+
+            }
+        }
+    }
+}
+
+class BlurCircularLoading : State {
+    override fun loading(stateLayout: View?, parent: ViewGroup, result: LiveTask<*>) {
+        stateLayout?.let {
+            it.apply {
+                cl_error_blur_circular.visibility = View.GONE
+                progressBar_blur_circular.visibility = View.VISIBLE
+//                tv_loading_blur_circular.visibility = View.VISIBLE
+                if ((result as BaseLiveTask<*>).cancelable) {
+                    ivBtn_close_blur_circular.visibility = View.VISIBLE
+                    ivBtn_close_blur_circular.setOnClickListener { _ ->
+                        result.cancel()
+                    }
+                } else ivBtn_close_blur_circular.visibility = View.INVISIBLE
+            }
+        }
+    }
+
+    override fun error(stateLayout: View?, parent: ViewGroup, result: LiveTask<*>) {
+        stateLayout?.let {
+            it.apply {
+                if ((result.result() as Result.Error).exception is CancellationException) {
+                    startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_out))
+                    tag = null
+                    parent.removeView(it)
+                } else {
+                    ivBtn_close_blur_circular.visibility = View.VISIBLE
+                    cl_error_blur_circular.visibility = View.VISIBLE
+                    ivBtn_close_blur_circular.setOnClickListener { _ ->
+                        startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_out))
+                        tag = null
+                        parent.removeView(it)
+                    }
+                    if ((result as BaseLiveTask<*>).retryable) {
+                        cl_container_blur_circular.visibility = View.VISIBLE
+                        cl_error_blur_circular.setOnClickListener {
+                            result.retry()
+                        }
+                    } else cl_container_blur_circular.visibility = View.INVISIBLE
+                    progressBar_blur_circular.visibility = View.GONE
+//                    tv_loading_blur_circular.visibility = View.GONE
                 }
 
             }

@@ -20,8 +20,8 @@
             android:id="@+id/progressBar_bouncing"
             android:layout_width="108dp"
             android:layout_height="108dp"
-            android:layout_gravity="center"
-            android:layout_marginRight="150dp"
+            style="@style/loading"
+            android:layout_marginEnd="150dp"
             android:layout_marginBottom="62dp"
             android:scaleType="fitXY"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -29,7 +29,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:lottie_autoPlay="true"
-            app:lottie_colorFilter="#000000"
             app:lottie_loop="true"
             app:lottie_rawRes="@raw/bouncing_loading" />
 
@@ -37,10 +36,7 @@
             android:id="@+id/tv_loading_bouncing"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="Loading"
-            android:textColor="@color/black"
-            android:textSize="20sp"
+            style="@style/tv_loading"
             android:translationZ="20dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/progressBar_bouncing"
@@ -58,28 +54,22 @@
 
             <ImageView
                 android:id="@+id/iv_retry_bouncing"
+                style="@style/btn_retry"
                 android:layout_width="18dp"
                 android:layout_height="18dp"
-                android:layout_marginTop="2dp"
-                android:layout_marginRight="120dp"
-                android:contentDescription="@string/close_state_layout"
+                android:contentDescription="@string/tv_retry"
                 android:scaleType="fitXY"
                 android:src="@drawable/ic_retry"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:tint="#000000" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/tv_error_bouncing"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="8dp"
-                android:gravity="center"
-                android:text="Click to retry"
-                android:textColor="@color/black"
-                android:textSize="20sp"
+                style="@style/tv_retry"
                 android:translationZ="2dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/iv_retry_bouncing"
@@ -91,16 +81,14 @@
 
     <ImageView
         android:id="@+id/ivBtn_close_bouncing"
+        style="@style/close"
         android:layout_width="12dp"
         android:layout_height="12dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="12dp"
-        android:contentDescription="@string/close_state_layout"
         android:scaleType="fitXY"
         android:src="@drawable/ic_close"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tint="#000000" />
+        android:contentDescription="@string/tv_close" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

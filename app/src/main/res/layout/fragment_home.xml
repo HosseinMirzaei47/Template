@@ -11,7 +11,7 @@
 
         <variable
             name="type"
-            type="com.example.template.core.bindingadapter.Type" />
+            type="com.example.template.core.bindingadapter.ProgressType" />
 
     </data>
 
@@ -24,35 +24,36 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constrant1"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            bind:reactToTask="@{vm.combinedTasks.asLiveData()}"
-            bind:type="@{type.LINEAR}"
+            android:layout_height="50dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            bind:reactToTask="@{vm.combinedTasks.asLiveData()}"
+            bind:type="@{type.CIRCULAR}">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constrant2"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="50dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constrant1"
             bind:reactToTask="@{vm.combinedTasks.asLiveData()}"
-            bind:type="@{type.SANDY_CLOCK}">
+            bind:type="@{type.CIRCULAR}">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constrant3"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="50dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constrant2"
             bind:reactToTask="@{vm.combinedTasks.asLiveData()}"
+            bind:layout="@{@layout/loading_indicator}"
             bind:type="@{type.CIRCULAR}">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -60,12 +61,12 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constrant4"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="50dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constrant3"
             bind:reactToTask="@{vm.combinedTasks.asLiveData()}"
-            bind:type="@{type.BOUNCING}">
+            bind:type="@{type.CIRCULAR}">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -78,30 +79,30 @@
 
         <Button
             android:id="@+id/submit"
+            disableOnLoading="@{vm.combinedTasks.asLiveData()}"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            disableOnLoading="@{vm.combinedTasks.asLiveData()}"
-            bind:reactToTask="@{vm.combinedTasks.asLiveData()}"
-            android:text="@string/submit"
-            android:backgroundTint="@color/teal_700"
             android:layout_marginLeft="40dp"
             android:layout_marginRight="40dp"
-            bind:type="@{type.INDICATOR}"
+            android:backgroundTint="@color/teal_700"
             android:gravity="center"
+            android:text="@string/submit"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
-            app:layout_constraintTop_toBottomOf="@id/guideline" />
+            app:layout_constraintTop_toBottomOf="@id/guideline"
+            bind:reactToTask="@{vm.combinedTasks.asLiveData()}"
+            bind:type="@{type.BLUR_CIRCULAR}" />
 
         <Button
             android:id="@+id/gotonext"
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:text="@string/navigate"
-            android:backgroundTint="@color/teal_700"
-            android:textColor="@color/white"
-            android:textSize="14sp"
             android:layout_marginLeft="40dp"
             android:layout_marginRight="40dp"
+            android:backgroundTint="@color/teal_700"
+            android:text="@string/navigate"
+            android:textColor="@color/white"
+            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toBottomOf="@id/submit" />
 
