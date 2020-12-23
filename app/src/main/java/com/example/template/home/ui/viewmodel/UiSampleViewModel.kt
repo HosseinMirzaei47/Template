@@ -5,13 +5,15 @@ import androidx.lifecycle.ViewModel
 import com.example.template.core.LiveTaskResult
 import com.example.template.core.livatask.combinedTask
 import com.example.template.core.livatask.liveTask
+import com.example.template.home.domain.CityUseCase
 import com.example.template.home.domain.RegionCodeUseCase
 import com.example.template.home.domain.RegionUseCase
 import kotlinx.coroutines.delay
 
 class UiSampleViewModel @ViewModelInject constructor(
     val regionUseCase: RegionUseCase ,
-    val regionCodeUseCase: RegionCodeUseCase
+    val regionCodeUseCase: RegionCodeUseCase,
+    val cityUseCase: CityUseCase
 ) : ViewModel() {
 
     val cityList = liveTask {
@@ -29,4 +31,5 @@ class UiSampleViewModel @ViewModelInject constructor(
 
     val combined = combinedTask(cityList , regionList,regionCode)
 
+    val cities = cityUseCase.asLiveTask("N/A")
 }

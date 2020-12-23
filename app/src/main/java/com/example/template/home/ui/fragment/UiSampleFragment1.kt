@@ -123,22 +123,15 @@ class UiSampleFragment1 : Fragment() {
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
-        viewModel.regionCode.asLiveData().observe(viewLifecycleOwner) {
-            println("mmb ${it.result()}")
-        }
-
         viewModel.combined.asLiveData().observe(viewLifecycleOwner, {
             it.result()?.withResult(
                 { isLoading ->
                     if (isLoading) {
-                        println("mmbd in loading....")
                         submit_btn.isEnabled = false
                         submit_btn.text = "N/A"
                     }
                 },
                 {
-                    println("mmbd in tooo")
-                    println("mmbd in $isCityAssigned && $isRegionAssigned")
                     if (isCityAssigned && isRegionAssigned) {
                         submit_btn.isEnabled = true
                         submit_btn.text = "Submit"
