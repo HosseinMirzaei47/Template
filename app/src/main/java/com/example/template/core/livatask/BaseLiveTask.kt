@@ -27,7 +27,7 @@ abstract class BaseLiveTask<T> : MediatorLiveData<LiveTask<T>>(), LiveTask<T> {
     }
 
     @Suppress("UNCHECKED_CAST")
-    override fun asLiveData() = this as LiveData<LiveTask<Result<T>>>
+    override fun asLiveData() = this as LiveData<LiveTask<T>>
 
     override fun result() = latestState
 
