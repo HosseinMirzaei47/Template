@@ -53,7 +53,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constrant2"
             bind:reactToTask="@{vm.combinedTasks.asLiveData()}"
-            bind:layout="@{@layout/loading_indicator}"
             bind:type="@{type.CIRCULAR}">
 
         </androidx.constraintlayout.widget.ConstraintLayout>

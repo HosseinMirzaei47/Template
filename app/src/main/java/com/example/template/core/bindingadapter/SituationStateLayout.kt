@@ -4,7 +4,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.LayoutRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import com.example.template.R
@@ -109,17 +108,15 @@ class SituationFactory() {
     fun executeState(
         view: View,
         progressType: ProgressType,
-        @LayoutRes layout: Int?,
     ): Pair<View, Any> {
-        val loadingLayout: Int = layout
-            ?: when (progressType) {
-                ProgressType.INDICATOR -> R.layout.loading_indicator
-                ProgressType.SANDY_CLOCK -> R.layout.loading_sandy_clock
-                ProgressType.LINEAR -> R.layout.loading_linear
-                ProgressType.CIRCULAR -> R.layout.loading_circular
-                ProgressType.BOUNCING -> R.layout.loading_bouncing
-                ProgressType.BLUR_CIRCULAR -> R.layout.loading_blur_circular
-            }
+        val loadingLayout: Int = when (progressType) {
+            ProgressType.INDICATOR -> R.layout.loading_indicator
+            ProgressType.SANDY_CLOCK -> R.layout.loading_sandy_clock
+            ProgressType.LINEAR -> R.layout.loading_linear
+            ProgressType.CIRCULAR -> R.layout.loading_circular
+            ProgressType.BOUNCING -> R.layout.loading_bouncing
+            ProgressType.BLUR_CIRCULAR -> R.layout.loading_blur_circular
+        }
         val situation = createSituation(view, loadingLayout).execute()
         var stateLayout = situation.first
         if (stateLayout == null) {
