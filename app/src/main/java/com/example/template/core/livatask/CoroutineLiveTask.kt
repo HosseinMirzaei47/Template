@@ -1,9 +1,10 @@
 package com.example.template.core.livatask
 
+import androidx.lifecycle.LiveData
 import com.example.template.core.ErrorEvent
+import com.example.template.core.LiveTaskResult
 import com.example.template.core.Logger
 import com.example.template.core.MyApp.Companion.connectionLiveData
-import com.example.template.core.Result
 import com.example.template.core.util.NoConnectionException
 import com.example.template.core.util.ServerException
 import com.example.template.core.withError
@@ -22,11 +23,12 @@ class CoroutineLiveTask<T>(
 
     private var blockRunner: TaskRunner<T>? = null
     var autoRetry = true
+    private var emittedSource: Emitted? = null
 
     init {
         this.addSource(this) {
             val taskResult = it.result()
-            if (taskResult is Result.Error) {
+            if (taskResult is LiveTaskResult.Error) {
                 taskResult.withError { exception ->
                     Logger.errorEvent.postValue(ErrorEvent((exception)))
 
@@ -51,7 +53,7 @@ class CoroutineLiveTask<T>(
     }
 
     override fun run(): CoroutineLiveTask<T> {
-        applyResult(Result.Loading)
+        applyResult(LiveTaskResult.Loading)
         val supervisorJob = SupervisorJob(context[Job])
         val scope = CoroutineScope(Dispatchers.IO + context + supervisorJob)
         blockRunner = TaskRunner(
@@ -95,13 +97,25 @@ class CoroutineLiveTask<T>(
     }
 
 
-    fun applyResult(result: Result<T>?) {
+    internal suspend fun emitSource(source: LiveData<LiveTaskResult<T>>): DisposableHandle {
+        clearSource()
+        val newSource = addDisposableEmit(source)
+        emittedSource = newSource
+        return newSource
+    }
+
+    internal suspend fun clearSource() {
+        emittedSource?.disposeNow()
+        emittedSource = null
+    }
+
+    fun applyResult(result: LiveTaskResult<T>?) {
         this.latestState = result
         postValue(this)
     }
 
     fun applyResult(task: LiveTask<T>) {
-        this.latestState = task.result()
+        this.latestState = task.result() as LiveTaskResult<T>?
         postValue(this)
     }
 }

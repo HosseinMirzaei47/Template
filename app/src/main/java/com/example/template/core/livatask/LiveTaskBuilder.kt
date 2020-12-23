@@ -1,21 +1,23 @@
 package com.example.template.core.livatask
 
-import com.example.template.core.Result
+import androidx.lifecycle.LiveData
+import com.example.template.core.LiveTaskResult
+import kotlinx.coroutines.DisposableHandle
 import kotlinx.coroutines.flow.Flow
 
 interface LiveTaskBuilder<T> {
-    val latestValue: Result<T>?
-    suspend fun emit(result: Result<T>)
+    val latestValue: LiveTaskResult<T>?
+    suspend fun emit(result: LiveTaskResult<T>)
     suspend fun emit(result: Flow<T>)
+    suspend fun emitSource(source: LiveData<LiveTaskResult<T>>): DisposableHandle
     fun retryAttempts(attempts: Int)
     fun autoRetry(bool: Boolean)
     fun cancelable(bool: Boolean)
     fun retryable(bool: Boolean)
-    fun retry()
 }
 
 interface CombinerBuilder {
-    val latestValue: Result<Any>?
+    val latestValue: LiveTaskResult<Any>?
     fun cancelable(bool: Boolean)
     fun retryable(bool: Boolean)
 }

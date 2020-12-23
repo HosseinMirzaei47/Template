@@ -1,5 +1,7 @@
 package com.example.template
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.liveData
 import com.example.template.home.data.remote.HomeApi
 import com.example.template.home.data.remote.UserDataSource
 import com.example.template.home.data.servicemodels.Ad
@@ -8,6 +10,7 @@ import com.example.template.home.data.servicemodels.UserRes
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlin.random.Random
 
 
 class UserServiceImpl(private val api: HomeApi) : UserDataSource {
@@ -62,14 +65,32 @@ class UserServiceImpl(private val api: HomeApi) : UserDataSource {
     }
 
     override suspend fun getUsers(page: Int): UserRes {
-        delay(3000)
-        return returnResponse(true)
+        delay(Random.nextLong(1000, 4000))
+        return if (Random.nextBoolean()) {
+            returnResponse(true)
+
+        } else {
+            returnResponse(false)
+
+        }
     }
 
-    override suspend fun getUsersFlow(page: Int): Flow<UserRes> {
-        return flow {
-            delay(3000)
-            emit(returnResponse(true))
+    override fun getUsersLiveData(page: Int): LiveData<UserRes> = liveData {
+        delay(Random.nextLong(1000, 4000))
+        if (Random.nextBoolean()) {
+            emit(returnSuccessResponse())
+        } else {
+            emit(returnSuccessResponse())
+            //emit(returnErrorResponse())
+        }
+    }
+
+    override suspend fun getUsersFlow(page: Int): Flow<UserRes> = flow {
+        delay(Random.nextLong(1000, 4000))
+        if (Random.nextBoolean()) {
+            emit(returnSuccessResponse())
+        } else {
+            emit(returnErrorResponse())
         }
     }
 

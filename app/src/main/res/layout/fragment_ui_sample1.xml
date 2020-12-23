@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:bind="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <variable
+            name="vm"
+            type="com.example.template.home.ui.viewmodel.UiSampleViewModel" />
+
+        <variable
+            name="type"
+            type="com.example.template.core.bindingadapter.Type" />
+
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context=".home.ui.fragment.UiSampleSelectorFragment">
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/ui_sample_gl_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.1" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/ui_sample_gl_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.9" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/ui_sample_gl_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.1" />
+
+        <Spinner
+            android:id="@+id/city_sp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintLeft_toRightOf="@id/ui_sample_gl_1"
+            app:layout_constraintRight_toLeftOf="@id/ui_sample_gl_2"
+            app:layout_constraintTop_toBottomOf="@id/ui_sample_gl_3"
+            bind:reactToTask="@{vm.cityList.asLiveData()}"
+            bind:type="@{type.SANDY_CLOCK}" />
+
+        <Spinner
+            android:id="@+id/region_sp"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:layout_constraintLeft_toRightOf="@id/ui_sample_gl_1"
+            app:layout_constraintRight_toLeftOf="@id/ui_sample_gl_2"
+            app:layout_constraintTop_toBottomOf="@id/city_sp"
+            bind:reactToTask="@{vm.regionList.asLiveData()}"
+            bind:type="@{type.SANDY_CLOCK}" />
+
+        <TextView
+            android:id="@+id/code_tv"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:text="@string/n_a"
+            android:textSize="24sp"
+            app:layout_constraintLeft_toRightOf="@id/ui_sample_gl_1"
+            app:layout_constraintRight_toLeftOf="@id/ui_sample_gl_2"
+            app:layout_constraintTop_toBottomOf="@id/region_sp"
+            bind:reactToTask="@{vm.regionCode.asLiveData()}"
+            bind:type="@{type.SANDY_CLOCK}" />
+
+        <Button
+            android:id="@+id/submit_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:enabled="false"
+            android:gravity="center"
+            android:text="@string/n_a"
+            android:textSize="20sp"
+            app:layout_constraintLeft_toRightOf="@id/ui_sample_gl_1"
+            app:layout_constraintRight_toLeftOf="@id/ui_sample_gl_2"
+            app:layout_constraintTop_toBottomOf="@id/code_tv" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

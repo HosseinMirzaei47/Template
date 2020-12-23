@@ -1,18 +1,15 @@
 package com.example.template.core.livatask
 
-import androidx.annotation.VisibleForTesting
-import androidx.annotation.VisibleForTesting.PRIVATE
-import com.example.template.core.Result
+import androidx.annotation.MainThread
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import com.example.template.core.LiveTaskResult
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.*
 import kotlin.coroutines.CoroutineContext
 
-class TaskRunner<T>(
-    @VisibleForTesting(otherwise = PRIVATE)
-    val liveData: CoroutineLiveTask<T>,
+internal class TaskRunner<T>(
+    private val liveData: CoroutineLiveTask<T>,
     private val block: Block<T>,
     private val timeoutInMs: Long = DEFAULT_TIMEOUT,
     private val scope: CoroutineScope,
@@ -36,44 +33,50 @@ class TaskRunner<T>(
     }
 
     fun cancel() {
-        cancellationJob = scope.launch(Dispatchers.IO) {
+        cancellationJob = scope.launch(Dispatchers.Main.immediate) {
             delay(timeoutInMs)
             runningJob?.cancel()
             runningJob = null
-            liveData.applyResult(Result.Error(CancellationException()))
+            liveData.applyResult(LiveTaskResult.Error(CancellationException()))
         }
     }
-
 }
 
-class LiveTaskBuilderImpl<T>(
+internal class LiveTaskBuilderImpl<T>(
     private var target: CoroutineLiveTask<T>,
     context: CoroutineContext
 ) : LiveTaskBuilder<T> {
 
-    override val latestValue: Result<T>?
+    override val latestValue: LiveTaskResult<T>?
         get() = target.value?.result()
 
     private val coroutineContext = context + Dispatchers.Main.immediate
 
-    override suspend fun emit(result: Result<T>) =
+    override suspend fun emit(result: LiveTaskResult<T>) {
+        target.clearSource()
         withContext(coroutineContext) {
             target.applyResult(result)
         }
+    }
 
     override suspend fun emit(result: Flow<T>) {
+        target.clearSource()
         result
             .onStart {
-                target.applyResult(Result.Loading)
+                target.applyResult(LiveTaskResult.Loading)
             }
             .catch { e ->
-                target.applyResult(Result.Error(Exception(e)))
-            }.collect {
-                target.applyResult(Result.Success(it))
+                target.applyResult(LiveTaskResult.Error(Exception(e)))
+            }
+            .collect {
+                target.applyResult(LiveTaskResult.Success(it))
             }
     }
 
-    override fun retry() {}
+    override suspend fun emitSource(source: LiveData<LiveTaskResult<T>>): DisposableHandle =
+        withContext(coroutineContext) {
+            return@withContext target.emitSource(source)
+        }
 
     override fun retryAttempts(attempts: Int) {
         target.retryAttempts = attempts
@@ -92,4 +95,33 @@ class LiveTaskBuilderImpl<T>(
     }
 }
 
+internal class Emitted(
+    private val source: LiveData<*>,
+    private val mediator: MediatorLiveData<*>
+) : DisposableHandle {
+    // @MainThread
+    private var disposed = false
+
+    /**
+     * Unlike [dispose] which cannot be sync because it not a coroutine (and we do not want to
+     * lock), this version is a suspend function and does not return until source is removed.
+     */
+    suspend fun disposeNow() = withContext(Dispatchers.Main.immediate) {
+        removeSource()
+    }
+
+    override fun dispose() {
+        CoroutineScope(Dispatchers.Main.immediate).launch {
+            removeSource()
+        }
+    }
+
+    @MainThread
+    private fun removeSource() {
+        if (!disposed) {
+            mediator.removeSource(source)
+            disposed = true
+        }
+    }
+}
 internal typealias Block<T> = suspend LiveTaskBuilder<T>.() -> Unit
