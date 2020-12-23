@@ -1,8 +1,8 @@
 package com.example.template.di
 
-import com.example.template.core.DefaultDispatcher
-import com.example.template.core.IoDispatcher
-import com.example.template.core.MainDispatcher
+import com.part.livetaskcore.DefaultDispatcher
+import com.part.livetaskcore.IoDispatcher
+import com.part.livetaskcore.MainDispatcher
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

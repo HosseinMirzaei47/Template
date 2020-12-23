@@ -2,12 +2,14 @@ package com.example.template.home.ui.viewmodel
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
-import com.example.template.core.livatask.combinedTask
-import com.example.template.core.livatask.liveTask
+import androidx.lifecycle.liveData
 import com.example.template.home.domain.*
+import com.part.livetaskcore.Resource
+import com.part.livetaskcore.livatask.combinedTask
+import com.part.livetaskcore.livatask.liveTask
 
 class HomeViewModel @ViewModelInject constructor(
-    private val useCase: GetUserUseCase,
+    private val getUserUseCase: GetUserUseCase,
     private val articleUseCase: GetArticleUseCase,
     private val commentUseCase: GetCommentUseCase,
     flowUseCase: GetUserFlowUseCase,
@@ -28,10 +30,18 @@ class HomeViewModel @ViewModelInject constructor(
 
 
     val user4 = liveTask {
-        emit(useCase(4))
+        emit(getUserUseCase(4))
     }
 
 
     val combinedTasks = combinedTask(user1, user2, user3, user4)
+    val query = 0
+
+
+    val user = liveData {
+        emit(Resource.Loading)
+        emit(getUserUseCase(query))
+    }
+
 
 }

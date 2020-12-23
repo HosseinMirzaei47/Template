@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.example.template.databinding.FragmentHomeBinding
 import com.example.template.home.ui.viewmodel.HomeViewModel
+import com.part.livetaskcore.livatask.liveTask
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -41,6 +42,9 @@ class HomeFragment : Fragment() {
             findNavController().navigate(HomeFragmentDirections.actionHomeFragmentSelf())
         }
 
+        val sdf = liveTask {
+            emitSource()
+        }
         binding.submit.setOnClickListener {
             viewModel.combinedTasks.run()
         }

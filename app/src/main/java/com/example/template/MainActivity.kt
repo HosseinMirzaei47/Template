@@ -5,15 +5,10 @@ import android.os.Bundle
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import com.example.template.core.Logger
-import com.example.template.core.util.NoConnectionException
-import com.example.template.core.util.NoInternetException
-import com.example.template.core.util.ServerException
-import com.example.template.core.util.UnAuthorizedException
 import com.example.template.databinding.ActivityMainBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.part.livetaskcore.Logger
 import dagger.hilt.android.AndroidEntryPoint
-import retrofit2.HttpException
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
@@ -23,21 +18,21 @@ class MainActivity : AppCompatActivity() {
         DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
 
         Logger.observe(this) {
-            val isNotAuthorized = (it.exception is ServerException &&
-                    it.exception.meta.statusCode == 401) ||
-                    (it.exception is HttpException && it.exception.code() == 401)
-
-            when {
-                it.exception is UnAuthorizedException || isNotAuthorized -> {
-                    unauthorizedDialog()
-                }
-                it.exception is NoConnectionException -> {
-                    noConnectionDialog()
-                }
-                it.exception is NoInternetException -> {
-                    errorDialog()
-                }
-            }
+//            val isNotAuthorized = (it.exception is ServerException &&
+//                    it.exception.meta.statusCode == 401) ||
+//                    (it.exception is HttpException && it.exception.code() == 401)
+//
+//            when {
+//                it.exception is UnAuthorizedException || isNotAuthorized -> {
+//                    unauthorizedDialog()
+//                }
+//                it.exception is NoConnectionException -> {
+//                    noConnectionDialog()
+//                }
+//                it.exception is NoInternetException -> {
+//                    errorDialog()
+//                }
+//            }
         }
     }
 

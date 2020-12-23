@@ -1,10 +1,10 @@
 package com.example.template.home.domain
 
 import androidx.lifecycle.LiveData
-import com.example.template.core.IoDispatcher
-import com.example.template.core.usecases.LiveDataUseCase
 import com.example.template.home.data.repository.HomeRepository
 import com.example.template.home.data.servicemodels.UserRes
+import com.part.livetaskcore.IoDispatcher
+import com.part.livetaskcore.usecases.LiveDataUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 

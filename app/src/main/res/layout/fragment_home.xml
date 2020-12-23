@@ -9,10 +9,10 @@
             name="vm"
             type="com.example.template.home.ui.viewmodel.HomeViewModel" />
 
+
         <variable
             name="type"
-            type="com.example.template.core.bindingadapter.Type" />
-
+            type="com.part.livetaskcore.core.bindingadapter.Type" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -27,9 +27,7 @@
             android:layout_height="100dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            bind:reactToTask="@{vm.user1.asLiveData()}"
-            bind:type="@{type.LINEAR}">
+            app:layout_constraintTop_toTopOf="parent">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
