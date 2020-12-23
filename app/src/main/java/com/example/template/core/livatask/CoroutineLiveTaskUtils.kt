@@ -3,7 +3,7 @@ package com.example.template.core.livatask
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import com.example.template.core.Result
+import com.example.template.core.LiveTaskResult
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlin.coroutines.CoroutineContext
@@ -37,7 +37,7 @@ internal class TaskRunner<T>(
             delay(timeoutInMs)
             runningJob?.cancel()
             runningJob = null
-            liveData.applyResult(Result.Error(CancellationException()))
+            liveData.applyResult(LiveTaskResult.Error(CancellationException()))
         }
     }
 }
@@ -47,12 +47,12 @@ internal class LiveTaskBuilderImpl<T>(
     context: CoroutineContext
 ) : LiveTaskBuilder<T> {
 
-    override val latestValue: Result<T>?
+    override val latestValue: LiveTaskResult<T>?
         get() = target.value?.result()
 
     private val coroutineContext = context + Dispatchers.Main.immediate
 
-    override suspend fun emit(result: Result<T>) {
+    override suspend fun emit(result: LiveTaskResult<T>) {
         target.clearSource()
         withContext(coroutineContext) {
             target.applyResult(result)
@@ -63,17 +63,17 @@ internal class LiveTaskBuilderImpl<T>(
         target.clearSource()
         result
             .onStart {
-                target.applyResult(Result.Loading)
+                target.applyResult(LiveTaskResult.Loading)
             }
             .catch { e ->
-                target.applyResult(Result.Error(Exception(e)))
+                target.applyResult(LiveTaskResult.Error(Exception(e)))
             }
             .collect {
-                target.applyResult(Result.Success(it))
+                target.applyResult(LiveTaskResult.Success(it))
             }
     }
 
-    override suspend fun emitSource(source: LiveData<Result<T>>): DisposableHandle =
+    override suspend fun emitSource(source: LiveData<LiveTaskResult<T>>): DisposableHandle =
         withContext(coroutineContext) {
             return@withContext target.emitSource(source)
         }

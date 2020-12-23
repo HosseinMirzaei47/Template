@@ -4,7 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import com.example.template.R
-import com.example.template.core.Result
+import com.example.template.core.LiveTaskResult
 import com.example.template.core.livatask.BaseLiveTask
 import com.example.template.core.livatask.LiveTask
 import kotlinx.android.synthetic.main.loading_blur_circular.view.*
@@ -76,20 +76,20 @@ class IndicatorLoading : State {
     override fun error(stateLayout: View?, parent: ViewGroup, result: LiveTask<*>) {
         stateLayout?.let {
             it.apply {
-                if ((result.result() as Result.Error).exception is CancellationException) {
+                if ((result.result() as LiveTaskResult.Error).exception is CancellationException) {
                     startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_out))
                     tag = null
                     parent.removeView(it)
                 } else {
-//                    val red = Color.parseColor("#E91E63")
-//                    val white = Color.parseColor("#ffffff")
-//                    val border = GradientDrawable()
-//                    border.setColor(red) //white background
-////                    border.setStroke(0, white) //black border with full opacity
-//                    it.background = border
-//                    tv_error_indicator.setTextColor(white)
-//                    ivBtn_close_indicator.setColorFilter(white)
-//                    iv_retry_indicator.setColorFilter(white)
+                    /*val red = Color.parseColor("#E91E63")
+                    val white = Color.parseColor("#ffffff")
+                    val border = GradientDrawable()
+                    border.setColor(red) //white background
+                    border.setStroke(0, white) //black border with full opacity
+                    it.background = border
+                    tv_error_indicator.setTextColor(white)
+                    ivBtn_close_indicator.setColorFilter(white)
+                    iv_retry_indicator.setColorFilter(white)*/
 
                     ivBtn_close_indicator.visibility = View.VISIBLE
                     cl_error_indicator.visibility = View.VISIBLE
@@ -132,7 +132,7 @@ class SandyClockLoading : State {
     override fun error(stateLayout: View?, parent: ViewGroup, result: LiveTask<*>) {
         stateLayout?.let {
             it.apply {
-                if ((result.result() as Result.Error).exception is CancellationException) {
+                if ((result.result() as LiveTaskResult.Error).exception is CancellationException) {
                     startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_out))
                     tag = null
                     parent.removeView(it)
@@ -181,7 +181,7 @@ class LinearLoading : State {
     override fun error(stateLayout: View?, parent: ViewGroup, result: LiveTask<*>) {
         stateLayout?.let {
             it.apply {
-                if ((result.result() as Result.Error).exception is CancellationException) {
+                if ((result.result() as LiveTaskResult.Error).exception is CancellationException) {
                     startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_out))
                     tag = null
                     parent.removeView(it)
@@ -229,7 +229,7 @@ class CircularLoading : State {
     override fun error(stateLayout: View?, parent: ViewGroup, result: LiveTask<*>) {
         stateLayout?.let {
             it.apply {
-                if ((result.result() as Result.Error).exception is CancellationException) {
+                if ((result.result() as LiveTaskResult.Error).exception is CancellationException) {
                     startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_out))
                     tag = null
                     parent.removeView(it)
@@ -276,7 +276,7 @@ class BouncingLoading : State {
     override fun error(stateLayout: View?, parent: ViewGroup, result: LiveTask<*>) {
         stateLayout?.let {
             it.apply {
-                if ((result.result() as Result.Error).exception is CancellationException) {
+                if ((result.result() as LiveTaskResult.Error).exception is CancellationException) {
                     startAnimation(AnimationUtils.loadAnimation(context, R.anim.fade_out))
                     tag = null
                     parent.removeView(it)

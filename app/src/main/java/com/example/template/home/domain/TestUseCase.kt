@@ -11,9 +11,7 @@ class TestUseCase @Inject constructor(
     private val homeRepository: HomeRepository,
     @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher
 ) : LiveTaskUseCase<Int, UserRes>(coroutineDispatcher) {
-
     override suspend fun execute(params: Int): UserRes {
         return homeRepository.getUsers(params)
     }
-
 }

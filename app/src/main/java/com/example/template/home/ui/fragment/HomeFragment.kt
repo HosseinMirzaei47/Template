@@ -20,7 +20,7 @@ class HomeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentHomeBinding.inflate(
             inflater, container, false
@@ -44,7 +44,6 @@ class HomeFragment : Fragment() {
         binding.submit.setOnClickListener {
             viewModel.combinedTasks.run()
         }
-
 
     }
 

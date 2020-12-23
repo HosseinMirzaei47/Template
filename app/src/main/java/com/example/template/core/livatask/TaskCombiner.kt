@@ -1,5 +1,6 @@
 package com.example.template.core.livatask
 
+import com.example.template.core.LiveTaskResult
 import com.example.template.core.util.NoConnectionException
 import com.example.template.core.util.ServerException
 import kotlinx.coroutines.*
@@ -28,11 +29,11 @@ class TaskCombiner(
             printStats()
 
             when (val result = liveTask.result()) {
-                is com.example.template.core.Result.Success -> {
+                is com.example.template.core.LiveTaskResult.Success -> {
                     checkIsThereAnyUnSuccess()
                 }
-                is com.example.template.core.Result.Error -> {
-                    if (this.value?.result() !is com.example.template.core.Result.Error) {
+                is com.example.template.core.LiveTaskResult.Error -> {
+                    if (this.value?.result() !is com.example.template.core.LiveTaskResult.Error && result.exception !is CancellationException) {
                         val isNotAuthorized = (result.exception is ServerException &&
                                 result.exception.meta.statusCode == 401) ||
                                 (result.exception is HttpException &&
@@ -49,20 +50,22 @@ class TaskCombiner(
                                 }
                             }
                         }
+                    } else {
+                        checkIsThereAnyUnSuccess()
                     }
                 }
-                is com.example.template.core.Result.Loading -> {
+                is com.example.template.core.LiveTaskResult.Loading -> {
                     when (this.value?.result()) {
-                        is com.example.template.core.Result.Error -> {
+                        is com.example.template.core.LiveTaskResult.Error -> {
                             setLoadingIfNoErrorLeft()
                         }
-                        is com.example.template.core.Result.Success<*> -> {
-                            applyResult(com.example.template.core.Result.Loading)
+                        is com.example.template.core.LiveTaskResult.Success<*> -> {
+                            applyResult(com.example.template.core.LiveTaskResult.Loading)
                         }
-                        is com.example.template.core.Result.Loading -> {
+                        is com.example.template.core.LiveTaskResult.Loading -> {
                         }
                         else -> {
-                            applyResult(com.example.template.core.Result.Loading)
+                            applyResult(com.example.template.core.LiveTaskResult.Loading)
                         }
                     }
                 }
@@ -72,23 +75,23 @@ class TaskCombiner(
 
     private fun setLoadingIfNoErrorLeft() {
         val hasError = taskList.any {
-            it.result() is com.example.template.core.Result.Error
+            it.result() is com.example.template.core.LiveTaskResult.Error && (it.result() as LiveTaskResult.Error).exception !is CancellationException
         }
         if (!hasError) {
-            applyResult(com.example.template.core.Result.Loading)
+            applyResult(com.example.template.core.LiveTaskResult.Loading)
         }
     }
 
     private fun checkIsThereAnyUnSuccess() {
         val anyRequestLeft = taskList.any {
-            it.result() is com.example.template.core.Result.Loading || it.result() is com.example.template.core.Result.Error
+            it.result() is com.example.template.core.LiveTaskResult.Loading || (it.result() is com.example.template.core.LiveTaskResult.Error && (it.result() as LiveTaskResult.Error).exception !is CancellationException)
         }
         if (!anyRequestLeft) {
-            applyResult(com.example.template.core.Result.Success(Any()))
+            applyResult(com.example.template.core.LiveTaskResult.Success(Any()))
         } else {
-            if (this.value?.result() is com.example.template.core.Result.Loading) {
+            if (this.value?.result() is com.example.template.core.LiveTaskResult.Loading) {
                 val oneOfErrors = taskList.find { coroutineLiveTask ->
-                    coroutineLiveTask.result() is com.example.template.core.Result.Error
+                    coroutineLiveTask.result() is com.example.template.core.LiveTaskResult.Error && (coroutineLiveTask.result() as LiveTaskResult.Error).exception !is CancellationException
                 }
                 oneOfErrors?.let {
                     applyResult(it)
@@ -97,30 +100,10 @@ class TaskCombiner(
         }
     }
 
-    private fun printStats() {
-        var successes = 0
-        var failed = 0
-        var loading = 0
-        taskList.forEach { coroutineLiveTask ->
-            when (coroutineLiveTask.result()) {
-                is com.example.template.core.Result.Success -> {
-                    successes++
-                }
-                is com.example.template.core.Result.Error -> {
-                    failed++
-                }
-                com.example.template.core.Result.Loading -> {
-                    loading++
-                }
-            }
-        }
-        println("mmb successful: $successes failed :$failed loading :$loading all requests: ${taskList.size}")
-    }
-
     override fun retry() {
-        applyResult(com.example.template.core.Result.Loading)
+        applyResult(com.example.template.core.LiveTaskResult.Loading)
         val listOfUnSuccesses = taskList.filter { coroutineLiveTask ->
-            coroutineLiveTask.result() is com.example.template.core.Result.Error
+            coroutineLiveTask.result() is com.example.template.core.LiveTaskResult.Error && (coroutineLiveTask.result() as LiveTaskResult.Error).exception !is CancellationException
         }
         listOfUnSuccesses.forEach { coroutineLiveTask ->
             coroutineLiveTask.retry()
@@ -148,7 +131,7 @@ class TaskCombiner(
 
     override fun cancel() {
         val listOfUnLoading = taskList.filter { coroutineLiveTask ->
-            coroutineLiveTask.result() is com.example.template.core.Result.Loading
+            coroutineLiveTask.result() is com.example.template.core.LiveTaskResult.Loading
         }
 
         listOfUnLoading.forEach { coroutineLiveTask ->
@@ -156,13 +139,33 @@ class TaskCombiner(
         }
     }
 
-    private fun applyResult(result: com.example.template.core.Result<Any>?) {
+    private fun applyResult(result: com.example.template.core.LiveTaskResult<Any>?) {
         this.latestState = result
         postValue(this)
     }
 
     private fun applyResult(task: LiveTask<*>) {
-        this.latestState = task.result() as com.example.template.core.Result<Any>?
+        this.latestState = task.result() as com.example.template.core.LiveTaskResult<Any>?
         postValue(this)
+    }
+
+    private fun printStats() {
+        var successes = 0
+        var failed = 0
+        var loading = 0
+        taskList.forEach { coroutineLiveTask ->
+            when (coroutineLiveTask.result()) {
+                is com.example.template.core.LiveTaskResult.Success -> {
+                    successes++
+                }
+                is com.example.template.core.LiveTaskResult.Error -> {
+                    failed++
+                }
+                com.example.template.core.LiveTaskResult.Loading -> {
+                    loading++
+                }
+            }
+        }
+        println("mmb successful: $successes failed :$failed loading :$loading all requests: ${taskList.size}")
     }
 }

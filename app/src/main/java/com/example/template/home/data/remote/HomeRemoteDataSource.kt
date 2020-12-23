@@ -1,5 +1,6 @@
 package com.example.template.home.data.remote
 
+import androidx.lifecycle.LiveData
 import com.example.template.home.data.servicemodels.Article
 import com.example.template.home.data.servicemodels.Comment
 import com.example.template.home.data.servicemodels.UserRes
@@ -9,7 +10,7 @@ import javax.inject.Inject
 class HomeRemoteDataSource @Inject constructor(
     private val userDataSource: UserDataSource,
     private val articleDataSource: ArticleDataSource,
-    private val commentDataSource: CommentDataSource
+    private val commentDataSource: CommentDataSource,
 ) {
     suspend fun getUsers(page: Int): UserRes = userDataSource.getUsers(page)
 
@@ -21,7 +22,7 @@ class HomeRemoteDataSource @Inject constructor(
     suspend fun getComments(articleId: String): List<Comment> =
         commentDataSource.getComments(articleId)
 
-
-    fun getUsersLiveData(page: Int) =
-        userDataSource.getUsersLiveData(page)
+    fun getUsersLiveData(page: Int): LiveData<UserRes> {
+        return userDataSource.getUsersLiveData(page)
+    }
 }
