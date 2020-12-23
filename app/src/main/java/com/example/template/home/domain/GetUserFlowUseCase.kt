@@ -7,7 +7,6 @@ import com.example.template.home.data.servicemodels.UserRes
 import kotlinx.coroutines.CoroutineDispatcher
 import javax.inject.Inject
 
-
 class GetUserFlowUseCase @Inject constructor(
     private val homeRepository: HomeRepository,
     @IoDispatcher private val coroutineDispatcher: CoroutineDispatcher

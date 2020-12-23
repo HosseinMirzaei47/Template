@@ -14,5 +14,4 @@ class GetUserUseCase @Inject constructor(
     override suspend fun execute(parameters: Int): UserRes {
         return homeRepository.getUsers(parameters)
     }
-
 }

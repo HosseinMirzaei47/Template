@@ -13,5 +13,4 @@ class GetArticleUseCase @Inject constructor(
 ) : CoroutineUseCase<Int, List<Article>>(coroutineDispatcher) {
     override suspend fun execute(parameters: Int): List<Article> =
         homeRepository.getArticles(parameters)
-
 }
