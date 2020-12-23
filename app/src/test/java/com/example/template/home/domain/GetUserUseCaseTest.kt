@@ -1,7 +1,7 @@
 package com.example.template.home.domain
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.template.core.Result
+import com.example.template.core.LiveTaskResult
 import com.example.template.home.data.repository.HomeRepository
 import com.example.template.home.data.servicemodels.Ad
 import com.example.template.home.data.servicemodels.Data
@@ -49,7 +49,7 @@ class GetUserUseCaseTest {
         )
         coEvery { homeRepository.getUsers(10) } returns userRes
         val userData = getUserUseCase(10)
-        assertTrue((userData as Result.Success).data.data.size == 2)
+        assertTrue((userData as LiveTaskResult.Success).data.data.size == 2)
 
 
     }

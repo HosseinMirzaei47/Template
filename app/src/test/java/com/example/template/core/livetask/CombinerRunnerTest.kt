@@ -1,7 +1,7 @@
 package com.example.template.core.livetask
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.template.core.Result
+import com.example.template.core.LiveTaskResult
 import com.example.template.core.livatask.CombineRunner
 import com.example.template.core.livatask.CombinerBuilder
 import com.example.template.core.livatask.TaskCombiner
@@ -20,14 +20,14 @@ class CombinerRunnerTest {
     private lateinit var taskCombiner: TaskCombiner
 
     private val liveTask1 = liveTask {
-        emit(Result.Success("ok"))
+        emit(LiveTaskResult.Success("ok"))
     }
     val block1: suspend CombinerBuilder.() -> Unit = {}
 
 
     @Before
     fun setup() {
-        taskCombiner = TaskCombiner(liveTask1)
+        taskCombiner = TaskCombiner(liveTask1) {}
         combinerRunner = CombineRunner(taskCombiner, block1, 100L, GlobalScope) {
             println("do something")
         }

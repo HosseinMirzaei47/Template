@@ -64,8 +64,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constrant3"
-            bind:reactToTask="@{vm.user4.asLiveData()}"
-            bind:type="@{type.BOUNCING}">
+         >
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

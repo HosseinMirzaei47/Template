@@ -1,7 +1,7 @@
 package com.example.template.core.livetask
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.template.core.Result
+import com.example.template.core.LiveTaskResult
 import com.example.template.core.livatask.CoroutineLiveTask
 import com.example.template.core.livatask.LiveTaskBuilderImpl
 import com.example.template.core.livatask.liveTask
@@ -21,10 +21,10 @@ class LiveTaskBuilderImplTest {
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
-    lateinit var liveTaskBuilderImpl: LiveTaskBuilderImpl<*>
+    private lateinit var liveTaskBuilderImpl: LiveTaskBuilderImpl<*>
 
     private val target = liveTask {
-        emit(Result.Success("ok"))
+        emit(LiveTaskResult.Success("ok"))
     }
 
 
@@ -37,16 +37,17 @@ class LiveTaskBuilderImplTest {
 
     @Test
     fun `test last value _ it must be equal with Result Success "ok"`() {
-        assertEquals("ok", (liveTaskBuilderImpl.latestValue as Result.Success).data)
+
+        assertEquals("ok", (liveTaskBuilderImpl.latestValue as LiveTaskResult.Success).data)
     }
 
     @Test
     fun `test emit `() = runBlockingTest {
-        liveTaskBuilderImpl.emit(Result.Error(Exception("network error")))
+        liveTaskBuilderImpl.emit(LiveTaskResult.Error(Exception("network error")))
 
         assertEquals(
             "network error",
-            (liveTaskBuilderImpl.latestValue as Result.Error).exception.message
+            (liveTaskBuilderImpl.latestValue as LiveTaskResult.Error).exception.message
         )
     }
 

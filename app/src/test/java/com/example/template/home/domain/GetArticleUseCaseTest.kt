@@ -1,7 +1,7 @@
 package com.example.template.home.domain
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.template.core.Result
+import com.example.template.core.LiveTaskResult
 import com.example.template.home.data.repository.HomeRepository
 import com.example.template.home.data.servicemodels.Article
 import com.example.template.testutils.MainCoroutineRule
@@ -43,7 +43,7 @@ class GetArticleUseCaseTest {
         )
         coEvery { homeRepository.getArticles(1) } returns articlesList
         val articlesData = getArticleUseCase(1)
-        Assert.assertTrue((articlesData as Result.Success).data.size == 5)
+        Assert.assertTrue((articlesData as LiveTaskResult.Success).data.size == 5)
 
 
     }

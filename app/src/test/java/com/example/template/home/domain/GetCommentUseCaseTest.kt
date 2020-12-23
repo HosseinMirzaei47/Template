@@ -1,7 +1,7 @@
 package com.example.template.home.domain
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import com.example.template.core.Result
+import com.example.template.core.LiveTaskResult
 import com.example.template.home.data.repository.HomeRepository
 import com.example.template.home.data.servicemodels.Comment
 import com.example.template.testutils.MainCoroutineRule
@@ -41,7 +41,7 @@ class GetCommentUseCaseTest {
         )
         coEvery { homeRepository.getComments("1") } returns commentsList
         val commentData = getCommentUseCase("1")
-        assertTrue((commentData as Result.Success).data.size == 3)
+        assertTrue((commentData as LiveTaskResult.Success).data.size == 3)
 
 
     }

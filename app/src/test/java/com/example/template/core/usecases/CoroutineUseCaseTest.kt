@@ -1,6 +1,6 @@
 package com.example.template.core.usecases
 
-import com.example.template.core.Result
+import com.example.template.core.LiveTaskResult
 import com.example.template.testutils.MainCoroutineRule
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.runBlocking
@@ -30,7 +30,7 @@ class CoroutineUseCaseTest {
     fun `exception emits Result#Error`() = runBlocking {
 
         val result = exceptionUseCase(Unit)
-        assertThat(result, CoreMatchers.instanceOf(Result.Error::class.java))
+        assertThat(result, CoreMatchers.instanceOf(LiveTaskResult.Error::class.java))
     }
 
     class ExceptionUseCase(dispatcher: CoroutineDispatcher) :

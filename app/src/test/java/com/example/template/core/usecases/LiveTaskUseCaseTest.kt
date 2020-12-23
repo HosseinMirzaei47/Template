@@ -1,6 +1,6 @@
 package com.example.template.core.usecases
 
-import com.example.template.core.Result
+import com.example.template.core.LiveTaskResult
 import com.example.template.testutils.MainCoroutineRule
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -33,7 +33,10 @@ class LiveTaskUseCaseTest {
 
         val result = exceptionUseCase.asLiveTask(Unit).run()
         delay(100L)
-        Assert.assertThat(result.result(), CoreMatchers.instanceOf(Result.Error::class.java))
+        Assert.assertThat(
+            result.result(),
+            CoreMatchers.instanceOf(LiveTaskResult.Error::class.java)
+        )
     }
 
     class ExceptionUseCase(dispatcher: CoroutineDispatcher) :

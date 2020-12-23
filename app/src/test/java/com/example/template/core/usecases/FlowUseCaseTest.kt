@@ -1,6 +1,6 @@
 package com.example.template.core.usecases
 
-import com.example.template.core.Result
+import com.example.template.core.LiveTaskResult
 import com.example.template.core.livatask.liveTask
 import com.example.template.testutils.MainCoroutineRule
 import kotlinx.coroutines.CoroutineDispatcher
@@ -41,7 +41,7 @@ class FlowUseCaseTest {
         delay(200L)
         val result = test.result()
 
-        assertThat(result, CoreMatchers.instanceOf(Result.Error::class.java))
+        assertThat(result, CoreMatchers.instanceOf(LiveTaskResult.Error::class.java))
 
     }
 

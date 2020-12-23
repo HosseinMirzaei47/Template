@@ -229,4 +229,7 @@ dependencies {
     implementation 'com.ms-square:etsyblur:0.2.1'
     implementation 'at.favre.lib:dali:0.4.0'
 
+    //mockK
+    testImplementation "io.mockk:mockk:1.10.2"
+
 }
