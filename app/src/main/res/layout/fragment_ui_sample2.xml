@@ -51,18 +51,28 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:layout_marginTop="4dp"
             android:id="@+id/city_recycler"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
             android:orientation="vertical"
             android:scrollbars="vertical"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintTop_toBottomOf="@id/province_et"
             app:layout_constraintLeft_toRightOf="@id/ui_sample_gl_1"
             app:layout_constraintRight_toLeftOf="@id/ui_sample_gl_2"
+            app:layout_constraintTop_toBottomOf="@id/province_et"
             app:reverseLayout="false"
             tools:listitem="@layout/city_list_item" />
+
+        <ProgressBar
+            android:id="@+id/pb"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginTop="4dp"
+            android:visibility="gone"
+            app:layout_constraintLeft_toRightOf="@id/ui_sample_gl_1"
+            app:layout_constraintRight_toLeftOf="@id/ui_sample_gl_2"
+            app:layout_constraintTop_toBottomOf="@id/city_recycler" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

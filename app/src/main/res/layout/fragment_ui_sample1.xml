@@ -12,7 +12,7 @@
 
         <variable
             name="type"
-            type="com.example.template.core.bindingadapter.Type" />
+            type="com.example.template.core.bindingadapter.ProgressType" />
 
     </data>
 
@@ -50,7 +50,7 @@
             app:layout_constraintRight_toLeftOf="@id/ui_sample_gl_2"
             app:layout_constraintTop_toBottomOf="@id/ui_sample_gl_3"
             bind:reactToTask="@{vm.cityList.asLiveData()}"
-            bind:type="@{type.SANDY_CLOCK}" />
+            bind:type="@{type.BLUR_CIRCULAR}" />
 
         <Spinner
             android:id="@+id/region_sp"
@@ -61,7 +61,7 @@
             app:layout_constraintRight_toLeftOf="@id/ui_sample_gl_2"
             app:layout_constraintTop_toBottomOf="@id/city_sp"
             bind:reactToTask="@{vm.regionList.asLiveData()}"
-            bind:type="@{type.SANDY_CLOCK}" />
+            bind:type="@{type.BLUR_CIRCULAR}" />
 
         <TextView
             android:id="@+id/code_tv"
@@ -75,7 +75,7 @@
             app:layout_constraintRight_toLeftOf="@id/ui_sample_gl_2"
             app:layout_constraintTop_toBottomOf="@id/region_sp"
             bind:reactToTask="@{vm.regionCode.asLiveData()}"
-            bind:type="@{type.SANDY_CLOCK}" />
+            bind:type="@{type.BLUR_CIRCULAR}" />
 
         <Button
             android:id="@+id/submit_btn"

@@ -19,7 +19,7 @@
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/progressBar_blur_circular"
-            style="@style/loading_white"
+            style="@style/loading"
             android:layout_width="32dp"
             android:layout_height="32dp"
             android:layout_marginStart="4dp"
@@ -43,7 +43,7 @@
 
             <ImageView
                 android:id="@+id/iv_retry_blur_circular"
-                style="@style/btn_retry_end"
+                style="@style/btn_retry"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:contentDescription="@string/tv_retry"
@@ -61,7 +61,7 @@
 
     <ImageView
         android:id="@+id/ivBtn_close_blur_circular"
-        style="@style/close_white"
+        style="@style/close"
         android:layout_width="12dp"
         android:layout_height="12dp"
         android:contentDescription="@string/tv_close"
