@@ -13,5 +13,4 @@ class GetCommentUseCase @Inject constructor(
 ) : CoroutineUseCase<String, List<Comment>>(coroutineDispatcher) {
     override suspend fun execute(parameters: String): List<Comment> =
         homeRepository.getComments(parameters)
-
 }

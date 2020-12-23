@@ -6,13 +6,8 @@ import androidx.lifecycle.MutableLiveData
 object Logger : MediatorLiveData<ErrorEvent>() {
 
     var errorEvent = MutableLiveData<ErrorEvent>()
-
     var lastShownErrorTime = 1L
     var lastErrorEvent = Exception("ali")
-
-    init {
-
-    }
 
     fun testFun(): Boolean {
         var flag = false

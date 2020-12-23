@@ -12,7 +12,6 @@ abstract class FlowUseCase<in P, R>(@IoDispatcher private val coroutineDispatche
         execute(parameters)
             .flowOn(coroutineDispatcher)
 
-
     private var parameter: P? = null
 
     private val task: LiveTask<R> by lazy {
@@ -23,7 +22,7 @@ abstract class FlowUseCase<in P, R>(@IoDispatcher private val coroutineDispatche
 
     abstract suspend fun execute(params: P): Flow<R>
 
-    fun setParams(parameter: P) {
+    private fun setParams(parameter: P) {
         this.parameter = parameter
     }
 

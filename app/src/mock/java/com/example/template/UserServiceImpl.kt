@@ -10,6 +10,7 @@ import com.example.template.home.data.servicemodels.UserRes
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlin.random.Random
 
 
 class UserServiceImpl(private val api: HomeApi) : UserDataSource {
@@ -64,21 +65,37 @@ class UserServiceImpl(private val api: HomeApi) : UserDataSource {
     }
 
     override suspend fun getUsers(page: Int): UserRes {
-        delay(3000)
-        return returnResponse(false)
+        delay(Random.nextLong(1000, 4000))
+        return if (Random.nextBoolean()) {
+            returnResponse(true)
+
+        } else {
+            println("mmb error getusers")
+            returnResponse(false)
+
+        }
     }
 
     override fun getUsersLiveData(page: Int): LiveData<UserRes> = liveData {
-        //for (x in 0..5) {
-        delay(2000)
-        emit(returnSuccessResponse())
-        //  }
+        delay(Random.nextLong(1000, 4000))
+        if (Random.nextBoolean()) {
+            emit(returnSuccessResponse())
+        } else {
+            emit(returnSuccessResponse())
+            println("mmb error getusersLiveData")
+            // emit(returnErrorResponse())
+        }
     }
 
     override suspend fun getUsersFlow(page: Int): Flow<UserRes> {
         return flow {
-            delay(3000)
-            emit(returnResponse(true))
+            delay(Random.nextLong(1000, 4000))
+            if (Random.nextBoolean()) {
+                emit(returnSuccessResponse())
+            } else {
+                println("mmb error getusersFlow")
+                emit(returnErrorResponse())
+            }
         }
     }
 

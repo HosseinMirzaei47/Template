@@ -11,4 +11,7 @@
     <string name="notification_ui_sample">notification ui sample</string>
     <string name="text_watcher_ui_sample">text watcher ui sample</string>
     <string name="spinner_ui_sample">spinner ui sample</string>
+    <string name="loading">Loading</string>
+    <string name="click_to_retry">Click to retry</string>
+    <string name="todo">todo</string>
 </resources>
