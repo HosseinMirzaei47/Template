@@ -2,12 +2,15 @@ package com.example.template.home.data.remote
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.filters.SmallTest
+import com.example.template.home.data.repository.HomeRepository
 import com.example.template.home.data.servicemodels.Article
 import com.google.common.truth.Truth.assertThat
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runBlockingTest
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -17,6 +20,7 @@ import javax.inject.Inject
 @SmallTest
 @HiltAndroidTest
 class HomeRemoteDataSourceTest {
+
 
     val sampleArticle = Article(
         "1",
@@ -42,6 +46,9 @@ class HomeRemoteDataSourceTest {
     @Inject
     lateinit var commentServiceApi: CommentDataSource
 
+    @Inject
+    lateinit var homeRepository: HomeRepository
+
     @Before
     fun setup() {
         hiltRule.inject()
@@ -50,13 +57,13 @@ class HomeRemoteDataSourceTest {
     @Test
     fun getUserListFromMockFakeDataSource_iteSizeMustBeEqualToThree() = runBlockingTest {
         val result = userServiceApi.getUsers(1)
-        assert(result.data.size == 3)
+        assertTrue(result.data.size == 3)
     }
 
     @Test
     fun getArticlesFromMockDataSource_iteSizeMustBeEqualToSeventeen() = runBlockingTest {
         val result = articleServiceApi.getArticle(1)
-        assertThat(result.size != 17).isFalse()
+        assertFalse(result.size != 17)
     }
 
     @Test
@@ -68,6 +75,9 @@ class HomeRemoteDataSourceTest {
     @Test
     fun getCommentsFromMockDataSource_mustBeEqualToFifteen() = runBlockingTest {
         val result = commentServiceApi.getComments("")
-        assert(result.size == 15)
+        assertTrue(result.size == 15)
     }
+
 }
+
+

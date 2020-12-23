@@ -11,9 +11,11 @@ import android.net.Network
 import android.net.NetworkInfo
 import android.net.NetworkRequest
 import android.os.Build
-import androidx.lifecycle.LiveData
+import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.PRIVATE
+import androidx.lifecycle.MutableLiveData
 
-class ConnectionLiveData(private val context: Context) : LiveData<Boolean>() {
+class ConnectionLiveData(private val context: Context) : MutableLiveData<Boolean>() {
 
     private var connectivityManager: ConnectivityManager =
         context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -59,7 +61,8 @@ class ConnectionLiveData(private val context: Context) : LiveData<Boolean>() {
         )
     }
 
-    private fun getConnectivityManagerCallback(): ConnectivityManager.NetworkCallback {
+    @VisibleForTesting(otherwise = PRIVATE)
+    fun getConnectivityManagerCallback(): ConnectivityManager.NetworkCallback {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 
             connectivityManagerCallback = object : ConnectivityManager.NetworkCallback() {

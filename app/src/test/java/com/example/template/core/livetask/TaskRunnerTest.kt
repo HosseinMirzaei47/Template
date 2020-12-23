@@ -6,9 +6,9 @@ import com.example.template.core.livatask.CoroutineLiveTask
 import com.example.template.core.livatask.LiveTaskBuilder
 import com.example.template.core.livatask.TaskRunner
 import com.example.template.core.livatask.liveTask
-import com.example.template.core.util.getOrAwaitValue
-import com.google.common.truth.Truth.assertThat
+import com.example.template.testutils.getOrAwaitValue
 import kotlinx.coroutines.*
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -18,11 +18,11 @@ class TaskRunnerTest {
     @get:Rule
     var instantExecutorRule = InstantTaskExecutorRule()
 
-    lateinit var taskRunner1: TaskRunner<*>
-    lateinit var taskRunner2: TaskRunner<*>
+    private lateinit var taskRunner1: TaskRunner<*>
+    private lateinit var taskRunner2: TaskRunner<*>
 
-    val block1: suspend LiveTaskBuilder<*>.() -> Unit = {}
-    val block2: suspend LiveTaskBuilder<*>.() -> Unit = {}
+    private val block1: suspend LiveTaskBuilder<*>.() -> Unit = {}
+    private val block2: suspend LiveTaskBuilder<*>.() -> Unit = {}
 
     private val liveTask1 = liveTask {
         emit(Result.Error(Exception("some error happened")))
@@ -34,21 +34,17 @@ class TaskRunnerTest {
     @Before
     fun setup() {
 
-
         runBlocking {
             taskRunner1 = TaskRunner(
                 liveTask1 as CoroutineLiveTask, block1, 100L, GlobalScope
-
             ) {
                 println("maybeRun method works fine!")
             }
 
             taskRunner2 = TaskRunner(
                 liveTask2 as CoroutineLiveTask, block2, 100L, GlobalScope
-
             ) {
             }
-
 
         }
 
@@ -67,10 +63,10 @@ class TaskRunnerTest {
             taskRunner2.cancel()
             delay(200L)
         }
-        assertThat(
+        Assert.assertTrue(
             (liveTask2.asLiveData().getOrAwaitValue()
                 .result() as Result.Error).exception is CancellationException
-        ).isTrue()
+        )
     }
 
 }

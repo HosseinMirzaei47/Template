@@ -12,7 +12,7 @@ import org.junit.Before
 import org.junit.Test
 import retrofit2.Retrofit
 
-class NetworkModuleTest {
+class RetrofitModuleTest {
 
     private lateinit var retrofitModule: RetrofitModule
 
@@ -31,7 +31,6 @@ class NetworkModuleTest {
     fun `verify Provided Http Client`() {
         val interceptor = mockk<HttpLoggingInterceptor>()
         val httpClient = retrofitModule.provideOkHttpClient(interceptor)
-
 
         assertEquals(1, httpClient.interceptors.size)
         assertEquals(2, httpClient.networkInterceptors.size)

@@ -5,10 +5,9 @@ import com.example.template.core.Result
 import com.example.template.core.livatask.CombinerBuilderImpl
 import com.example.template.core.livatask.TaskCombiner
 import com.example.template.core.livatask.liveTask
-import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.runBlockingTest
+import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,13 +32,19 @@ class CombinerBuilderImplTest {
             cancelable(false)
             retryable(false)
         }
-        delay(300L)
         combinerBuilderImpl = CombinerBuilderImpl(taskCombiner)
         taskCombiner.run()
-
-        delay(100L)
     }
 
+    @Test
+    fun `test cancellation_default value is true `() {
+        assertFalse(taskCombiner.cancelable)
+    }
+
+    @Test
+    fun `test retryable_ default value is true `() {
+        assertFalse(taskCombiner.retryable)
+    }
 
     /* @Test
      fun `test last value _ it must be equal with Result Success "ok"`() {
@@ -49,15 +54,5 @@ class CombinerBuilderImplTest {
          }
          assertThat((combinerBuilderImpl.latestValue as Result.Success).data).isEqualTo("ok")
      }*/
-
-    @Test
-    fun `test cancellation_default value is true `() {
-        assertThat(taskCombiner.cancelable).isFalse()
-    }
-
-    @Test
-    fun `test retryable_ default value is true `() {
-        assertThat(taskCombiner.retryable).isFalse()
-    }
 
 }

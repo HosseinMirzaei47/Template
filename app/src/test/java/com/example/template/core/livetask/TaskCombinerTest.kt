@@ -5,11 +5,12 @@ import com.example.template.core.Result
 import com.example.template.core.livatask.CoroutineLiveTask
 import com.example.template.core.livatask.TaskCombiner
 import com.example.template.core.livatask.liveTask
-import com.example.template.core.util.getOrAwaitValue
-import com.google.common.truth.Truth.assertThat
+import com.example.template.testutils.getOrAwaitValue
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -38,12 +39,11 @@ class TaskCombinerTest {
         emit(Result.Success(785))
     }
     private val liveData6 = liveTask {
-        emit(Result.Success(564))
+        emit(Result.Success(67))
     }
     private val liveData7 = liveTask {
         emit(Result.Success(9))
     }
-
 
 
     @Before
@@ -55,7 +55,6 @@ class TaskCombinerTest {
             liveData4,
             liveData5,
             liveData6
-
         )
     }
 
@@ -63,9 +62,9 @@ class TaskCombinerTest {
     fun `task combiner test`() {
         runBlocking {
             taskCombiner.run()
-            delay(100)
+            delay(200)
             val result = taskCombiner.getOrAwaitValue().result()
-            assertThat(result is Result.Success).isTrue()
+            assertTrue(result is Result.Success)
         }
     }
 
@@ -75,7 +74,7 @@ class TaskCombinerTest {
         runBlocking {
             delay(100L)
         }
-        assertThat(result.result() is Result.Success).isTrue()
+        assertTrue(result.result() is Result.Success)
     }
 
     @Test
@@ -85,10 +84,10 @@ class TaskCombinerTest {
         runBlocking {
             taskCombiner.cancel()
             delay(100L)
-            assertThat(
+            assertTrue(
                 (taskCombiner.getOrAwaitValue()
                     .result() as Result.Error).exception is CancellationException
-            ).isTrue()
+            )
 
         }
     }
@@ -98,7 +97,7 @@ class TaskCombinerTest {
         (liveData1 as CoroutineLiveTask).latestState =
             Result.Error(Exception("some error happened"))
 
-        assertThat((liveData1.result() as Result.Error).exception.message).isEqualTo("some error happened")
+        assertEquals("some error happened", (liveData1.result() as Result.Error).exception.message)
     }
 
 

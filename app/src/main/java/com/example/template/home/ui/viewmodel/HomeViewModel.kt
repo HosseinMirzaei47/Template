@@ -15,6 +15,9 @@ class HomeViewModel @ViewModelInject constructor(
 ) : ViewModel() {
 
 
+    init {
+    }
+
     // حالت سینتکس قبلی با قابلیت emit های چندگانه
     val user1 = liveTask {
         emit(useCase(1))
@@ -26,10 +29,13 @@ class HomeViewModel @ViewModelInject constructor(
     // حالت استفاده ی معمولی به صورت سینتکس جدید
     val user3 = testUseCase.asLiveTask(5)
 
+    val combinedTasks = combinedTask(user1, user2, user3)
 
-    val combinedTasks = combinedTask(user1, user2, user3) {
-
+    val articles = liveTask {
+        emit(articleUseCase(1))
     }
 
-
+    val comments = liveTask {
+        emit(commentUseCase("1"))
+    }
 }

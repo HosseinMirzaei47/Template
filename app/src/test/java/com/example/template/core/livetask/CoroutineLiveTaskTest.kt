@@ -4,9 +4,10 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.example.template.core.Result
 import com.example.template.core.livatask.CoroutineLiveTask
 import com.example.template.core.livatask.liveTask
-import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -23,7 +24,6 @@ class CoroutineLiveTaskTest {
         emit(Result.Loading)
     }
     private val liveData2 = liveTask {
-        delay(4_000L)
         emit(Result.Success("abc"))
     }
 
@@ -39,7 +39,7 @@ class CoroutineLiveTaskTest {
     @Test
     fun `test emit loading to live task`() {
         liveData1.run()
-        assertThat(liveData1.asLiveData().value?.result() is Result.Loading).isTrue()
+        assertTrue(liveData1.asLiveData().value?.result() is Result.Loading)
     }
 
     @Test
@@ -49,7 +49,7 @@ class CoroutineLiveTaskTest {
         //if runBlocking changes to runBlockingTest error happened why?!
         runBlocking {
             delay(150)
-            assertThat((liveData2.result() as Result.Error).exception is CancellationException).isTrue()
+            assertTrue((liveData2.result() as Result.Error).exception is CancellationException)
         }
     }
 
@@ -58,7 +58,7 @@ class CoroutineLiveTaskTest {
         (liveData3 as CoroutineLiveTask).latestState =
             Result.Error(Exception("some error happened"))
 
-        assertThat((liveData3.result() as Result.Error).exception.message).isEqualTo("some error happened")
+        assertEquals("some error happened", (liveData3.result() as Result.Error).exception.message)
     }
 
 }

@@ -19,8 +19,6 @@ class LoggerTest {
 //        Logger.lastErrorEvent = Exception("ali")
         Logger.errorEvent.postValue(ErrorEvent((Exception("alii"))))
         assertThat(Logger.testFun()).isTrue()
-
-
     }
 
 }
