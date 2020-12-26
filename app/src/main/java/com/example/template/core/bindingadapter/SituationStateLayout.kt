@@ -118,7 +118,7 @@ class SituationFactory() {
             ProgressType.CIRCULAR -> R.layout.loading_circular
             ProgressType.BOUNCING -> R.layout.loading_bouncing
             ProgressType.BLUR_CIRCULAR -> R.layout.loading_blur_circular
-            null -> TODO() // do nothing
+            else -> R.layout.loading_sandy_clock
         }
         Log.d("layout", "reactToTask: $loadingLayout")
         val situation = createSituation(view, loadingLayout).execute()

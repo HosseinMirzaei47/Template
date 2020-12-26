@@ -23,7 +23,7 @@ enum class Theme {
     DARK, LIGHT
 }
 
-fun ProgressType.loading() =
+fun ProgressType?.loading() =
     when (this) {
         ProgressType.INDICATOR -> IndicatorLoading()
         ProgressType.SANDY_CLOCK -> SandyClockLoading()
@@ -31,6 +31,7 @@ fun ProgressType.loading() =
         ProgressType.CIRCULAR -> CircularLoading()
         ProgressType.BOUNCING -> BouncingLoading()
         ProgressType.BLUR_CIRCULAR -> BlurCircularLoading()
+        else -> SandyClockLoading()
     }
 
 interface State {

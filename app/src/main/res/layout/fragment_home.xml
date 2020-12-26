@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-        <!--when bind layout with type, Priority is given to layout-->
+
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constrant1"
             android:layout_width="match_parent"
@@ -29,8 +29,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             bind:reactToTask="@{vm.user1.asLiveData()}"
-            bind:layout="@{@layout/loading_linear}"
-            bind:type="@{type.INDICATOR}">
+            bind:layout="@{@layout/loading_linear}">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -41,8 +40,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constrant1"
-            bind:reactToTask="@{vm.user1.asLiveData()}"
-            bind:type="@{type.SANDY_CLOCK}">
+            bind:reactToTask="@{vm.user1.asLiveData()}">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -53,12 +51,10 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constrant2"
-            bind:reactToTask="@{vm.user1.asLiveData()}"
-            bind:type="@{type.BOUNCING}">
+            bind:reactToTask="@{vm.user1.asLiveData()}">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!--if you bind layout, you should handle loading and error states-->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constrant4"
             android:layout_width="match_parent"
