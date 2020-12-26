@@ -17,7 +17,7 @@ class LoggerTest {
 //        Logger.lastShownErrorTime = 1
 //        println(System.currentTimeMillis() )
 //        Logger.lastErrorEvent = Exception("ali")
-        Logger.errorEvent.postValue(ErrorEvent((Exception("alii"))))
+        Logger.notifyError(ErrorEvent((Exception("alii"))))
         assertThat(Logger.testFun()).isTrue()
 
 

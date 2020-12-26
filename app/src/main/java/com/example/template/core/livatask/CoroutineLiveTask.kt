@@ -1,10 +1,10 @@
 package com.example.template.core.livatask
 
 import androidx.lifecycle.LiveData
+import com.example.template.connection.ConnectionManager
 import com.example.template.core.ErrorEvent
 import com.example.template.core.LiveTaskResult
-import com.example.template.core.Logger
-import com.example.template.core.MyApp.Companion.connectionLiveData
+import com.example.template.core.LoggerInterface
 import com.example.template.core.util.NoConnectionException
 import com.example.template.core.util.ServerException
 import com.example.template.core.withError
@@ -18,6 +18,8 @@ internal const val DEFAULT_TIMEOUT = 100L
 class CoroutineLiveTask<T>(
     private val context: CoroutineContext = EmptyCoroutineContext,
     private val timeoutInMs: Long = DEFAULT_TIMEOUT,
+    private val connectionManager: ConnectionManager,
+    private val logger: LoggerInterface,
     val block: suspend LiveTaskBuilder<T>.() -> Unit = {},
 ) : BaseLiveTask<T>() {
 
@@ -30,7 +32,7 @@ class CoroutineLiveTask<T>(
             val taskResult = it.result()
             if (taskResult is LiveTaskResult.Error) {
                 taskResult.withError { exception ->
-                    Logger.errorEvent.postValue(ErrorEvent((exception)))
+                    logger.notifyError(ErrorEvent((exception)))
 
                     val isNotAuthorized =
                         (exception is ServerException && exception.meta.statusCode == 401) ||
@@ -69,8 +71,8 @@ class CoroutineLiveTask<T>(
     }
 
     private fun retryOnNetworkBack() {
-        this.removeSource(connectionLiveData)
-        this.addSource(connectionLiveData) { hasConnection ->
+        this.removeSource(connectionManager)
+        this.addSource(connectionManager) { hasConnection ->
             if (hasConnection) {
                 retry()
             }
@@ -88,7 +90,7 @@ class CoroutineLiveTask<T>(
     }
 
     override fun retry() {
-        this.removeSource(connectionLiveData)
+        this.removeSource(connectionManager)
         run()
     }
 

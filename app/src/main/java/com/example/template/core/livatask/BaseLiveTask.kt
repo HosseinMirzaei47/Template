@@ -6,7 +6,7 @@ import com.example.template.core.LiveTaskResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-internal const val DEFAULT_RETRY_ATTEMPTS = 1
+internal const val DEFAULT_RETRY_ATTEMPTS = 0
 
 abstract class BaseLiveTask<T> : MediatorLiveData<LiveTask<T>>(), LiveTask<T> {
     var retryCounts = 1

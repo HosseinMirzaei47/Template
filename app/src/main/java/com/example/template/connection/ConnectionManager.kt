@@ -13,7 +13,8 @@ import android.net.NetworkRequest
 import android.os.Build
 import androidx.lifecycle.LiveData
 
-class ConnectionLiveData(private val context: Context) : LiveData<Boolean>() {
+class ConnectionManager(private val context: Context) : LiveData<Boolean>() {
+
 
     private var connectivityManager: ConnectivityManager =
         context.getSystemService(CONNECTIVITY_SERVICE) as ConnectivityManager
@@ -88,6 +89,14 @@ class ConnectionLiveData(private val context: Context) : LiveData<Boolean>() {
     private fun updateConnection() {
         val activeNetwork: NetworkInfo? = connectivityManager.activeNetworkInfo
         postValue(activeNetwork?.isConnected == true)
+    }
+
+    companion object {
+        lateinit var connectionManager: ConnectionManager
+
+        fun initialize(context: Context) {
+            connectionManager = ConnectionManager(context = context)
+        }
     }
 
 }

@@ -1,6 +1,5 @@
 package com.example.template.core.bindingadapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,11 +10,9 @@ import com.example.template.R
 
 interface Situation {
     fun inflateStateLayout(view: ViewGroup, layoutId: Int): View {
-        Log.d("execute", "inflateStateLayout: $view , $layoutId")
         val stateLayout = LayoutInflater.from(view.context)
             .inflate(layoutId, view, false)
         stateLayout.id = View.generateViewId()
-//        stateLayout.translationZ = 10F
         return stateLayout
     }
 
@@ -25,12 +22,9 @@ interface Situation {
 class IsConstrainLayout(private val parent: ConstraintLayout, val view: View, val layout: Int) :
     Situation {
     override fun execute(): Pair<View, Any> {
-        Log.d("execute", "execute: isconstraint")
         if (view.tag == null) {
             val stateLayout = inflateStateLayout(parent, layout)
             setConstraintForStateLayout(stateLayout)
-//            stateLayout.translationZ = 10F
-//            parent.bringChildToFront(stateLayout)
             stateLayout.bringToFront()
             view.tag = stateLayout.id
         }
@@ -66,10 +60,6 @@ class IsConstrainLayout(private val parent: ConstraintLayout, val view: View, va
             view.id,
             ConstraintSet.START
         )
-//        constraintSet.constrainMaxHeight(stateLayout.id, view.layoutParams.height - 10)
-//        constraintSet.constrainHeight(stateLayout.id, view.layoutParams.height - 10)
-//        constraintSet.constrainMinHeight(stateLayout.id, view.layoutParams.height - 10)
-//        constraintSet.constrainDefaultHeight(stateLayout.id, view.layoutParams.height - 10)
         parent.addView(stateLayout)
         constraintSet.applyTo(parent)
     }
@@ -77,7 +67,6 @@ class IsConstrainLayout(private val parent: ConstraintLayout, val view: View, va
 
 class IsNotConstrainLayout(val view: View, val layout: Int) : Situation {
     override fun execute(): Pair<View, Any> {
-        Log.d("execute", "execute: IsNotConstrainLayout")
         val parent = view.parent as ViewGroup
         if (view.tag == null) {
             val stateLayout = inflateStateLayout(parent, layout)
@@ -120,7 +109,6 @@ class SituationFactory() {
             ProgressType.BLUR_CIRCULAR -> R.layout.loading_blur_circular
             else -> R.layout.loading_sandy_clock
         }
-        Log.d("layout", "reactToTask: $loadingLayout")
         val situation = createSituation(view, loadingLayout).execute()
         var stateLayout = situation.first
         if (stateLayout == null) {
