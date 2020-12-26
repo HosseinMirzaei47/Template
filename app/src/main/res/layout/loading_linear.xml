@@ -23,7 +23,7 @@
             android:layout_height="24dp"
             style="@style/loading"
             android:layout_marginTop="2dp"
-            android:layout_marginEnd="100dp"
+            android:layout_marginStart="100dp"
             android:scaleType="centerCrop"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

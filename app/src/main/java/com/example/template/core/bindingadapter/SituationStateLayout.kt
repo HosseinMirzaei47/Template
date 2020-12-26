@@ -11,10 +11,11 @@ import com.example.template.R
 
 interface Situation {
     fun inflateStateLayout(view: ViewGroup, layoutId: Int): View {
+        Log.d("execute", "inflateStateLayout: $view , $layoutId")
         val stateLayout = LayoutInflater.from(view.context)
             .inflate(layoutId, view, false)
         stateLayout.id = View.generateViewId()
-        stateLayout.translationZ = 10F
+//        stateLayout.translationZ = 10F
         return stateLayout
     }
 
@@ -28,8 +29,8 @@ class IsConstrainLayout(private val parent: ConstraintLayout, val view: View, va
         if (view.tag == null) {
             val stateLayout = inflateStateLayout(parent, layout)
             setConstraintForStateLayout(stateLayout)
-            stateLayout.translationZ = 10F
-            parent.bringChildToFront(stateLayout)
+//            stateLayout.translationZ = 10F
+//            parent.bringChildToFront(stateLayout)
             stateLayout.bringToFront()
             view.tag = stateLayout.id
         }
@@ -65,10 +66,10 @@ class IsConstrainLayout(private val parent: ConstraintLayout, val view: View, va
             view.id,
             ConstraintSet.START
         )
-        constraintSet.constrainMaxHeight(stateLayout.id, view.layoutParams.height - 10)
-        constraintSet.constrainHeight(stateLayout.id, view.layoutParams.height - 10)
-        constraintSet.constrainMinHeight(stateLayout.id, view.layoutParams.height - 10)
-        constraintSet.constrainDefaultHeight(stateLayout.id, view.layoutParams.height - 10)
+//        constraintSet.constrainMaxHeight(stateLayout.id, view.layoutParams.height - 10)
+//        constraintSet.constrainHeight(stateLayout.id, view.layoutParams.height - 10)
+//        constraintSet.constrainMinHeight(stateLayout.id, view.layoutParams.height - 10)
+//        constraintSet.constrainDefaultHeight(stateLayout.id, view.layoutParams.height - 10)
         parent.addView(stateLayout)
         constraintSet.applyTo(parent)
     }
@@ -107,16 +108,19 @@ class SituationFactory() {
 
     fun executeState(
         view: View,
-        progressType: ProgressType,
+        progressType: ProgressType?,
+        layout: Int?,
     ): Pair<View, Any> {
-        val loadingLayout: Int = when (progressType) {
+        val loadingLayout: Int = layout ?: when (progressType) {
             ProgressType.INDICATOR -> R.layout.loading_indicator
             ProgressType.SANDY_CLOCK -> R.layout.loading_sandy_clock
             ProgressType.LINEAR -> R.layout.loading_linear
             ProgressType.CIRCULAR -> R.layout.loading_circular
             ProgressType.BOUNCING -> R.layout.loading_bouncing
             ProgressType.BLUR_CIRCULAR -> R.layout.loading_blur_circular
+            null -> TODO() // do nothing
         }
+        Log.d("layout", "reactToTask: $loadingLayout")
         val situation = createSituation(view, loadingLayout).execute()
         var stateLayout = situation.first
         if (stateLayout == null) {
