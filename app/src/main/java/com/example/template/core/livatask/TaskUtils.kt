@@ -1,8 +1,8 @@
 package com.example.template.core.livatask
 
 import com.example.template.connection.ConnectionManager
-import com.example.template.core.Logger
-import com.example.template.core.LoggerInterface
+import com.example.template.core.ErrorObserver
+import com.example.template.core.ErrorObserverInterface
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.experimental.ExperimentalTypeInference
@@ -11,13 +11,13 @@ import kotlin.experimental.ExperimentalTypeInference
 fun <T> liveTask(
     context: CoroutineContext = EmptyCoroutineContext,
     connectionManager: ConnectionManager = ConnectionManager.connectionManager,
-    logger: LoggerInterface = Logger,
+    errorObserver: ErrorObserverInterface = ErrorObserver,
     @BuilderInference block: suspend LiveTaskBuilder<T>.() -> Unit = {}
 ): LiveTask<T> = CoroutineLiveTask(
     context,
     block = block,
     connectionManager = connectionManager,
-    logger = logger
+    errorObserver = errorObserver
 )
 
 @OptIn(ExperimentalTypeInference::class)

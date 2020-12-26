@@ -3,8 +3,8 @@ package com.example.template.core.livatask
 import androidx.lifecycle.LiveData
 import com.example.template.connection.ConnectionManager
 import com.example.template.core.ErrorEvent
+import com.example.template.core.ErrorObserverInterface
 import com.example.template.core.LiveTaskResult
-import com.example.template.core.LoggerInterface
 import com.example.template.core.util.NoConnectionException
 import com.example.template.core.util.ServerException
 import com.example.template.core.withError
@@ -19,7 +19,7 @@ class CoroutineLiveTask<T>(
     private val context: CoroutineContext = EmptyCoroutineContext,
     private val timeoutInMs: Long = DEFAULT_TIMEOUT,
     private val connectionManager: ConnectionManager,
-    private val logger: LoggerInterface,
+    private val errorObserver: ErrorObserverInterface,
     val block: suspend LiveTaskBuilder<T>.() -> Unit = {},
 ) : BaseLiveTask<T>() {
 
@@ -32,7 +32,7 @@ class CoroutineLiveTask<T>(
             val taskResult = it.result()
             if (taskResult is LiveTaskResult.Error) {
                 taskResult.withError { exception ->
-                    logger.notifyError(ErrorEvent((exception)))
+                    errorObserver.notifyError(ErrorEvent((exception)))
 
                     val isNotAuthorized =
                         (exception is ServerException && exception.meta.statusCode == 401) ||

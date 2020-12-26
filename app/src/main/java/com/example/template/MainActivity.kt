@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.provider.Settings
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
-import com.example.template.core.Logger
+import com.example.template.core.ErrorObserver
 import com.example.template.core.util.NoConnectionException
 import com.example.template.core.util.NoInternetException
 import com.example.template.core.util.ServerException
@@ -22,7 +22,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         DataBindingUtil.setContentView<ActivityMainBinding>(this, R.layout.activity_main)
 
-        Logger.watchDistinct(this) {
+        ErrorObserver.watchDistinct(this) {
             val isNotAuthorized = (it.exception is ServerException &&
                     it.exception.meta.statusCode == 401) ||
                     (it.exception is HttpException && it.exception.code() == 401)
@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        Logger.watch(this) {
+        ErrorObserver.watch(this) {
             val isNotAuthorized = (it.exception is ServerException &&
                     it.exception.meta.statusCode == 401) ||
                     (it.exception is HttpException && it.exception.code() == 401)
@@ -57,10 +57,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-
-
     }
-
 
     private fun unauthorizedDialog() {
         val dialog = MaterialAlertDialogBuilder(this)

@@ -2,6 +2,7 @@ package com.example.template.home.ui.viewmodel
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
+import com.example.template.core.bindingadapter.ProgressType
 import com.example.template.core.livatask.combinedTask
 import com.example.template.core.livatask.liveTask
 import com.example.template.home.domain.*
@@ -16,6 +17,7 @@ class HomeViewModel @ViewModelInject constructor(
 ) : ViewModel() {
 
     val users = liveTask {
+        loadingViewType(ProgressType.SANDY_CLOCK)
         emitSource(liveDataUseCase(1))
     }
 
