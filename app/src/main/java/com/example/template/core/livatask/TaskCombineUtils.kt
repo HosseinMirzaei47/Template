@@ -1,9 +1,13 @@
 package com.example.template.core.livatask
 
+import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.PRIVATE
 import kotlinx.coroutines.*
 
-internal class CombineRunner(
-    private val liveData: TaskCombiner,
+
+class CombineRunner(
+    @VisibleForTesting(otherwise = PRIVATE)
+    val liveData: TaskCombiner,
     private val block: CombinerBlock,
     private val timeoutInMs: Long = DEFAULT_TIMEOUT,
     private val scope: CoroutineScope,
@@ -27,7 +31,7 @@ internal class CombineRunner(
     }
 
     fun cancel() {
-        cancellationJob = scope.launch(Dispatchers.Main.immediate) {
+        cancellationJob = scope.launch(Dispatchers.IO) {
             delay(timeoutInMs)
             runningJob?.cancel()
             runningJob = null
@@ -35,7 +39,7 @@ internal class CombineRunner(
     }
 }
 
-internal class CombinerBuilderImpl(
+class CombinerBuilderImpl(
     private var target: TaskCombiner,
 ) : CombinerBuilder {
 

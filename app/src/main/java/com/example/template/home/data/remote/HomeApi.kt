@@ -6,7 +6,7 @@ import retrofit2.http.GET
 import retrofit2.http.Query
 
 interface HomeApi {
-    @GET("users")
+    @GET("users?delay=2")
     suspend fun getUsers(
         @Query("page") page: Int,
     ): Response<UserRes>

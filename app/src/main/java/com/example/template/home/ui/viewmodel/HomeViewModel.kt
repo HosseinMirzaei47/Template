@@ -11,27 +11,31 @@ class HomeViewModel @ViewModelInject constructor(
     private val articleUseCase: GetArticleUseCase,
     private val commentUseCase: GetCommentUseCase,
     flowUseCase: GetUserFlowUseCase,
-    testUseCase: TestUseCase,
-    liveDataUseCase: GetUserUseCaseLiveData,
+    testUseCase: TestUseCase
 ) : ViewModel() {
+
+
+    init {
+
+    }
 
     // حالت سینتکس قبلی با قابلیت emit های چندگانه
     val user1 = liveTask {
-        emitSource(liveDataUseCase(2))
+        emit(useCase(1))
     }
-
     // حالت استفاده از flow
     val user2 = flowUseCase.asLiveTask(5)
 
     // حالت استفاده ی معمولی به صورت سینتکس جدید
     val user3 = testUseCase.asLiveTask(5)
 
+    val combinedTasks = combinedTask(user1, user2, user3)
 
-    val user4 = liveTask {
-        emit(useCase(4))
+    val articles = liveTask {
+        emit(articleUseCase(1))
     }
 
-
-    val combinedTasks = combinedTask(user1, user2, user3, user4)
-
+    val comments = liveTask {
+        emit(commentUseCase("1"))
+    }
 }

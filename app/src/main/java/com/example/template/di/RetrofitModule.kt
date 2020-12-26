@@ -45,11 +45,12 @@ object RetrofitModule {
     @Singleton
     @Provides
     fun provideRetrofit(
+        okHttpClient: OkHttpClient
     ): Retrofit =
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(MoshiConverterFactory.create())
-            .client(provideOkHttpClient(provideLoggingInterceptor()))
+            .client(okHttpClient)
             .build()
 
     @Singleton
