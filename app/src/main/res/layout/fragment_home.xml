@@ -11,7 +11,7 @@
 
         <variable
             name="type"
-            type="com.example.template.core.bindingadapter.Type" />
+            type="com.example.template.core.bindingadapter.ProgressType" />
 
     </data>
 
@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
+        <!--when bind layout with type, Priority is given to layout-->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constrant1"
             android:layout_width="match_parent"
@@ -29,7 +29,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             bind:reactToTask="@{vm.user1.asLiveData()}"
-            bind:type="@{type.LINEAR}">
+            bind:layout="@{@layout/loading_linear}"
+            bind:type="@{type.INDICATOR}">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -40,7 +41,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constrant1"
-            bind:reactToTask="@{vm.user2.asLiveData()}"
+            bind:reactToTask="@{vm.user1.asLiveData()}"
             bind:type="@{type.SANDY_CLOCK}">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -52,11 +53,12 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constrant2"
-            bind:reactToTask="@{vm.user3.asLiveData()}"
-            bind:type="@{type.CIRCULAR}">
+            bind:reactToTask="@{vm.user1.asLiveData()}"
+            bind:type="@{type.BOUNCING}">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <!--if you bind layout, you should handle loading and error states-->
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constrant4"
             android:layout_width="match_parent"
@@ -64,8 +66,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constrant3"
-            bind:reactToTask="@{vm.user4.asLiveData()}"
-            bind:type="@{type.BOUNCING}">
+            bind:layout="@{@layout/loading_circular}"
+            bind:reactToTask="@{vm.user1.asLiveData()}">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -88,9 +90,10 @@
             android:text="@string/submit"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
+            bind:layout="@{@layout/loading_indicator}"
             app:layout_constraintTop_toBottomOf="@id/guideline"
             bind:reactToTask="@{vm.combinedTasks.asLiveData()}"
-            bind:type="@{type.INDICATOR}" />
+            bind:type="@{type.BLUR_CIRCULAR}" />
 
         <Button
             android:id="@+id/gotonext"
