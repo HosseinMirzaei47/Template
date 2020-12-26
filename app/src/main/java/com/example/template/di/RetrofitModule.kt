@@ -54,7 +54,7 @@ object RetrofitModule {
 
     @Singleton
     @Provides
-    fun provideUserApi(retrofit: Retrofit) = retrofit.create(HomeApi::class.java)
+    fun provideUserApi(retrofit: Retrofit): HomeApi = retrofit.create(HomeApi::class.java)
 
     @Singleton
     @Provides

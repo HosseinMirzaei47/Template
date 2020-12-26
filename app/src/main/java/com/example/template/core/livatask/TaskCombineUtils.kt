@@ -1,5 +1,6 @@
 package com.example.template.core.livatask
 
+import com.example.template.core.bindingadapter.ProgressType
 import kotlinx.coroutines.*
 
 internal class CombineRunner(
@@ -44,6 +45,10 @@ internal class CombinerBuilderImpl(
 
     override fun cancelable(bool: Boolean) {
         target.cancelable(bool)
+    }
+
+    override fun loadingViewType(type: ProgressType) {
+        target.loadingViewType = type
     }
 
     override fun retryable(bool: Boolean) {
