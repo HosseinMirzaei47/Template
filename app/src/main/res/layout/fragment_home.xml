@@ -9,10 +9,6 @@
             name="vm"
             type="com.example.template.home.ui.viewmodel.HomeViewModel" />
 
-        <variable
-            name="type"
-            type="com.example.template.core.bindingadapter.ProgressType" />
-
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -28,8 +24,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            bind:reactToTask="@{vm.user1.asLiveData()}"
-            bind:layout="@{@layout/loading_linear}">
+            bind:layout="@{@layout/loading_linear}"
+            bind:reactToTask="@{vm.users.asLiveData()}">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -40,7 +36,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constrant1"
-            bind:reactToTask="@{vm.user1.asLiveData()}">
+            bind:reactToTask="@{vm.users.asLiveData()}">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -51,7 +47,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constrant2"
-            bind:reactToTask="@{vm.user1.asLiveData()}">
+            bind:reactToTask="@{vm.users.asLiveData()}">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -63,7 +59,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/constrant3"
             bind:layout="@{@layout/loading_circular}"
-            bind:reactToTask="@{vm.user1.asLiveData()}">
+            bind:reactToTask="@{vm.users.asLiveData()}">
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -86,10 +82,9 @@
             android:text="@string/submit"
             android:textColor="#FFFFFF"
             android:textSize="14sp"
-            bind:layout="@{@layout/loading_indicator}"
             app:layout_constraintTop_toBottomOf="@id/guideline"
-            bind:reactToTask="@{vm.combinedTasks.asLiveData()}"
-            bind:type="@{type.BLUR_CIRCULAR}" />
+            bind:layout="@{@layout/loading_indicator}"
+            bind:reactToTask="@{vm.combinedTasks.asLiveData()}" />
 
         <Button
             android:id="@+id/gotonext"

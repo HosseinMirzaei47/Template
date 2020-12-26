@@ -37,6 +37,11 @@ class HomeFragment : Fragment() {
     }
 
     private fun setOnClicks() {
+
+
+        viewModel.users
+
+
         binding.gotonext.setOnClickListener {
             findNavController().navigate(HomeFragmentDirections.actionHomeFragmentToUiSampleSelectorFragment())
         }
