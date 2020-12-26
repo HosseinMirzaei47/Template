@@ -82,32 +82,32 @@ class IsNotConstrainLayout(val view: View, val layout: Int) : Situation {
 }
 
 class SituationFactory() {
-    fun createSituation(view: View, layout: Int): Situation =
-        when (view) {
-            is ConstraintLayout ->
-                IsConstrainLayout(view, view, layout)
+    private fun createSituation(view: View, layout: Int): Situation = when (view) {
+        is ConstraintLayout ->
+            IsConstrainLayout(view, view, layout)
 
-            else -> {
-                if (view.parent is ConstraintLayout)
-                    IsConstrainLayout(view.parent as ConstraintLayout, view, layout)
-                else
-                    IsNotConstrainLayout(view, layout)
-            }
+        else -> {
+            if (view.parent is ConstraintLayout)
+                IsConstrainLayout(view.parent as ConstraintLayout, view, layout)
+            else
+                IsNotConstrainLayout(view, layout)
         }
+    }
 
     fun executeState(
         view: View,
         progressType: ProgressType?,
         layout: Int?,
+        loadingViewType: ProgressType?,
     ): Pair<View, Any> {
-        val loadingLayout: Int = layout ?: when (progressType) {
+        val loadingLayout: Int = layout ?: when (progressType ?: loadingViewType) {
             ProgressType.INDICATOR -> R.layout.loading_indicator
             ProgressType.SANDY_CLOCK -> R.layout.loading_sandy_clock
             ProgressType.LINEAR -> R.layout.loading_linear
             ProgressType.CIRCULAR -> R.layout.loading_circular
             ProgressType.BOUNCING -> R.layout.loading_bouncing
             ProgressType.BLUR_CIRCULAR -> R.layout.loading_blur_circular
-            else -> R.layout.loading_sandy_clock
+            else -> R.layout.loading_circular
         }
         val situation = createSituation(view, loadingLayout).execute()
         var stateLayout = situation.first
@@ -118,5 +118,4 @@ class SituationFactory() {
         val parent = situation.second
         return Pair(stateLayout, parent)
     }
-
 }

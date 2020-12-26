@@ -1,13 +1,10 @@
 package com.example.template.core.livatask
 
-import androidx.annotation.VisibleForTesting
-import androidx.annotation.VisibleForTesting.PRIVATE
+import com.example.template.core.bindingadapter.ProgressType
 import kotlinx.coroutines.*
 
-
-class CombineRunner(
-    @VisibleForTesting(otherwise = PRIVATE)
-    val liveData: TaskCombiner,
+internal class CombineRunner(
+    private val liveData: TaskCombiner,
     private val block: CombinerBlock,
     private val timeoutInMs: Long = DEFAULT_TIMEOUT,
     private val scope: CoroutineScope,
@@ -31,7 +28,7 @@ class CombineRunner(
     }
 
     fun cancel() {
-        cancellationJob = scope.launch(Dispatchers.IO) {
+        cancellationJob = scope.launch(Dispatchers.Main.immediate) {
             delay(timeoutInMs)
             runningJob?.cancel()
             runningJob = null
@@ -39,7 +36,7 @@ class CombineRunner(
     }
 }
 
-class CombinerBuilderImpl(
+internal class CombinerBuilderImpl(
     private var target: TaskCombiner,
 ) : CombinerBuilder {
 
@@ -48,6 +45,10 @@ class CombinerBuilderImpl(
 
     override fun cancelable(bool: Boolean) {
         target.cancelable(bool)
+    }
+
+    override fun loadingViewType(type: ProgressType) {
+        target.loadingViewType = type
     }
 
     override fun retryable(bool: Boolean) {

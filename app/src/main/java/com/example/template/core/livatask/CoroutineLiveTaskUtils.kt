@@ -4,6 +4,7 @@ import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import com.example.template.core.LiveTaskResult
+import com.example.template.core.bindingadapter.ProgressType
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import kotlin.coroutines.CoroutineContext
@@ -93,6 +94,10 @@ internal class LiveTaskBuilderImpl<T>(
     override fun retryable(bool: Boolean) {
         target.retryable(bool)
     }
+
+    override fun loadingViewType(type: ProgressType) {
+        target.loadingViewType = type
+    }
 }
 
 internal class Emitted(
@@ -124,4 +129,5 @@ internal class Emitted(
         }
     }
 }
+
 internal typealias Block<T> = suspend LiveTaskBuilder<T>.() -> Unit

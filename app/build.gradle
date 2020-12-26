@@ -40,15 +40,15 @@ android {
 
     // Specifies one flavor dimension.
     flavorDimensions "version"
-    buildTypes {
-        productFlavors {
-            webApi {
-                dimension "version"
-            }
-            mock {
-                dimension "version"
-            }
+    productFlavors {
+        webApi {
+            dimension "version"
         }
+        mock {
+            dimension "version"
+        }
+    }
+    buildTypes {
         debug {
             buildConfigField 'String', 'ENVIRONMENT', '"FAKE"'
         }
