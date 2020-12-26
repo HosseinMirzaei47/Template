@@ -3,6 +3,7 @@ package com.example.template.core.usecases
 import com.example.template.core.LiveTaskResult
 import com.example.template.testutils.MainCoroutineRule
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers
 import org.junit.Assert.assertThat
@@ -10,10 +11,12 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class CoroutineUseCaseTest {
 
 
     // Overrides Dispatchers.Main used in Coroutines
+
     @get:Rule
     var coroutineRule = MainCoroutineRule()
 

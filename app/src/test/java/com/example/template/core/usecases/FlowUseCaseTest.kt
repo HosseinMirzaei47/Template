@@ -15,6 +15,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@ExperimentalCoroutinesApi
 class FlowUseCaseTest {
 
     // Overrides Dispatchers.Main used in Coroutines
@@ -30,7 +31,6 @@ class FlowUseCaseTest {
         exceptionUseCase = ExceptionUseCase(testDispatcher)
     }
 
-    @ExperimentalCoroutinesApi
     @Test
     fun `exception emits Result#Error`() = runBlocking {
 

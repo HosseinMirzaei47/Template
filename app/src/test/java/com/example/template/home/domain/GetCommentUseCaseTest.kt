@@ -7,6 +7,7 @@ import com.example.template.home.data.servicemodels.Comment
 import com.example.template.testutils.MainCoroutineRule
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -15,6 +16,7 @@ import org.junit.Test
 
 class GetCommentUseCaseTest {
 
+    @ExperimentalCoroutinesApi
     @get:Rule
     var coroutineRule = MainCoroutineRule()
 

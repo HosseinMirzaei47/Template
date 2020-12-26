@@ -8,6 +8,7 @@ import com.example.template.home.domain.*
 import com.example.template.testutils.MainCoroutineRule
 import io.mockk.MockKAnnotations
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
@@ -62,7 +63,8 @@ class HomeViewModelTest {
         coEvery { getUserUseCase(1) } returns LiveTaskResult.Success(userRes)
         coEvery { getCommentUseCase("1") } returns LiveTaskResult.Success(comments)
         coEvery { getArticleUseCase(1) } returns LiveTaskResult.Success(articles)
-        coEvery { getUserFlowUseCase.asLiveTask(5) } returns userFlow
+        every { getUserFlowUseCase.asLiveTask(5) } returns userFlow
+        println(getUserFlowUseCase.asLiveTask(5).result())
 
         homeViewModel = HomeViewModel(
             getUserUseCase,
@@ -95,12 +97,12 @@ class HomeViewModelTest {
         assertTrue((comments.result() as LiveTaskResult.Success).data.size == 4)
     }
 
-    /*@Test
+    @Test
     fun `Verify Get User Flow`() = runBlocking {
         val userFlow = homeViewModel.user2.run()
         delay(200L)
         assertTrue(userFlow.result() is LiveTaskResult.Success)
-    }*/
+    }
 
     private fun initGetUserUseCase() {
         userRes =

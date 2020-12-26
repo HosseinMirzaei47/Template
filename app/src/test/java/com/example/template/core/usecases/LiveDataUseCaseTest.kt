@@ -1,19 +1,21 @@
 package com.example.template.core.usecases
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.liveData
 import com.example.template.core.LiveTaskResult
 import com.example.template.testutils.MainCoroutineRule
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.CoreMatchers
-import org.junit.Assert
+import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class LiveTaskUseCaseTest {
+class LiveDataUseCaseTest {
+
     @get:Rule
     var coroutineRule = MainCoroutineRule()
 
@@ -24,27 +26,19 @@ class LiveTaskUseCaseTest {
     @Before
     fun setUp() {
         exceptionUseCase = ExceptionUseCase(testDispatcher)
-
-
     }
 
     @Test
     fun `exception emits Result#Error`() = runBlocking {
-
-        val result = exceptionUseCase.asLiveTask(Unit).run()
-        delay(100L)
-        Assert.assertThat(
-            result.result(),
-            CoreMatchers.instanceOf(LiveTaskResult.Error::class.java)
-        )
+        val result = exceptionUseCase(Unit)
+        assertThat(result.value, CoreMatchers.instanceOf(LiveTaskResult.Error::class.java))
     }
 
     class ExceptionUseCase(dispatcher: CoroutineDispatcher) :
-        LiveTaskUseCase<Unit, Unit>(dispatcher) {
-        override suspend fun execute(params: Unit) {
-            throw Exception("Test exception")
+        LiveDataUseCase<Unit, Unit>(dispatcher) {
+        override fun execute(parameters: Unit): LiveData<Unit> = liveData {
+            throw Exception("Test Exception")
         }
 
     }
-
 }

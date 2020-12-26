@@ -6,9 +6,9 @@ import com.example.template.core.livatask.CoroutineLiveTask
 import com.example.template.core.livatask.LiveTaskBuilder
 import com.example.template.core.livatask.TaskRunner
 import com.example.template.core.livatask.liveTask
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.runBlocking
+import com.example.template.testutils.getOrAwaitValue
+import kotlinx.coroutines.*
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -55,19 +55,25 @@ class TaskRunnerTest {
         taskRunner1.maybeRun()
     }
 
-//    @Test
-//    fun `test cancel method of runner`() {
-//
-//        liveTask2.run()
-//        runBlocking {
-//            taskRunner2.cancel()
-//            delay(200L)
-//        }
-//        Assert.assertTrue(
-//            (liveTask2.asLiveData().getOrAwaitValue()
-//                .result() as LiveTaskResult.Error).exception is CancellationException
-//        )
-//    }
+    @Test
+    fun `test cancel method of runner`() = runBlocking<Unit> {
+
+        liveTask2.run()
+        launch(Dispatchers.Main.immediate) {
+            withTimeout(300L) {
+                if (isActive) cancel()
+                taskRunner2.cancel()
+                delay(200L)
+                assertTrue(
+                    (liveTask2.asLiveData().getOrAwaitValue()
+                        .result() as LiveTaskResult.Error).exception is CancellationException
+                )
+            }
+        }
+
+
+    }
+
 
 }
 

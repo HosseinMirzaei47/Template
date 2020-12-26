@@ -16,13 +16,13 @@ class HomeViewModel @ViewModelInject constructor(
 
 
     init {
+
     }
 
     // حالت سینتکس قبلی با قابلیت emit های چندگانه
     val user1 = liveTask {
         emit(useCase(1))
     }
-
     // حالت استفاده از flow
     val user2 = flowUseCase.asLiveTask(5)
 

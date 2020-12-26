@@ -6,8 +6,7 @@ import com.example.template.core.livatask.CoroutineLiveTask
 import com.example.template.core.livatask.TaskCombiner
 import com.example.template.core.livatask.liveTask
 import com.example.template.testutils.getOrAwaitValue
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -75,21 +74,25 @@ class TaskCombinerTest {
         }
         assertTrue(result.result() is LiveTaskResult.Success)
     }
-/*
+
     @Test
-    fun `test cancel method _ result error must be cancellation exception`() {
+    fun `test cancel method _ result error must be cancellation exception`() = runBlocking<Unit> {
         taskCombiner.run()
 
-        runBlocking {
-            taskCombiner.cancel()
-            delay(100L)
-            assertTrue(
-                (taskCombiner.getOrAwaitValue()
-                    .result() as LiveTaskResult.Error).exception is CancellationException
-            )
+        launch(Dispatchers.Main.immediate) {
+            withTimeout(200L) {
+                if (isActive) cancel()
+                taskCombiner.cancel()
+                delay(150L)
+                assertTrue(
+                    (taskCombiner.result() as LiveTaskResult.Error).exception is CancellationException
+                )
+
+            }
 
         }
-    }*/
+
+    }
 
     @Test
     fun `test apply result of live data`() {
