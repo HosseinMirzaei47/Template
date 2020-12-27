@@ -9,7 +9,7 @@ import androidx.databinding.BindingAdapter
 import com.example.template.core.LiveTaskResult
 import com.example.template.core.livatask.LiveTask
 
-@BindingAdapter(value = ["bind:reactToTask", "bind:type", "bind:layout"], requireAll = false)
+@BindingAdapter(value = ["reactToTask", "type", "layout"], requireAll = false)
 fun <T> View.reactToTask(
     liveTask: LiveTask<*>?,
     progressType: ProgressType?,
@@ -18,39 +18,24 @@ fun <T> View.reactToTask(
     val loadingViewType = liveTask?.loadingViewType
     when (liveTask?.result()) {
         is LiveTaskResult.Success -> {
-            val state = SituationFactory().executeState(
-                this,
-                progressType,
-                layout,
-                loadingViewType
-            )
+            val viewParent = getViewParent(this, progressType, layout, loadingViewType)
             if (layout == null) {
                 progressType ?: loadingViewType.loading()
-                    .success(state.first, state.second as ViewGroup, liveTask)
+                    .success(viewParent.view, viewParent.parent as ViewGroup, liveTask)
             }
         }
         is LiveTaskResult.Loading -> {
-            val state = SituationFactory().executeState(
-                this,
-                progressType,
-                layout,
-                loadingViewType
-            )
+            val viewParent = getViewParent(this, progressType, layout, loadingViewType)
             if (layout == null) {
                 progressType ?: loadingViewType.loading()
-                    .loading(state.first, state.second as ViewGroup, liveTask)
+                    .loading(viewParent.view, viewParent.parent as ViewGroup, liveTask)
             }
         }
         is LiveTaskResult.Error -> {
-            val state = SituationFactory().executeState(
-                this,
-                progressType,
-                layout,
-                loadingViewType
-            )
+            val viewParent = getViewParent(this, progressType, layout, loadingViewType)
             if (layout == null) {
                 progressType ?: loadingViewType.loading()
-                    .error(state.first, state.second as ViewGroup, liveTask)
+                    .error(viewParent.view, viewParent.parent as ViewGroup, liveTask)
             }
         }
     }
