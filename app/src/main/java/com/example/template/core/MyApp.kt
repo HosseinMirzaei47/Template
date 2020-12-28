@@ -10,6 +10,12 @@ class MyApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        /*AABuilder.create()
+            .setErrorMapper(DefaultErrorMapper)
+            .serErrorObserver(ErrorObserver)*/
+
+        DefaultErrorMapper.setMapper(DefaultErrorMapper)
         ConnectionManager.initialize(this)
     }
 }

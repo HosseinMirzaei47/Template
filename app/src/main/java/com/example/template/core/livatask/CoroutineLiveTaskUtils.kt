@@ -3,6 +3,8 @@ package com.example.template.core.livatask
 import androidx.annotation.MainThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import com.example.template.core.DefaultErrorMapper
+import com.example.template.core.ErrorMapper
 import com.example.template.core.LiveTaskResult
 import com.example.template.core.bindingadapter.ProgressType
 import kotlinx.coroutines.*
@@ -45,8 +47,9 @@ internal class TaskRunner<T>(
 
 internal class LiveTaskBuilderImpl<T>(
     private var target: CoroutineLiveTask<T>,
-    context: CoroutineContext
+    context: CoroutineContext,
 ) : LiveTaskBuilder<T> {
+    private var errorMapper: ErrorMapper = DefaultErrorMapper.getMapper()
 
     override val latestValue: LiveTaskResult<T>?
         get() = target.value?.result()
@@ -67,12 +70,14 @@ internal class LiveTaskBuilderImpl<T>(
                 target.applyResult(LiveTaskResult.Loading)
             }
             .catch { e ->
-                target.applyResult(LiveTaskResult.Error(Exception(e)))
+                target.applyResult(getError(e))
             }
             .collect {
                 target.applyResult(LiveTaskResult.Success(it))
             }
     }
+
+    private fun getError(e: Throwable) = LiveTaskResult.Error(errorMapper.map((Exception(e))))
 
     override suspend fun emitSource(source: LiveData<LiveTaskResult<T>>): DisposableHandle =
         withContext(coroutineContext) {
@@ -97,6 +102,10 @@ internal class LiveTaskBuilderImpl<T>(
 
     override fun loadingViewType(type: ProgressType) {
         target.loadingViewType = type
+    }
+
+    override fun errorMapper(errorMapper: ErrorMapper) {
+        this.errorMapper = errorMapper
     }
 }
 

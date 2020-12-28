@@ -27,33 +27,6 @@ class CoroutineLiveTask<T>(
     var autoRetry = true
     private var emittedSource: Emitted? = null
 
-    init {
-        this.addSource(this) {
-            val taskResult = it.result()
-            if (taskResult is LiveTaskResult.Error) {
-                taskResult.withError { exception ->
-                    errorObserver.notifyError(ErrorEvent((exception)))
-
-                    val isNotAuthorized =
-                        (exception is ServerException && exception.meta.statusCode == 401) ||
-                                (exception is HttpException && exception.code() == 401)
-
-                    when (exception) {
-                        is NoConnectionException -> {
-                            if (autoRetry) retryOnNetworkBack()
-                        }
-                        else -> {
-                            if (retryCounts <= retryAttempts && !isNotAuthorized && exception !is CancellationException) {
-                                retryCounts++
-                                this.retry()
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
     override fun run(): CoroutineLiveTask<T> {
         applyResult(LiveTaskResult.Loading)
         val supervisorJob = SupervisorJob(context[Job])
@@ -113,11 +86,38 @@ class CoroutineLiveTask<T>(
 
     fun applyResult(result: LiveTaskResult<T>?) {
         this.latestState = result
-        postValue(this)
+        function()
     }
 
     fun applyResult(task: LiveTask<T>) {
         this.latestState = task.result() as LiveTaskResult<T>?
+        function()
+    }
+
+    private fun function() {
         postValue(this)
+        val taskResult = result()
+        if (taskResult is LiveTaskResult.Error) {
+            taskResult.withError { exception ->
+                errorObserver.notifyError(ErrorEvent((exception)))
+
+                val isNotAuthorized =
+                    (exception is ServerException && exception.meta.statusCode == 401) ||
+                            (exception is HttpException && exception.code() == 401)
+
+                when (exception) {
+                    is NoConnectionException -> {
+                        if (autoRetry) retryOnNetworkBack()
+                    }
+                    else -> {
+                        if (retryCounts <= retryAttempts && !isNotAuthorized && exception !is CancellationException) {
+                            retryCounts++
+                            this.retry()
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }
